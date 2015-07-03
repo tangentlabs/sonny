@@ -1,4 +1,4 @@
-import utils
+# import utils
 
 
 class BaseLoader(object):
@@ -7,7 +7,6 @@ class BaseLoader(object):
         pass
 
     # @utils.not_implemented
-    @utils.log_call
     def get_all_data(self, filename):
         return [{}]
 
