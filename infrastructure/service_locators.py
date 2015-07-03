@@ -7,7 +7,7 @@ class BaseServiceLocator(object):
         pass
 
     @utils.not_implemented
-    def locate(self, service, args, kwrags):
+    def locate(self):
         pass
 
 
@@ -15,8 +15,8 @@ class SimpleServiceLocator(object):
     def __init__(self):
         pass
 
-    def locate(self, service, args, kwargs):
-        return service(*args, **kwargs)
+    def locate(self, service):
+        return service
 
 
 class MockServiceLocator(object):
@@ -28,10 +28,10 @@ class MockServiceLocator(object):
 
         return self
 
-    def locate(self, service, args, kwargs):
+    def locate(self, service):
         try:
             replacement = self.replacements[service]
         except (TypeError, KeyError):
             replacement = service
 
-        return replacement(*args, **kwargs)
+        return replacement
