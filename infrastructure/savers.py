@@ -1,16 +1,18 @@
-# import utils
+import MySQLdb
+
+import utils
 
 
 class BaseSaver(object):
-    # @utils.not_implemented
+    @utils.not_implemented
     def __init__(self, *args, **kwargs):
         pass
 
-    # @utils.not_implemented
+    @utils.not_implemented
     def save(self, data):
         pass
 
-    # @utils.not_implemented
+    @utils.not_implemented
     def save_no_data(self):
         pass
 
@@ -19,7 +21,24 @@ class BaseSaver(object):
 
 
 class DbSaver(BaseSaver):
-    pass
+    def __init__(self, destination):
+        self.destination = destination
+        with open(destination['file'], 'rb') as _file:
+            self.query = _file.read()
+        self.connection = MySQLdb.connect(
+            host=destination['host'],
+            user=destination['username'],
+            passwd=destination['password'],
+            db=destination['db'],
+            port=int(destination['port']))
+        self.cursor = self.connection.cursor()
+
+    def save(self, data):
+        self.cursor.executemany(self.query, data)
+        self.connection.commit()
+
+    def save_no_data(self):
+        self.save([])
 
 
 class PrintSaver(BaseSaver):
