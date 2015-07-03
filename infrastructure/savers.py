@@ -20,3 +20,16 @@ class BaseSaver(object):
 
 class DbSaver(BaseSaver):
     pass
+
+
+class PrintSaver(BaseSaver):
+    def __init__(self, *args, **kwargs):
+        pass
+
+    def save(self, data):
+        print 'Save with data'
+        for datum in data:
+            print datum
+
+    def save_no_data(self):
+        print 'Save with no data'
