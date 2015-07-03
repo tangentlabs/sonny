@@ -10,6 +10,10 @@ class Pipeline(object):
     def taking_input(cls, func):
         return WithInputOperation(func)
 
+    @classmethod
+    def map(cls, func):
+        return MapOperation(None, cls.taking_input(func))
+
 
 class BaseOperation(object):
     def pipe(self, func):
@@ -20,6 +24,9 @@ class BaseOperation(object):
 
     def map(self, operation):
         return MapOperation(self, operation)
+
+    def tee(self, *operations):
+        return FanOutOperation(self, *operations)
 
     @utils.not_implemented
     def with_no_input(self):
@@ -117,3 +124,37 @@ class MapOperation(BaseOperation):
         mapped_operation_str = str(self.mapped_operation)
         mapped_operation_str = '\n'.join('*%s' % line for line in mapped_operation_str.split('\n'))
         return '%s\noperation:\n%s\nmapped_operation:\n%s\n' % (self.__class__.__name__, operation_str, mapped_operation_str)
+
+
+class FanOutOperation(BaseOperation):
+    def __init__(self, start_operation, *operations):
+        self.start_operation = start_operation
+        self.operations = operations
+        self._merge_fanout_operations()
+
+    def _merge_fanout_operations(self):
+        if not isinstance(self.start_operation, FanOutOperation):
+            return
+
+        start_operation = self.start_operation
+        self.start_operation = start_operation.start_operation
+        self.operations = start_operation.operations + self.operations
+
+    def with_no_input(self):
+        values = self.start_operation.with_no_input()
+        return self.taking_input(values)
+
+    def taking_input(self, values):
+        values = [
+            operation.taking_input(values)
+            for operation in self.operations
+        ]
+
+        return values[0]
+
+    def __str__(self):
+        start_operation_str = str(self.start_operation)
+        start_operation_str = '\n'.join('*%s' % line for line in start_operation_str.split('\n'))
+        operations_str = [str(operation) for operation in self.operations]
+        operations_str = '\n'.join('\n'.join('*%s' % line for line in operation_str.split('\n')) for operation_str in operations_str)
+        return '%s\nstart_operation:\n%s\noperations:\n%s\n' % (self.__class__.__name__, start_operation_str, operations_str)
