@@ -1,4 +1,4 @@
-import utils
+# import utils
 
 
 class BaseFileFetcher(object):
@@ -7,7 +7,6 @@ class BaseFileFetcher(object):
         pass
 
     # @utils.not_implemented
-    @utils.log_call
     def fetch_files(self, filenames):
         return filenames
 

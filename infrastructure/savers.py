@@ -1,4 +1,4 @@
-import utils
+# import utils
 
 
 class BaseSaver(object):
@@ -7,12 +7,10 @@ class BaseSaver(object):
         pass
 
     # @utils.not_implemented
-    @utils.log_call
     def save(self, data):
         pass
 
     # @utils.not_implemented
-    @utils.log_call
     def save_no_data(self):
         pass
 

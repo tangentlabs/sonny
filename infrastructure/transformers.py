@@ -1,8 +1,4 @@
-import utils
-
-
 def keep_keys(keys):
-    @utils.log_call
     def do_keep_keys(inputs):
         return (
             {
@@ -16,7 +12,6 @@ def keep_keys(keys):
 
 
 def keys_to_tuple(keys):
-    @utils.log_call
     def do_keys_to_tuple(inputs):
         return (
             tuple(
