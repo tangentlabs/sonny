@@ -2,9 +2,10 @@ import tempfile
 from ftplib import FTP
 
 import utils
+from mockable import Mockable
 
 
-class BaseFileFetcher(object):
+class BaseFileFetcher(Mockable):
     @utils.not_implemented
     def __init__(self, *args, **kwargs):
         pass
