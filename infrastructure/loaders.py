@@ -1,9 +1,10 @@
 import csv
 
 import utils
+from mockable import Mockable
 
 
-class BaseLoader(object):
+class BaseLoader(Mockable):
     @utils.not_implemented
     def __init__(self, *args, **kwargs):
         pass

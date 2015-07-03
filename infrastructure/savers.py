@@ -1,9 +1,10 @@
 import MySQLdb
 
 import utils
+from mockable import Mockable
 
 
-class BaseSaver(object):
+class BaseSaver(Mockable):
     @utils.not_implemented
     def __init__(self, *args, **kwargs):
         pass

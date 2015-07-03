@@ -1,9 +1,10 @@
 import os
 
 import utils
+from mockable import Mockable
 
 
-class BaseFileDeleter(object):
+class BaseFileDeleter(Mockable):
     @utils.not_implemented
     def __init__(self, *args, **kwargs):
         pass
