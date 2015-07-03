@@ -8,11 +8,11 @@ class Pipeline(object):
 
     @classmethod
     def taking_input(cls, func):
-        return WithInputOperation(func)
+        return PipeOperation(None, WithInputOperation(func))
 
     @classmethod
-    def map(cls, func):
-        return MapOperation(None, cls.taking_input(func))
+    def map(cls, operation):
+        return MapOperation(None, operation)
 
 
 class BaseOperation(object):
