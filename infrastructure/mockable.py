@@ -1,6 +1,7 @@
-from context import method_using_current_frame
+from context import method_using_current_frame, context
 
 
+@context.auto_frame_attribute("mock_registry")
 class MockRegistry(object):
     def __init__(self):
         self.mocks = {}

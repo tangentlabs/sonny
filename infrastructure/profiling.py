@@ -2,8 +2,8 @@ import time
 from functools import wraps
 
 import utils
-from context import function_using_current_frame, method_using_current_frame
-from mockable import Mockable
+from context import \
+    function_using_current_frame, method_using_current_frame, context
 
 
 class ProfilerContextManager(object):
@@ -20,7 +20,7 @@ class ProfilerContextManager(object):
         self.profiler.section_end(self.name)
 
 
-class BaseProfiler(Mockable):
+class BaseProfiler(object):
     @utils.not_implemented
     def __init__(self, *args, **kwargs):
         pass
@@ -57,6 +57,7 @@ def profile_method(func):
     return decorated
 
 
+@context.auto_frame_attribute("profiler")
 class SimpleProfiler(BaseProfiler):
     def __init__(self):
         self._profiled = []
