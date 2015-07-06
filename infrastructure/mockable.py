@@ -11,6 +11,11 @@ class MockRegistry(object):
 
         return self
 
+    def register_mocks_using_default_noops(self, *types):
+        for _type in types:
+            mocked = _type._default_noop
+            self.register_mock(_type, mocked)
+
     def should_mock(self, _type):
         mocked = self.mock(_type)
         return _type != mocked
@@ -30,3 +35,7 @@ class Mockable(object):
             return mocked(*args, **kwargs)
         else:
             return object.__new__(cls, *args, **kwargs)
+
+    @classmethod
+    def register_default_noop(cls, _type):
+        cls._default_noop = _type

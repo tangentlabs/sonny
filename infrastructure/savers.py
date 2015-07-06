@@ -48,6 +48,7 @@ class DbSaver(BaseSaver):
         self.save([])
 
 
+@BaseSaver.register_default_noop
 class PrintSaver(BaseSaver):
     def __init__(self, *args, **kwargs):
         pass
