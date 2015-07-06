@@ -7,6 +7,8 @@ class Context(object):
     def __init__(self):
         self.job_stack = []
         self.job_attribute_factories = {}
+        self.section_wrappers = []
+        self.method_section_wrappers = []
 
     def new_job(self):
         job = Job(self)
@@ -35,6 +37,34 @@ class Context(object):
             return type_or_factory
 
         return decorator
+
+    def auto_section_wrapper(self, wrapper):
+        self.section_wrappers.append(wrapper)
+
+        return wrapper
+
+    def auto_method_section_wrapper(self, wrapper):
+        self.method_section_wrappers.append(wrapper)
+
+        return wrapper
+
+    def auto_section(self, func):
+        decorated = func
+        for wrapper in self.section_wrappers:
+            decorated = wrapper(decorated)
+
+        decorated = with_new_section(decorated)
+
+        return decorated
+
+    def auto_method_section(self, func):
+        decorated = func
+        for wrapper in self.method_section_wrappers:
+            decorated = wrapper(decorated)
+
+        decorated = with_new_section(decorated)
+
+        return decorated
 
 
 # Global context

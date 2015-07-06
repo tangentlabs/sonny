@@ -2,9 +2,7 @@ import csv
 
 import utils
 from mockable import Mockable
-from context import with_new_section
-from logging import log_method_call
-from profiling import profile_method
+from context import context
 
 
 class BaseLoader(Mockable):
@@ -24,9 +22,7 @@ class CsvLoader(BaseLoader):
     def __init__(self):
         pass
 
-    @with_new_section
-    @profile_method
-    @log_method_call
+    @context.auto_method_section
     def get_all_data(self, filename):
         with open(filename, 'rb') as _file:
             reader = csv.reader(_file, delimiter=',', quotechar='"')

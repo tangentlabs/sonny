@@ -16,9 +16,10 @@ class BaseProfiler(object):
         pass
 
 
+@context.auto_section_wrapper
 def profile(func):
-    @wraps(func)
     @function_using_current_job("profiler")
+    @wraps(func)
     def decorated(profiler, *args, **kwargs):
         with profiler.section(utils.get_callable_name(func)):
             return func(*args, **kwargs)
@@ -26,9 +27,10 @@ def profile(func):
     return decorated
 
 
+@context.auto_method_section_wrapper
 def profile_method(func):
-    @wraps(func)
     @method_using_current_job("profiler")
+    @wraps(func)
     def decorated(self_or_cls, profiler, *args, **kwargs):
         with profiler.section(utils.get_callable_name(func)):
             return func(self_or_cls, *args, **kwargs)
