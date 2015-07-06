@@ -23,16 +23,22 @@ class BaseSaver(Mockable):
 
 
 class DbSaver(BaseSaver):
-    def __init__(self, destination):
+    def __init__(self, db_registry, destination):
+        self.db_registry = db_registry
         self.destination = destination
         with open(destination['file'], 'rb') as _file:
             self.query = _file.read()
+
+        host = db_registry["hosts"][destination["host"]]
+        user = host["users"][destination["user"]]
+        db = host["databases"][destination["db"]]
         self.connection = MySQLdb.connect(
-            host=destination['host'],
-            user=destination['username'],
-            passwd=destination['password'],
-            db=destination['db'],
-            port=int(destination['port']))
+            host=host['host'],
+            port=int(host['port']),
+            user=user['username'],
+            passwd=user['password'],
+            db=db,
+        )
         self.cursor = self.connection.cursor()
 
     @context.auto_method_section
