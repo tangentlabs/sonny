@@ -22,9 +22,8 @@ class MockRegistry(object):
 
 
 class Mockable(object):
-    @method_using_current_frame
-    def __new__(cls, _current_frame, *args, **kwargs):
-        mock_registry = _current_frame.mock_registry
+    @method_using_current_frame("mock_registry")
+    def __new__(cls, mock_registry, *args, **kwargs):
         if mock_registry.should_mock(cls):
             mocked = mock_registry.mock(cls)
             return mocked(*args, **kwargs)
