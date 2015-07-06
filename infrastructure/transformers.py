@@ -1,3 +1,7 @@
+from logging import log_call
+
+
+@log_call
 def keep_keys(keys):
     def do_keep_keys(inputs):
         return (
@@ -11,6 +15,7 @@ def keep_keys(keys):
     return do_keep_keys
 
 
+@log_call
 def keys_to_tuple(keys):
     def do_keys_to_tuple(inputs):
         return (

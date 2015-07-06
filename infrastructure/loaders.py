@@ -2,6 +2,7 @@ import csv
 
 import utils
 from mockable import Mockable
+from logging import log_method_call
 
 
 class BaseLoader(Mockable):
@@ -21,6 +22,7 @@ class CsvLoader(BaseLoader):
     def __init__(self):
         pass
 
+    @log_method_call
     def get_all_data(self, filename):
         with open(filename, 'rb') as _file:
             reader = csv.reader(_file, delimiter=',', quotechar='"')

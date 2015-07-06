@@ -1,7 +1,7 @@
 from functools import wraps
 
 import utils
-from context import function_using_current_frame
+from context import function_using_current_frame, method_using_current_frame
 from mockable import Mockable
 
 
@@ -34,6 +34,17 @@ def log_call(func):
         logger.debug('** Calling: %s with *%s, **%s',
                      utils.get_callable_name(func), args, kwargs)
         return func(*args, **kwargs)
+
+    return decorated
+
+
+def log_method_call(func):
+    @wraps(func)
+    @method_using_current_frame("logger")
+    def decorated(self_or_cls, logger, *args, **kwargs):
+        logger.debug('** Calling: %s with *%s, **%s',
+                     utils.get_callable_name(func), args, kwargs)
+        return func(self_or_cls, *args, **kwargs)
 
     return decorated
 
