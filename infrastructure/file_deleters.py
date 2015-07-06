@@ -2,6 +2,7 @@ import os
 
 import utils
 from mockable import Mockable
+from logging import log_method_call
 
 
 class BaseFileDeleter(Mockable):
@@ -22,6 +23,7 @@ class LocalFileDeleter(BaseFileDeleter):
     def __init__(self):
         pass
 
+    @log_method_call
     def delete_file(self, filename):
         os.remove(filename)
 
@@ -30,5 +32,6 @@ class NoOpFileDeleter(BaseFileDeleter):
     def __init__(self):
         pass
 
+    @log_method_call
     def delete_file(self, filename):
         pass
