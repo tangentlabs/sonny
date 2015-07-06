@@ -3,7 +3,7 @@ from functools import wraps
 
 import utils
 from context import \
-    function_using_current_frame, method_using_current_frame, context
+    function_using_current_job, method_using_current_job, context
 
 
 class ProfilerContextManager(object):
@@ -39,7 +39,7 @@ class BaseProfiler(object):
 
 def profile(func):
     @wraps(func)
-    @function_using_current_frame("profiler")
+    @function_using_current_job("profiler")
     def decorated(profiler, *args, **kwargs):
         with profiler.section(utils.get_callable_name(func)):
             return func(*args, **kwargs)
@@ -49,7 +49,7 @@ def profile(func):
 
 def profile_method(func):
     @wraps(func)
-    @method_using_current_frame("profiler")
+    @method_using_current_job("profiler")
     def decorated(self_or_cls, profiler, *args, **kwargs):
         with profiler.section(utils.get_callable_name(func)):
             return func(self_or_cls, *args, **kwargs)
@@ -57,7 +57,7 @@ def profile_method(func):
     return decorated
 
 
-@context.auto_frame_attribute("profiler")
+@context.auto_job_attribute("profiler")
 class SimpleProfiler(BaseProfiler):
     def __init__(self):
         self._profiled = []

@@ -1,7 +1,7 @@
-from context import method_using_current_frame, context
+from context import method_using_current_job, context
 
 
-@context.auto_frame_attribute("mock_registry")
+@context.auto_job_attribute("mock_registry")
 class MockRegistry(object):
     def __init__(self):
         self.mocks = {}
@@ -28,7 +28,7 @@ class MockRegistry(object):
 
 
 class Mockable(object):
-    @method_using_current_frame("mock_registry")
+    @method_using_current_job("mock_registry")
     def __new__(cls, mock_registry, *args, **kwargs):
         if mock_registry.should_mock(cls):
             mocked = mock_registry.mock(cls)

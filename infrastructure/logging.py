@@ -2,7 +2,7 @@ from functools import wraps
 
 import utils
 from context import \
-    function_using_current_frame, method_using_current_frame, context
+    function_using_current_job, method_using_current_job, context
 
 
 class BaseLogger(object):
@@ -29,7 +29,7 @@ class BaseLogger(object):
 
 def log_call(func):
     @wraps(func)
-    @function_using_current_frame("logger")
+    @function_using_current_job("logger")
     def decorated(logger, *args, **kwargs):
         logger.debug('** Calling: %s with *%s, **%s',
                      utils.get_callable_name(func), args, kwargs)
@@ -40,7 +40,7 @@ def log_call(func):
 
 def log_method_call(func):
     @wraps(func)
-    @method_using_current_frame("logger")
+    @method_using_current_job("logger")
     def decorated(self_or_cls, logger, *args, **kwargs):
         logger.debug('** Calling: %s with *%s, **%s',
                      utils.get_callable_name(func), args, kwargs)
@@ -49,7 +49,7 @@ def log_method_call(func):
     return decorated
 
 
-@context.auto_frame_attribute("logger")
+@context.auto_job_attribute("logger")
 class InMemoryLogger(BaseLogger):
     def __init__(self):
         self._logs = []
