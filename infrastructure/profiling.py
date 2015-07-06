@@ -6,35 +6,14 @@ from context import \
     function_using_current_job, method_using_current_job, context
 
 
-class ProfilerContextManager(object):
-    def __init__(self, profiler, name):
-        self.profiler = profiler
-        self.name = name
-
-    def __enter__(self):
-        self.profiler.section_start(self.name)
-
-        return self.profiler
-
-    def __exit__(self, _type, value, traceback):
-        self.profiler.section_end(self.name)
-
-
 class BaseProfiler(object):
     @utils.not_implemented
     def __init__(self, *args, **kwargs):
         pass
 
     @utils.not_implemented
-    def section_start(self, name):
-        pass
-
-    @utils.not_implemented
-    def section_end(self, name):
-        pass
-
     def section(self, name):
-        return ProfilerContextManager(self, name)
+        pass
 
 
 def profile(func):
@@ -57,20 +36,52 @@ def profile_method(func):
     return decorated
 
 
+class ProfilingSection(object):
+    def __init__(self, profiler, section, name, parent, duration=None):
+        self.profiler = profiler
+        self.section = section
+        self.parent = parent
+        if self.parent:
+            self.parent.profiling_sections.append(self)
+        self.name = name
+        self.duration = duration
+
+        self.profiling_sections = []
+
+    def start(self):
+        self.start_time = time.time()
+
+    def finish(self):
+        self.end_time = time.time()
+        self.duration = self.end_time - self.start_time
+
+    def __enter__(self):
+        self.profiler._push(self)
+        self.start()
+        return self.profiler
+
+    def __exit__(self, _type, value, traceback):
+        self.profiler._pop(self)
+        self.finish()
+
+
 @context.auto_job_attribute("profiler")
 class SimpleProfiler(BaseProfiler):
-    def __init__(self):
-        self._profiled = []
-        self._profiling = []
+    def __init__(self, job):
+        self._job = job
+        self.profiling_section = \
+            ProfilingSection(self, self._job.current_section, "<root>", None)
 
-    def section_start(self, name):
-        profile_data = (name, time.time())
-        self._profiling.append(profile_data)
+    def section(self, name):
+        profiling_section = ProfilingSection(
+            self, self._job.current_section, name, self.profiling_section)
 
-    def section_end(self, expected_name):
-        time_end = time.time()
-        name, time_start = self._profiling.pop()
-        assert name == expected_name
-        duration = time_end - time_start
+        return profiling_section
 
-        self._profiled.append((name, duration))
+    def _push(self, profiling_section):
+        assert profiling_section.parent == self.profiling_section
+        self.profiling_section = profiling_section
+
+    def _pop(self, expected_profiling_section):
+        assert expected_profiling_section == self.profiling_section
+        self.profiling_section = self.profiling_section.parent

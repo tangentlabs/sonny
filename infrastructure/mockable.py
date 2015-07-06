@@ -3,8 +3,9 @@ from context import method_using_current_job, context
 
 @context.auto_job_attribute("mock_registry")
 class MockRegistry(object):
-    def __init__(self):
+    def __init__(self, job):
         self.mocks = {}
+        self._job = job
 
     def register_mock(self, _type, mocked):
         self.mocks[_type] = mocked

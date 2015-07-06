@@ -51,8 +51,9 @@ def log_method_call(func):
 
 @context.auto_job_attribute("logger")
 class InMemoryLogger(BaseLogger):
-    def __init__(self):
+    def __init__(self, job):
         self._logs = []
+        self._job = job
 
     def _log(self, level, message, args, kwargs):
         if args:
@@ -60,7 +61,7 @@ class InMemoryLogger(BaseLogger):
         else:
             log_string = message % kwargs
         log_string = "[%s] %s" % (level, log_string)
-        self._logs.append(log_string)
+        self._logs.append((self._job.current_section.full_name, log_string))
 
     def debug(self, message, *args, **kwargs):
         self._log("DEBUG", message, args, kwargs)
