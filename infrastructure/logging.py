@@ -1,11 +1,11 @@
 from functools import wraps
 
 import utils
-from context import function_using_current_frame, method_using_current_frame
-from mockable import Mockable
+from context import \
+    function_using_current_frame, method_using_current_frame, context
 
 
-class BaseLogger(Mockable):
+class BaseLogger(object):
     @utils.not_implemented
     def __init__(self, *args, **kwargs):
         pass
@@ -49,6 +49,7 @@ def log_method_call(func):
     return decorated
 
 
+@context.auto_frame_attribute("logger")
 class InMemoryLogger(BaseLogger):
     def __init__(self):
         self._logs = []

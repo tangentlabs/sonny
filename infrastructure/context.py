@@ -25,11 +25,22 @@ class Frame(object):
 class Context(object):
     def __init__(self):
         self.frames = []
+        self.frame_attribute_factories = {}
 
     def new_frame(self, frame=None):
         if frame is None:
-            frame = Frame()
+            frame = self.create_frame()
         return ContextContextManager(self, frame)
+
+    def create_frame(self):
+        frame = Frame()
+
+        for attribute_name, attribute_factory in \
+                self.frame_attribute_factories.iteritems():
+            attribute = attribute_factory()
+            setattr(frame, attribute_name, attribute)
+
+        return frame
 
     def _push(self, frame):
         self.frames.append(frame)
@@ -40,6 +51,14 @@ class Context(object):
     @property
     def current_frame(self):
         return self.frames[-1]
+
+    def auto_frame_attribute(self, attribute_name):
+        def decorator(type_or_factory):
+            self.frame_attribute_factories[attribute_name] = type_or_factory
+
+            return type_or_factory
+
+        return decorator
 
 
 # Global context
