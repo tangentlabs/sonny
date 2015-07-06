@@ -26,13 +26,16 @@ class BaseFileFetcher(Mockable):
 
 
 class FtpContextManager(object):
-    def __init__(self, source):
+    def __init__(self, ftp_registry, source):
+        self.ftp_registry = ftp_registry
         self.source = source
         self.ftp = None
 
     def __enter__(self):
-        self.ftp = FTP(self.source['server'])
-        self.ftp.login(self.source['username'], self.source['password'])
+        host = self.ftp_registry["hosts"][self.source["host"]]
+        user = host["users"][self.source["user"]]
+        self.ftp = FTP(host["server"])
+        self.ftp.login(user['username'], user['password'])
 
         return self.ftp
 
@@ -42,12 +45,13 @@ class FtpContextManager(object):
 
 
 class FtpFetcher(BaseFileFetcher):
-    def __init__(self, source):
+    def __init__(self, ftp_registry, source):
+        self.ftp_registry = ftp_registry
         self.source = source
 
     @context.auto_method_section
     def fetch_file(self, filename):
-        with FtpContextManager(self.source) as ftp:
+        with FtpContextManager(self.ftp_registry, self.source) as ftp:
             _, local_filename = tempfile.mkstemp()
             with open(local_filename, 'wb') as local_file:
                 ftp.retrbinary('RETR %s' % filename, local_file.write)
@@ -57,7 +61,7 @@ class FtpFetcher(BaseFileFetcher):
 
 @BaseFileFetcher.register_default_noop
 class NoOpFetcher(BaseFileFetcher):
-    def __init__(self, source):
+    def __init__(self, *args, **kwargs):
         pass
 
     @context.auto_method_section
