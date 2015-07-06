@@ -16,8 +16,8 @@ def keep_keys(keys):
 
 
 @context.auto_section
-def keys_to_tuple(keys):
-    def do_keys_to_tuple(inputs):
+def dicts_to_tuples(keys):
+    def do_dicts_to_tuples(inputs):
         return (
             tuple(
                 _input[key]
@@ -26,4 +26,4 @@ def keys_to_tuple(keys):
             for _input in inputs
         )
 
-    return do_keys_to_tuple
+    return do_dicts_to_tuples
