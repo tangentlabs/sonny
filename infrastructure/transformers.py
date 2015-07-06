@@ -1,8 +1,8 @@
 import context
 
 
-@context.auto_section
 def keep_keys(keys):
+    @context.auto_section
     def do_keep_keys(inputs):
         return (
             {
@@ -15,8 +15,8 @@ def keep_keys(keys):
     return do_keep_keys
 
 
-@context.auto_section
 def dicts_to_tuples(keys):
+    @context.auto_section
     def do_dicts_to_tuples(inputs):
         return (
             tuple(
