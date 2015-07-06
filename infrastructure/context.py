@@ -13,7 +13,7 @@ class Context(object):
 
         for attribute_name, attribute_factory in \
                 self.job_attribute_factories.iteritems():
-            attribute = attribute_factory()
+            attribute = attribute_factory(job)
             setattr(job, attribute_name, attribute)
 
         return job
@@ -44,6 +44,9 @@ context = Context()
 class Job(object):
     def __init__(self, context):
         self.context = context
+        self.sections = []
+
+        self._push(Section(self, None, "<root>"))
 
     def __enter__(self):
         self.context._push(self)
@@ -53,6 +56,54 @@ class Job(object):
     def __exit__(self, _type, value, traceback):
         popped = self.context._pop()
         assert popped == self, "Popped job was not the same as pushed"
+
+    def _push(self, section):
+        self.sections.append(section)
+
+    def _pop(self, expetcted):
+        popped = self.sections.pop()
+        assert popped == expetcted, "Popped section was not same as pushed"
+
+    def section(self, name):
+        return Section(self, self.current_section, name)
+
+    @property
+    def current_section(self):
+        return self.sections[-1]
+
+
+class Section(object):
+    def __init__(self, job, parent, name):
+        self.job = job
+        self.parent = parent
+        if self.parent:
+            self.parents = self.parent.parents + (self.parent,)
+        else:
+            self.parents = ()
+
+        self.name = name
+        if self.parent:
+            self.full_name = "%s/%s" % (self.parent.full_name, self.name)
+        else:
+            self.full_name = "%s" % self.name
+
+        self.sections = []
+
+    def __enter__(self):
+        self.job._push(self)
+
+    def __exit__(self, _type, value, traceback):
+        self.job._pop(self)
+
+
+def with_new_section(func):
+    @function_using_current_job
+    @wraps(func)
+    def decorated(job, *args, **kwargs):
+        with job.section(utils.get_callable_name(func)):
+            return func(*args, **kwargs)
+
+    return decorated
 
 
 def function_using_current_job(*attributes):

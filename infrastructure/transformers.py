@@ -1,7 +1,9 @@
+from context import with_new_section
 from logging import log_call
 from profiling import profile
 
 
+@with_new_section
 @profile
 @log_call
 def keep_keys(keys):
@@ -17,6 +19,7 @@ def keep_keys(keys):
     return do_keep_keys
 
 
+@with_new_section
 @profile
 @log_call
 def keys_to_tuple(keys):
