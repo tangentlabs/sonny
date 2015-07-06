@@ -50,12 +50,3 @@ def not_implemented(method):
         raise NotImplementedError(get_callable_name(method))
 
     return decorated
-
-
-def log_call(func):
-    @wraps(func)
-    def decorated(*args, **kwargs):
-        print '** Calling:', get_callable_name(func), args, kwargs
-        return func(*args, **kwargs)
-
-    return decorated
