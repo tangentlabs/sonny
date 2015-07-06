@@ -13,6 +13,10 @@ def make_location(_file_):
     return location
 
 
+def is_callable(potentional_callable):
+    return hasattr(potentional_callable, '__call__')
+
+
 def is_method(func):
     return hasattr(func, 'im_class')
 
@@ -30,6 +34,14 @@ def get_callable_name(func):
         return get_method_name(func)
     else:
         return get_function_name(func)
+
+
+def is_argumentless_decorator(decorator_args):
+    if len(decorator_args) != 1:
+        return False
+
+    potentional_callable = decorator_args[0]
+    return is_callable(potentional_callable)
 
 
 def not_implemented(method):
