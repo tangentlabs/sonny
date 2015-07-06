@@ -1,4 +1,5 @@
 import utils
+import logging
 
 
 class Pipeline(object):
@@ -42,7 +43,7 @@ class BaseOperation(object):
 
 class WithNoInputOperation(BaseOperation):
     def __init__(self, func):
-        self.func = utils.log_call(func)
+        self.func = logging.log_call(func)
 
     def with_no_input(self):
         return self.func()
@@ -58,7 +59,7 @@ class WithNoInputOperation(BaseOperation):
 
 class WithInputOperation(BaseOperation):
     def __init__(self, func):
-        self.func = utils.log_call(func)
+        self.func = logging.log_call(func)
 
     def taking_input(self, value):
         return self.func(value)
