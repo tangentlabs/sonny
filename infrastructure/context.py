@@ -107,3 +107,12 @@ def method_using_current_frame(*frargs):
         return decorator(func)
     else:
         return decorator
+
+
+def creating_new_frame(func):
+    @wraps(func)
+    def decorated(*args, **kwargs):
+        with context.new_frame():
+            return func(*args, **kwargs)
+
+    return decorated
