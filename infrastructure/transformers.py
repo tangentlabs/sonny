@@ -1,4 +1,4 @@
-from context import context
+import context
 
 
 @context.auto_section
