@@ -30,6 +30,7 @@ class LocalFileDeleter(BaseFileDeleter):
         os.remove(filename)
 
 
+@BaseFileDeleter.register_default_noop
 class NoOpFileDeleter(BaseFileDeleter):
     def __init__(self):
         pass

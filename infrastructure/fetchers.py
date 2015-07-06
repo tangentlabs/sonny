@@ -57,6 +57,7 @@ class FtpFetcher(BaseFileFetcher):
         return local_filename
 
 
+@BaseFileFetcher.register_default_noop
 class NoOpFetcher(BaseFileFetcher):
     def __init__(self, source):
         pass
