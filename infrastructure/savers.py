@@ -3,6 +3,7 @@ import MySQLdb
 import utils
 from mockable import Mockable
 from logging import log_method_call
+from profiling import profile_method
 
 
 class BaseSaver(Mockable):
@@ -35,11 +36,13 @@ class DbSaver(BaseSaver):
             port=int(destination['port']))
         self.cursor = self.connection.cursor()
 
+    @profile_method
     @log_method_call
     def save(self, data):
         self.cursor.executemany(self.query, data)
         self.connection.commit()
 
+    @profile_method
     @log_method_call
     def save_no_data(self):
         self.save([])
@@ -49,12 +52,14 @@ class PrintSaver(BaseSaver):
     def __init__(self, *args, **kwargs):
         pass
 
+    @profile_method
     @log_method_call
     def save(self, data):
         print 'Save with data'
         for datum in data:
             print datum
 
+    @profile_method
     @log_method_call
     def save_no_data(self):
         print 'Save with no data'

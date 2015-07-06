@@ -1,5 +1,4 @@
 import utils
-import logging
 
 
 class Pipeline(object):
