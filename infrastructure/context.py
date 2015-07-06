@@ -193,3 +193,23 @@ def creating_new_job(func):
             return func(*args, **kwargs)
 
     return decorated
+
+
+def auto_section(func):
+    @wraps(func)
+    def decorated(*args, **kwargs):
+        decorated_with_context = context.auto_section(func)
+
+        return decorated_with_context(*args, **kwargs)
+
+    return decorated
+
+
+def auto_method_section(func):
+    @wraps(func)
+    def decorated(*args, **kwargs):
+        decorated_with_context = context.auto_method_section(func)
+
+        return decorated_with_context(*args, **kwargs)
+
+    return decorated

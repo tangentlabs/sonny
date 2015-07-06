@@ -3,7 +3,7 @@ from ftplib import FTP
 
 import utils
 from mockable import Mockable
-from context import context
+import context
 
 
 class BaseFileFetcher(Mockable):

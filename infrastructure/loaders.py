@@ -2,7 +2,7 @@ import csv
 
 import utils
 from mockable import Mockable
-from context import context
+import context
 
 
 class BaseLoader(Mockable):

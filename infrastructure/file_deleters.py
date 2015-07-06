@@ -2,7 +2,7 @@ import os
 
 import utils
 from mockable import Mockable
-from context import context
+import context
 
 
 class BaseFileDeleter(Mockable):
