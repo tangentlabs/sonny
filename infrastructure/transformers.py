@@ -1,6 +1,8 @@
 from logging import log_call
+from profiling import profile
 
 
+@profile
 @log_call
 def keep_keys(keys):
     def do_keep_keys(inputs):
@@ -15,6 +17,7 @@ def keep_keys(keys):
     return do_keep_keys
 
 
+@profile
 @log_call
 def keys_to_tuple(keys):
     def do_keys_to_tuple(inputs):

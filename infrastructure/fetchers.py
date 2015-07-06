@@ -4,6 +4,7 @@ from ftplib import FTP
 import utils
 from mockable import Mockable
 from logging import log_method_call
+from profiling import profile_method
 
 
 class BaseFileFetcher(Mockable):
@@ -45,6 +46,7 @@ class FtpFetcher(BaseFileFetcher):
     def __init__(self, source):
         self.source = source
 
+    @profile_method
     @log_method_call
     def fetch_file(self, filename):
         with FtpContextManager(self.source) as ftp:
@@ -59,6 +61,7 @@ class NoOpFetcher(BaseFileFetcher):
     def __init__(self, source):
         pass
 
+    @profile_method
     @log_method_call
     def fetch_file(self, filename):
         return filename
