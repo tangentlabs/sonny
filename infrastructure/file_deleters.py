@@ -2,9 +2,7 @@ import os
 
 import utils
 from mockable import Mockable
-from context import with_new_section
-from logging import log_method_call
-from profiling import profile_method
+from context import context
 
 
 class BaseFileDeleter(Mockable):
@@ -25,9 +23,7 @@ class LocalFileDeleter(BaseFileDeleter):
     def __init__(self):
         pass
 
-    @with_new_section
-    @profile_method
-    @log_method_call
+    @context.auto_method_section
     def delete_file(self, filename):
         os.remove(filename)
 
@@ -37,8 +33,6 @@ class NoOpFileDeleter(BaseFileDeleter):
     def __init__(self):
         pass
 
-    @with_new_section
-    @profile_method
-    @log_method_call
+    @context.auto_method_section
     def delete_file(self, filename):
         pass

@@ -27,9 +27,10 @@ class BaseLogger(object):
         pass
 
 
+@context.auto_section_wrapper
 def log_call(func):
-    @wraps(func)
     @function_using_current_job("logger")
+    @wraps(func)
     def decorated(logger, *args, **kwargs):
         logger.debug('** Calling: %s with *%s, **%s',
                      utils.get_callable_name(func), args, kwargs)
@@ -38,9 +39,10 @@ def log_call(func):
     return decorated
 
 
+@context.auto_method_section_wrapper
 def log_method_call(func):
-    @wraps(func)
     @method_using_current_job("logger")
+    @wraps(func)
     def decorated(self_or_cls, logger, *args, **kwargs):
         logger.debug('** Calling: %s with *%s, **%s',
                      utils.get_callable_name(func), args, kwargs)

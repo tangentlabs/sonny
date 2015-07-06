@@ -1,11 +1,7 @@
-from context import with_new_section
-from logging import log_call
-from profiling import profile
+from context import context
 
 
-@with_new_section
-@profile
-@log_call
+@context.auto_section
 def keep_keys(keys):
     def do_keep_keys(inputs):
         return (
@@ -19,9 +15,7 @@ def keep_keys(keys):
     return do_keep_keys
 
 
-@with_new_section
-@profile
-@log_call
+@context.auto_section
 def keys_to_tuple(keys):
     def do_keys_to_tuple(inputs):
         return (
