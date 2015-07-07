@@ -34,8 +34,9 @@ class FtpContextManager(object):
         self.ftp = None
 
     def __enter__(self):
-        host = self.ftp_registry["hosts"][self.source["host"]]
-        user = host["users"][self.source["user"]]
+        source = self.ftp_registry["servers"][self.source]
+        host = self.ftp_registry["hosts"][source["host"]]
+        user = host["users"][source["user"]]
         self.ftp = FTP(host["server"])
         self.ftp.login(user['username'], user['password'])
 

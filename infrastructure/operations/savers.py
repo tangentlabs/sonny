@@ -31,9 +31,10 @@ class DbSaver(BaseSaver):
         with open(destination['file'], 'rb') as _file:
             self.query = _file.read()
 
-        host = db_registry["hosts"][destination["host"]]
-        user = host["users"][destination["user"]]
-        db = host["databases"][destination["db"]]
+        database = self.db_registry["databases"][self.destination["database"]]
+        host = db_registry["hosts"][database["host"]]
+        user = host["users"][database["user"]]
+        db = host["databases"][database["database"]]
         self.connection = MySQLdb.connect(
             host=host['host'],
             port=int(host['port']),
