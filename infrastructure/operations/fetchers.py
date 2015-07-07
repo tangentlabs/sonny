@@ -9,11 +9,11 @@ from infrastructure.facilities.mockable import Mockable
 
 
 class BaseFileFetcher(Mockable):
-    @utils.not_implemented
+    @utils.must_be_implemented_by_subclasses
     def __init__(self, *args, **kwargs):
         pass
 
-    @utils.not_implemented
+    @utils.must_be_implemented_by_subclasses
     def fetch_file(self, filename):
         return filename
 

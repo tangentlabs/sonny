@@ -6,23 +6,23 @@ from infrastructure.context import \
 
 
 class BaseLogger(object):
-    @utils.not_implemented
+    @utils.must_be_implemented_by_subclasses
     def __init__(self, *args, **kwargs):
         pass
 
-    @utils.not_implemented
+    @utils.must_be_implemented_by_subclasses
     def debug(self, *args, **kwargs):
         pass
 
-    @utils.not_implemented
+    @utils.must_be_implemented_by_subclasses
     def info(self, *args, **kwargs):
         pass
 
-    @utils.not_implemented
+    @utils.must_be_implemented_by_subclasses
     def warn(self, *args, **kwargs):
         pass
 
-    @utils.not_implemented
+    @utils.must_be_implemented_by_subclasses
     def error(self, *args, **kwargs):
         pass
 

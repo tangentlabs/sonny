@@ -3,6 +3,10 @@ from functools import wraps
 
 
 def make_location(_file_):
+    """
+    Create a location function, as used in Django, that returns a filename
+    relative the the __file__ provided as argument
+    """
     def location(*paths):
         realpath = os.path.realpath(_file_)
         dirname = os.path.dirname(realpath)
@@ -37,6 +41,19 @@ def get_callable_name(func):
 
 
 def is_argumentless_decorator(decorator_args):
+    """
+    Find out if a decorator is used as a function decorator with no arguments
+
+    @decorator
+    def f()
+        pass
+
+    Or if it is used as decorator with parameters
+
+    @decorator("a", b)
+    def g()
+        pass
+    """
     if len(decorator_args) != 1:
         return False
 
@@ -44,7 +61,7 @@ def is_argumentless_decorator(decorator_args):
     return is_callable(potentional_callable)
 
 
-def not_implemented(method):
+def must_be_implemented_by_subclasses(method):
     @wraps(method)
     def decorated(*args, **kwargs):
         raise NotImplementedError(get_callable_name(method))

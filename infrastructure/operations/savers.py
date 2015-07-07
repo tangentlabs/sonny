@@ -8,15 +8,15 @@ from infrastructure.facilities.mockable import Mockable
 
 
 class BaseSaver(Mockable):
-    @utils.not_implemented
+    @utils.must_be_implemented_by_subclasses
     def __init__(self, *args, **kwargs):
         pass
 
-    @utils.not_implemented
+    @utils.must_be_implemented_by_subclasses
     def save(self, data):
         pass
 
-    @utils.not_implemented
+    @utils.must_be_implemented_by_subclasses
     def save_no_data(self):
         pass
 
