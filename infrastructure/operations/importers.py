@@ -2,17 +2,60 @@ import utils
 
 from infrastructure import context
 
-from infrastructure.transformers import dicts_to_tuples
-from infrastructure.fetchers import FtpFetcher
-from infrastructure.loaders import CsvLoader
-from infrastructure.savers import DbSaver
-from infrastructure.file_deleters import LocalFileDeleter
+from infrastructure.operations.transformers import dicts_to_tuples
+from infrastructure.operations.fetchers import FtpFetcher
+from infrastructure.operations.loaders import CsvLoader
+from infrastructure.operations.savers import DbSaver
+from infrastructure.operations.file_deleters import LocalFileDeleter
 
 
 class BaseImporter(object):
     """
     A basic interface for importers
     """
+    ftp_registry = {
+        "hosts": {
+            "main_host": {
+                "server": "upload.tangentuk.com",
+                "users": {
+                    "main_user": {
+                        "username": "newaccounts_plumbcenter",
+                        "password": "CdVdPte8",
+                    },
+                },
+            },
+        },
+        "servers": {
+            "toolkit": {
+                "host": "main_host",
+                "user": "main_user",
+            }
+        }
+    }
+    db_registry = {
+        "hosts": {
+            "main_host": {
+                "host": "127.0.0.1",
+                "port": "3306",
+                "users": {
+                    "main_user": {
+                        "username": "app-dash-dev",
+                        "password": "app-dash-dev",
+                    }
+                },
+                "databases": {
+                    "main_database": "miniTao_Wolseley",
+                },
+            },
+        },
+        "databases": {
+            "dashboard_live": {
+                "host": "main_host",
+                "user": "main_user",
+                "database": "main_database",
+            }
+        }
+    }
 
     @classmethod
     @context.create_for_job
@@ -25,7 +68,7 @@ class BaseImporter(object):
         pass
 
 
-class FetchLoadInsertDeleteCleanupImporter(object):
+class FetchLoadInsertDeleteCleanupImporter(BaseImporter):
     """
     As the name describes:
     * Fetch a file
@@ -34,10 +77,7 @@ class FetchLoadInsertDeleteCleanupImporter(object):
     * Delete the fetched files
     * Run a post-job script
     """
-    ftp_registry = None
-    db_registry = None
-
-    files_source = None
+    file_server = None
     insert_query_fields = None
     insert_query = None
     post_job_query = None
@@ -49,8 +89,8 @@ class FetchLoadInsertDeleteCleanupImporter(object):
 
     @context.job_step_method
     def run_import(self):
-        filenames = self.get_filenames()
-        local_filenames = self.fetcher(self.ftp_registry, self.files_source).fetch_files(filenames)
+        filenames = self.files_to_fetch()
+        local_filenames = self.fetcher(self.ftp_registry, self.file_server).fetch_files(filenames)
         for local_filename in local_filenames:
             data = self._loader().get_all_data(local_filename)
             data = dicts_to_tuples(self.insert_query_fields)(data)
@@ -60,7 +100,7 @@ class FetchLoadInsertDeleteCleanupImporter(object):
 
     @context.job_step_method
     @utils.must_be_implemented_by_subclasses
-    def get_filenames(self):
+    def files_to_fetch(self):
         """The filenames to fetch from the remote location"""
         pass
 
@@ -77,3 +117,15 @@ class FtpCsvDbImporter(FetchLoadInsertDeleteCleanupImporter):
     _loader = CsvLoader
     saver = DbSaver
     deleter = LocalFileDeleter
+
+    @context.job_step_method
+    def files_to_fetch(self):
+        return self.ftp_files_to_fetch()
+
+    @utils.must_be_implemented_by_subclasses
+    def ftp_files_to_fetch(self):
+        pass
+
+    @property
+    def file_server(self):
+        return self.ftp_server
