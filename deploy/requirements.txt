@@ -1,0 +1,4 @@
+ipdb
+ipython
+
+MySQL-python>=1.2,<1.3
