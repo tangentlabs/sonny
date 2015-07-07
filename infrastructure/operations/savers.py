@@ -4,7 +4,7 @@ import utils
 
 from infrastructure import context
 
-from infrastructure.facilities.mockable import Mockable
+from infrastructure.facilities.mocking import Mockable
 
 
 class BaseSaver(Mockable):
