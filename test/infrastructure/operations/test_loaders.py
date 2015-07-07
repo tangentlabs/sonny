@@ -9,6 +9,8 @@ from infrastructure.operations.loaders import CsvLoader
 
 @ddt
 class TestCsvLoader(unittest.TestCase):
+    _loader = CsvLoader
+
     @data(
         # Empty file
         ("", []),
@@ -26,5 +28,5 @@ class TestCsvLoader(unittest.TestCase):
     def test_loader_output(self, contents, expected):
         _file = contents.split('\n')
 
-        results = list(CsvLoader().get_all_data_with_headers_from_file(_file))
+        results = list(self._loader().get_all_data_with_headers_from_file(_file))
         self.assertEqual(results, expected)
