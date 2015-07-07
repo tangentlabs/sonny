@@ -1,4 +1,4 @@
-from context import method_using_current_job, context
+from infrastructure.context import method_using_current_job, context
 
 
 @context.register_job_facility_factory("mock_registry")

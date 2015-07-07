@@ -2,7 +2,7 @@ import time
 from functools import wraps
 
 import utils
-from context import \
+from infrastructure.context import \
     function_using_current_job, method_using_current_job, context
 
 
