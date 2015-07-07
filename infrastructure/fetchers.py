@@ -49,7 +49,7 @@ class FtpFetcher(BaseFileFetcher):
         self.ftp_registry = ftp_registry
         self.source = source
 
-    @context.auto_method_section
+    @context.job_step_method
     def fetch_file(self, filename):
         with FtpContextManager(self.ftp_registry, self.source) as ftp:
             _, local_filename = tempfile.mkstemp()
@@ -64,6 +64,6 @@ class NoOpFetcher(BaseFileFetcher):
     def __init__(self, *args, **kwargs):
         pass
 
-    @context.auto_method_section
+    @context.job_step_method
     def fetch_file(self, filename):
         return filename

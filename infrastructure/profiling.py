@@ -12,36 +12,36 @@ class BaseProfiler(object):
         pass
 
     @utils.not_implemented
-    def section(self, name):
+    def job_step(self, name):
         pass
 
 
-@context.auto_section_wrapper
+@context.register_job_step_wrapper
 def profile(func):
     @function_using_current_job("profiler")
     @wraps(func)
     def decorated(profiler, *args, **kwargs):
-        with profiler.section(utils.get_callable_name(func)):
+        with profiler.job_step(utils.get_callable_name(func)):
             return func(*args, **kwargs)
 
     return decorated
 
 
-@context.auto_method_section_wrapper
+@context.register_job_step_method_wrapper
 def profile_method(func):
     @method_using_current_job("profiler")
     @wraps(func)
     def decorated(self_or_cls, profiler, *args, **kwargs):
-        with profiler.section(utils.get_callable_name(func)):
+        with profiler.job_step(utils.get_callable_name(func)):
             return func(self_or_cls, *args, **kwargs)
 
     return decorated
 
 
 class ProfilingSection(object):
-    def __init__(self, profiler, section, name, parent, duration=None):
+    def __init__(self, profiler, job_step, name, parent, duration=None):
         self.profiler = profiler
-        self.section = section
+        self.job_step = job_step
         self.parent = parent
         if self.parent:
             self.parent.profiling_sections.append(self)
@@ -67,14 +67,14 @@ class ProfilingSection(object):
         self.finish()
 
 
-@context.auto_job_attribute("profiler")
+@context.register_job_facility_factory("profiler")
 class SimpleProfiler(BaseProfiler):
     def __init__(self, job):
         self._job = job
         self.profiling_section = \
             ProfilingSection(self, self._job.current_section, "<root>", None)
 
-    def section(self, name):
+    def job_step(self, name):
         profiling_section = ProfilingSection(
             self, self._job.current_section, name, self.profiling_section)
 

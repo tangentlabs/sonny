@@ -23,7 +23,7 @@ class LocalFileDeleter(BaseFileDeleter):
     def __init__(self):
         pass
 
-    @context.auto_method_section
+    @context.job_step_method
     def delete_file(self, filename):
         os.remove(filename)
 
@@ -33,6 +33,6 @@ class NoOpFileDeleter(BaseFileDeleter):
     def __init__(self):
         pass
 
-    @context.auto_method_section
+    @context.job_step_method
     def delete_file(self, filename):
         pass

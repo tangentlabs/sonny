@@ -15,12 +15,11 @@ class BaseImporter(object):
     """
 
     @classmethod
-    @context.creating_new_job
-    def create_and_run(cls, *args, **kwargs):
+    @context.create_for_job
+    def run(cls, *args, **kwargs):
         importer = cls(*args, **kwargs)
         importer.run_import()
 
-    @context.auto_method_section
     @utils.not_implemented
     def run_import(self):
         pass
@@ -48,7 +47,7 @@ class FetchLoadInsertDeleteCleanupImporter(object):
     saver = None
     deleter = None
 
-    @context.auto_method_section
+    @context.job_step_method
     def run_import(self):
         filenames = self.get_filenames()
         local_filenames = self.fetcher(self.ftp_registry, self.files_source).fetch_files(filenames)
@@ -59,7 +58,7 @@ class FetchLoadInsertDeleteCleanupImporter(object):
         self.deleter().delete_files(local_filenames)
         self.saver(self.db_registry, self.post_job_query).save_no_data()
 
-    @context.auto_method_section
+    @context.job_step_method
     @utils.not_implemented
     def get_filenames(self):
         """The filenames to fetch from the remote location"""

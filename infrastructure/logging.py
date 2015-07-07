@@ -27,7 +27,7 @@ class BaseLogger(object):
         pass
 
 
-@context.auto_section_wrapper
+@context.register_job_step_wrapper
 def log_call(func):
     @function_using_current_job("logger")
     @wraps(func)
@@ -39,7 +39,7 @@ def log_call(func):
     return decorated
 
 
-@context.auto_method_section_wrapper
+@context.register_job_step_method_wrapper
 def log_method_call(func):
     @method_using_current_job("logger")
     @wraps(func)
@@ -51,7 +51,7 @@ def log_method_call(func):
     return decorated
 
 
-@context.auto_job_attribute("logger")
+@context.register_job_facility_factory("logger")
 class InMemoryLogger(BaseLogger):
     def __init__(self, job):
         self._logs = []
