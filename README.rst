@@ -9,3 +9,10 @@ Usage
 It's enough to do:
 
 ``python -m path.to.importer.package``
+
+Testing
+====
+
+It's enough to do:
+
+``nosetests``

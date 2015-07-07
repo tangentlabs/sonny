@@ -1,4 +1,9 @@
+# utilities
 ipdb
 ipython
 
+# Testing
+nose
+
+# Operations
 MySQL-python>=1.2,<1.3
