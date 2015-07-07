@@ -7,9 +7,10 @@ def keep_keys(keys):
         return (
             {
                 key: value
-                for key, value in inputs.iteritems
+                for key, value in _input.iteritems()
                 if key in keys
             }
+            for _input in inputs
         )
 
     return do_keep_keys
