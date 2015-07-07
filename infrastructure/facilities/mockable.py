@@ -40,3 +40,5 @@ class Mockable(object):
     @classmethod
     def register_default_noop(cls, _type):
         cls._default_noop = _type
+
+        return _type
