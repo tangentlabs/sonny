@@ -1,8 +1,10 @@
 import os
 
 import utils
-from mockable import Mockable
-import context
+
+from infrastructure import context
+
+from infrastructure.facilities.mockable import Mockable
 
 
 class BaseFileDeleter(Mockable):
