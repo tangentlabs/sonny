@@ -2,7 +2,7 @@ import context
 
 
 def keep_keys(keys):
-    @context.auto_section
+    @context.job_step
     def do_keep_keys(inputs):
         return (
             {
@@ -16,7 +16,7 @@ def keep_keys(keys):
 
 
 def dicts_to_tuples(keys):
-    @context.auto_section
+    @context.job_step
     def do_dicts_to_tuples(inputs):
         return (
             tuple(

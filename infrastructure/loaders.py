@@ -22,7 +22,7 @@ class CsvLoader(BaseLoader):
     def __init__(self):
         pass
 
-    @context.auto_method_section
+    @context.job_step_method
     def get_all_data(self, filename):
         with open(filename, 'rb') as _file:
             reader = csv.reader(_file, delimiter=',', quotechar='"')

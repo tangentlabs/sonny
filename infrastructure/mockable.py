@@ -1,7 +1,7 @@
 from context import method_using_current_job, context
 
 
-@context.auto_job_attribute("mock_registry")
+@context.register_job_facility_factory("mock_registry")
 class MockRegistry(object):
     def __init__(self, job):
         self.mocks = {}
