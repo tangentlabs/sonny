@@ -92,7 +92,7 @@ class FetchLoadInsertDeleteCleanupImporter(BaseImporter):
         filenames = self.files_to_fetch()
         local_filenames = self.fetcher(self.ftp_registry, self.file_server).fetch_files(filenames)
         for local_filename in local_filenames:
-            data = self._loader().get_all_data(local_filename)
+            data = self._loader().get_all_data_with_headers(local_filename)
             data = dicts_to_tuples(self.insert_query_fields)(data)
             self.saver(self.db_registry, self.insert_query).save(data)
         self.deleter().delete_files(local_filenames)

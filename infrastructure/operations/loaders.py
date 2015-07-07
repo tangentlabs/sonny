@@ -13,7 +13,7 @@ class BaseLoader(Mockable):
         pass
 
     @utils.must_be_implemented_by_subclasses
-    def get_all_data(self, filename):
+    def get_all_data_with_headers(self, filename):
         pass
 
     def __repr__(self):
@@ -25,16 +25,19 @@ class CsvLoader(BaseLoader):
         pass
 
     @context.job_step_method
-    def get_all_data(self, filename):
+    def get_all_data_with_headers(self, filename):
         with open(filename, 'rb') as _file:
-            reader = csv.reader(_file, delimiter=',', quotechar='"')
+            return self.get_all_data_with_headers_from_file(_file)
 
-            headers = reader.next()
-            headers = map(str.strip, headers)
+    def get_all_data_with_headers_from_file(self, _file):
+        reader = csv.reader(_file, delimiter=',', quotechar='"')
 
-            for row in reader:
-                datum = {
-                    header: value.strip()
-                    for header, value in zip(headers, row)
-                }
-                yield datum
+        headers = reader.next()
+        headers = map(str.strip, headers)
+
+        for row in reader:
+            datum = {
+                header: value.strip()
+                for header, value in zip(headers, row)
+            }
+            yield datum
