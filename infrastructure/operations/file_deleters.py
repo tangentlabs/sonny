@@ -8,11 +8,11 @@ from infrastructure.facilities.mockable import Mockable
 
 
 class BaseFileDeleter(Mockable):
-    @utils.not_implemented
+    @utils.must_be_implemented_by_subclasses
     def __init__(self, *args, **kwargs):
         pass
 
-    @utils.not_implemented
+    @utils.must_be_implemented_by_subclasses
     def delete_file(self, filename):
         pass
 

@@ -20,7 +20,7 @@ class BaseImporter(object):
         importer = cls(*args, **kwargs)
         importer.run_import()
 
-    @utils.not_implemented
+    @utils.must_be_implemented_by_subclasses
     def run_import(self):
         pass
 
@@ -59,7 +59,7 @@ class FetchLoadInsertDeleteCleanupImporter(object):
         self.saver(self.db_registry, self.post_job_query).save_no_data()
 
     @context.job_step_method
-    @utils.not_implemented
+    @utils.must_be_implemented_by_subclasses
     def get_filenames(self):
         """The filenames to fetch from the remote location"""
         pass

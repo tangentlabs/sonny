@@ -28,11 +28,11 @@ class BaseOperation(object):
     def tee(self, *operations):
         return FanOutOperation(self, *operations)
 
-    @utils.not_implemented
+    @utils.must_be_implemented_by_subclasses
     def with_no_input(self):
         pass
 
-    @utils.not_implemented
+    @utils.must_be_implemented_by_subclasses
     def taking_input(self, value):
         pass
 
