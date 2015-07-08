@@ -4,12 +4,12 @@ import utils
 
 from infrastructure.facilities import logging, profiling  # noqa
 
-from import_jobs import base
+from import_jobs import common
 
 location = utils.make_location(__file__)
 
 
-class SampleImporter(base.FtpCsvDbImporter):
+class SampleImporter(common.FtpCsvDbImporter):
     """
     Sample Importer
     Import NRR Plumb WDL New customers for today
