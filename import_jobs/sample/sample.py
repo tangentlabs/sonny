@@ -45,7 +45,3 @@ class SampleImporter(common.FtpCsvDbImporter):
 
     def get_ftp_files_to_fetch(self):
         return ['NEW_Accounts_%s.csv' % date.today().strftime('%d%m%Y')]
-
-
-if __name__ == '__main__':
-    SampleImporter.from_command_line()

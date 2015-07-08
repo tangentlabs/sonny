@@ -17,8 +17,9 @@ class BaseImporter(object):
         importer.run_import()
 
     @classmethod
-    def run_from_command_line(cls):
-        sysargs = sys.argv[1:]
+    def run_from_command_line(cls, sysargs=None):
+        if sysargs is None:
+            sysargs = sys.argv[1:]
         args, kwargs = cls.args_and_kwargs_from_command_line(sysargs)
         cls.run(*args, **kwargs)
 
@@ -38,24 +39,25 @@ class BaseImporter(object):
         print profiler
 
     @classmethod
-    def test_from_command_line(cls):
-        sysargs = sys.argv[1:]
+    def test_from_command_line(cls, sysargs=None):
+        if sysargs is None:
+            sysargs = sys.argv[1:]
         args, kwargs = cls.args_and_kwargs_from_command_line(sysargs)
-        cls.run(*args, **kwargs)
+        cls.test(*args, **kwargs)
 
     @classmethod
-    def from_command_line(cls):
-        sysargs = sys.argv[1:]
+    def from_command_line(cls, sysargs=None):
+        if sysargs is None:
+            sysargs = sys.argv[1:]
         if not sysargs:
             cls.run()
             return
 
         mode, sysargs = sysargs[0], sysargs[1:]
-        args, kwargs = cls.args_and_kwargs_from_command_line(sysargs)
         if mode == "test":
-            cls.test(*args, **kwargs)
+            cls.test_from_command_line(sysargs)
         elif mode == "run":
-            cls.run(*args, **kwargs)
+            cls.run_from_command_line(sysargs)
         else:
             raise Exception("If arguments are passed, the first argument "
                             "must be 'run' or 'test'")
