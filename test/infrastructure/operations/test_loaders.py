@@ -20,8 +20,12 @@ class TestCsvLoader(unittest.TestCase):
         ("a,b\nc,d", [{'a': 'c', 'b': 'd'}]),
         # Multiple rows
         ("C1,C2\nR1V1,R1V2\nR2V1,R2V2", [{'C1': 'R1V1', 'C2': 'R1V2'}, {'C1': 'R2V1', 'C2': 'R2V2'}]),
-        # Loader trims whitespace
-        ("       a  \t   ,   b \n c    , \td", [{'a': 'c', 'b': 'd'}]),
+        # Loader trims prefix spaces
+        ("       a,   b\n c, d", [{'a': 'c', 'b': 'd'}]),
+        # Doubly-quoted
+        ('''C1,C2\n "a", "b"''', [{'C1': 'a', 'C2': 'b'}]),
+        # Doubly-quoted with inside spaces
+        ('''C1,C2\n " a1 ", " b1 "''', [{'C1': ' a1 ', 'C2': ' b1 '}]),
     )
     @unpack
     @context.create_for_job
