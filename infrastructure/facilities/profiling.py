@@ -66,6 +66,15 @@ class ProfilingSection(object):
         self.profiler._pop(self)
         self.finish()
 
+    def __str__(self, indent=""):
+        return ''.join(
+            "\n%s[%s] %s: %.3f%s" %
+            (indent, profiling_section.job_step.full_name,
+             profiling_section.name, profiling_section.duration or -1,
+             profiling_section.__str__(indent="  " + indent))
+            for profiling_section in self.profiling_sections
+        )
+
 
 @context.register_job_facility_factory("profiler")
 class SimpleProfiler(BaseProfiler):
@@ -87,3 +96,6 @@ class SimpleProfiler(BaseProfiler):
     def _pop(self, expected_profiling_section):
         assert expected_profiling_section == self.profiling_section
         self.profiling_section = self.profiling_section.parent
+
+    def __str__(self):
+        return str(self.profiling_section)

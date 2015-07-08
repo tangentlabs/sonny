@@ -76,3 +76,9 @@ class InMemoryLogger(BaseLogger):
 
     def error(self, message, *args, **kwargs):
         self._log("ERROR", message, args, kwargs)
+
+    def __str__(self):
+        return '\n'.join(
+            "[%s] %s" % (section_full_name, log_string)
+            for section_full_name, log_string in self._logs
+        )
