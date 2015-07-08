@@ -32,14 +32,13 @@ class CsvLoader(BaseLoader):
                 yield datum
 
     def get_all_data_with_headers_from_file(self, _file):
-        reader = csv.reader(_file, delimiter=',', quotechar='"')
+        reader = csv.reader(_file, delimiter=',', skipinitialspace=True)
 
         headers = reader.next()
-        headers = map(str.strip, headers)
 
         for row in reader:
             datum = {
-                header: value.strip()
+                header: value
                 for header, value in zip(headers, row)
             }
             yield datum
