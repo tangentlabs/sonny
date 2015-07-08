@@ -27,7 +27,9 @@ class CsvLoader(BaseLoader):
     @context.job_step_method
     def get_all_data_with_headers(self, filename):
         with open(filename, 'rb') as _file:
-            return self.get_all_data_with_headers_from_file(_file)
+            data = self.get_all_data_with_headers_from_file(_file)
+            for datum in data:
+                yield datum
 
     def get_all_data_with_headers_from_file(self, _file):
         reader = csv.reader(_file, delimiter=',', quotechar='"')
