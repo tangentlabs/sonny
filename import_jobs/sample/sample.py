@@ -2,7 +2,7 @@ from datetime import date
 
 import utils
 
-from infrastructure.facilities import logging, profiling, db_registry, ftp_registry, config  # noqa
+from infrastructure.facilities import everything  # noqa
 
 from import_jobs import common
 
