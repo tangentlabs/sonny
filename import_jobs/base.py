@@ -29,14 +29,15 @@ class BaseImporter(object):
     def test(cls, mock_registry, logger, profiler, *args, **kwargs):
         mock_registry.register_auto_mocks_for_local_testing()
 
-        importer = cls(*args, **kwargs)
-        importer.run_import()
+        try:
+            importer = cls(*args, **kwargs)
+            importer.run_import()
+        finally:
+            print '*********** LOGS: ***********'
+            print logger
 
-        print '*********** LOGS: ***********'
-        print logger
-
-        print '*********** PROFILING: ***********'
-        print profiler
+            print '*********** PROFILING: ***********'
+            print profiler
 
     @classmethod
     def test_from_command_line(cls, sysargs=None):
