@@ -9,49 +9,6 @@ class BaseImporter(object):
     """
     A basic interface for importers
     """
-    ftp_registry = {
-        "hosts": {
-            "main_host": {
-                "server": "upload.tangentuk.com",
-                "users": {
-                    "main_user": {
-                        "username": "newaccounts_plumbcenter",
-                        "password": "CdVdPte8",
-                    },
-                },
-            },
-        },
-        "servers": {
-            "toolkit": {
-                "host": "main_host",
-                "user": "main_user",
-            }
-        }
-    }
-    db_registry = {
-        "hosts": {
-            "main_host": {
-                "host": "127.0.0.1",
-                "port": "3306",
-                "users": {
-                    "main_user": {
-                        "username": "app-dash-dev",
-                        "password": "app-dash-dev",
-                    }
-                },
-                "databases": {
-                    "main_database": "miniTao_Wolseley",
-                },
-            },
-        },
-        "databases": {
-            "dashboard_live": {
-                "host": "main_host",
-                "user": "main_user",
-                "database": "main_database",
-            }
-        }
-    }
 
     @classmethod
     @context.create_for_job

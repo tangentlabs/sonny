@@ -28,14 +28,14 @@ class BaseFileFetcher(Mockable):
 
 
 class FtpContextManager(object):
-    def __init__(self, ftp_registry, source):
-        self.ftp_registry = ftp_registry
+    def __init__(self, source):
         self.source = source
         self.ftp = None
 
-    def __enter__(self):
-        source = self.ftp_registry["servers"][self.source]
-        host = self.ftp_registry["hosts"][source["host"]]
+    @context.method_using_current_job("ftp_registry")
+    def __enter__(self, ftp_registry):
+        source = ftp_registry["servers"][self.source]
+        host = ftp_registry["hosts"][source["host"]]
         user = host["users"][source["user"]]
         self.ftp = FTP(host["server"])
         self.ftp.login(user['username'], user['password'])
@@ -49,13 +49,12 @@ class FtpContextManager(object):
 
 @BaseFileFetcher.auto_mock_for_local_testing
 class FtpFetcher(BaseFileFetcher):
-    def __init__(self, ftp_registry, source):
-        self.ftp_registry = ftp_registry
+    def __init__(self, source):
         self.source = source
 
     @context.job_step_method
     def fetch_file(self, filename):
-        with FtpContextManager(self.ftp_registry, self.source) as ftp:
+        with FtpContextManager(self.source) as ftp:
             _, local_filename = tempfile.mkstemp()
             with open(local_filename, 'wb') as local_file:
                 ftp.retrbinary('RETR %s' % filename, local_file.write)

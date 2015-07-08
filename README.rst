@@ -9,7 +9,9 @@ Usage
 
 It's enough to do:
 
-``python -m path.to.importer.package``
+``IMPORT_CONF=live python -m path.to.importer.package``
+
+where ``IMPORT_CONF`` should be the appropriate environment. It defaults to ``local``.
 
 To pass arguments:
 
