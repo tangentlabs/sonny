@@ -13,11 +13,11 @@ It's enough to do:
 
 To pass arguments:
 
-``python -m path.to.importer.package run arg1 arg2``
+``python -m path.to.importer.package run arg1 arg2 -- param3=arg3 param4=arg4``
 
 To test a job:
 
-``python -m path.to.importer.package test arg1 arg2``
+``python -m path.to.importer.package test arg1 arg2 -- param3=arg3 param4=arg4``
 
 
 Tests

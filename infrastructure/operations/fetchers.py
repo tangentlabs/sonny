@@ -47,6 +47,7 @@ class FtpContextManager(object):
         self.ftp = None
 
 
+@BaseFileFetcher.auto_mock_for_local_testing
 class FtpFetcher(BaseFileFetcher):
     def __init__(self, ftp_registry, source):
         self.ftp_registry = ftp_registry

@@ -24,6 +24,7 @@ class BaseSaver(Mockable):
         return self.__class__.__name__
 
 
+@BaseSaver.auto_mock_for_local_testing
 class DbSaver(BaseSaver):
     def __init__(self, db_registry, destination):
         self.db_registry = db_registry
