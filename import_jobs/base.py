@@ -9,49 +9,6 @@ class BaseImporter(object):
     """
     A basic interface for importers
     """
-    ftp_registry = {
-        "hosts": {
-            "main_host": {
-                "server": "test",
-                "users": {
-                    "main_user": {
-                        "username": "test",
-                        "password": "test",
-                    },
-                },
-            },
-        },
-        "servers": {
-            "main": {
-                "host": "main_host",
-                "user": "main_user",
-            }
-        }
-    }
-    db_registry = {
-        "hosts": {
-            "main_host": {
-                "host": "127.0.0.1",
-                "port": "3306",
-                "users": {
-                    "main_user": {
-                        "username": "test",
-                        "password": "test",
-                    }
-                },
-                "databases": {
-                    "main_database": "test",
-                },
-            },
-        },
-        "databases": {
-            "dashboard_live": {
-                "host": "main_host",
-                "user": "main_user",
-                "database": "main_database",
-            }
-        }
-    }
 
     @classmethod
     @context.create_for_job

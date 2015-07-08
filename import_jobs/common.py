@@ -41,13 +41,13 @@ class FetchLoadInsertDeleteCleanupImporter(BaseImporter):
     @context.job_step_method
     def run_import(self):
         filenames = self._get_files_to_fetch()
-        local_filenames = self.fetcher(self.ftp_registry, self.file_server).fetch_files(filenames)
+        local_filenames = self.fetcher(self.file_server).fetch_files(filenames)
         for local_filename in local_filenames:
             data = self._loader().get_all_data_with_headers(local_filename)
             data = dicts_to_tuples(self.insert_query_fields)(data)
-            self.saver(self.db_registry, self.insert_query).save(data)
+            self.saver(self.insert_query).save(data)
         self.deleter().delete_files(local_filenames)
-        self.saver(self.db_registry, self.post_job_query).save_no_data()
+        self.saver(self.post_job_query).save_no_data()
 
     def _get_files_to_fetch(self):
         if self.files_to_fetch:
