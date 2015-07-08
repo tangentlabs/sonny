@@ -21,6 +21,7 @@ class BaseFileDeleter(Mockable):
             self.delete_file(filename)
 
 
+@BaseFileDeleter.auto_mock_for_local_testing
 class LocalFileDeleter(BaseFileDeleter):
     def __init__(self):
         pass

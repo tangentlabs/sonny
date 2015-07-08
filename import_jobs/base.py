@@ -4,10 +4,6 @@ import utils
 
 from infrastructure import context
 
-from infrastructure.operations.fetchers import FtpFetcher
-from infrastructure.operations.savers import DbSaver
-from infrastructure.operations.file_deleters import LocalFileDeleter
-
 
 class BaseImporter(object):
     """
@@ -73,11 +69,7 @@ class BaseImporter(object):
     @context.create_for_job
     @context.method_using_current_job("mock_registry", "logger", "profiler")
     def test(cls, mock_registry, logger, profiler, *args, **kwargs):
-        mock_registry.register_mocks_using_default_noops(
-            FtpFetcher,
-            LocalFileDeleter,
-            DbSaver,
-        )
+        mock_registry.register_auto_mocks_for_local_testing()
 
         importer = cls(*args, **kwargs)
         importer.run_import()
