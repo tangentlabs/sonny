@@ -10,6 +10,12 @@ class BaseImporter(object):
     A basic interface for importers
     """
 
+    job_config_filename = None
+    """
+    Config for specific import. It should be a YAML that contains the config
+    for each environment
+    """
+
     @classmethod
     @context.create_for_job
     def run(cls, *args, **kwargs):
@@ -86,3 +92,12 @@ class BaseImporter(object):
     @utils.must_be_implemented_by_subclasses
     def run_import(self):
         pass
+
+    @property
+    @context.method_using_current_job("config")
+    def job_environment_config(self, config):
+        if not hasattr(self, "_job_environment_config"):
+            self._job_environment_config = \
+                config.get_job_environment_config(self.job_config_filename)
+
+        return self._job_environment_config
