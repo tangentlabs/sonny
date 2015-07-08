@@ -5,25 +5,27 @@ import utils
 from infrastructure import context
 
 
-class BaseImporter(object):
+class ImporterRunningMixin(object):
     """
-    A basic interface for importers
-    """
-
-    job_config_filename = None
-    """
-    Config for specific import. It should be a YAML that contains the config
-    for each environment
+    Helper functionality to run an importing job
     """
 
     @classmethod
     @context.create_for_job
     def run(cls, *args, **kwargs):
+        """
+        Run the import, creating a job context
+        """
+
         importer = cls(*args, **kwargs)
         importer.run_import()
 
     @classmethod
     def run_from_command_line(cls, sysargs=None):
+        """
+        Run the import, taking arguments from the command line
+        """
+
         if sysargs is None:
             sysargs = sys.argv[1:]
         args, kwargs = cls.args_and_kwargs_from_command_line(sysargs)
@@ -33,6 +35,10 @@ class BaseImporter(object):
     @context.create_for_job
     @context.method_using_current_job("mock_registry", "logger", "profiler")
     def test(cls, mock_registry, logger, profiler, *args, **kwargs):
+        """
+        Test the import with auto-mocking, creating a job context
+        """
+
         mock_registry.register_auto_mocks_for_local_testing()
 
         try:
@@ -47,30 +53,21 @@ class BaseImporter(object):
 
     @classmethod
     def test_from_command_line(cls, sysargs=None):
+        """
+        Test the import, taking arguments from the command line
+        """
+
         if sysargs is None:
             sysargs = sys.argv[1:]
         args, kwargs = cls.args_and_kwargs_from_command_line(sysargs)
         cls.test(*args, **kwargs)
 
     @classmethod
-    def from_command_line(cls, sysargs=None):
-        if sysargs is None:
-            sysargs = sys.argv[1:]
-        if not sysargs:
-            cls.run()
-            return
-
-        mode, sysargs = sysargs[0], sysargs[1:]
-        if mode == "test":
-            cls.test_from_command_line(sysargs)
-        elif mode == "run":
-            cls.run_from_command_line(sysargs)
-        else:
-            raise Exception("If arguments are passed, the first argument "
-                            "must be 'run' or 'test'")
-
-    @classmethod
     def args_and_kwargs_from_command_line(cls, sysargs):
+        """
+        Find out which command line arguments are positional, and which named
+        """
+
         if '--' not in sysargs:
             args = sysargs
             kwargs = {}
@@ -89,8 +86,24 @@ class BaseImporter(object):
 
         return args, kwargs
 
+
+class BaseImporter(ImporterRunningMixin):
+    """
+    A basic interface for importers
+    """
+
+    job_config_filename = None
+    """
+    Config for specific import. It should be a YAML that contains the config
+    for each environment
+    """
+
     @utils.must_be_implemented_by_subclasses
     def run_import(self):
+        """
+        The main function that does all the importing
+        """
+
         pass
 
     @property
