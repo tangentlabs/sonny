@@ -4,12 +4,12 @@ import utils
 
 from infrastructure.facilities import logging, profiling  # noqa
 
-from infrastructure.operations import importers
+from import_jobs import base
 
 location = utils.make_location(__file__)
 
 
-class SampleImporter(importers.FtpCsvDbImporter):
+class SampleImporter(base.FtpCsvDbImporter):
     """
     Sample Importer
     New customers for today
