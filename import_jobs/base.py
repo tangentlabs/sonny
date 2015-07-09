@@ -32,24 +32,38 @@ class ImporterRunningMixin(object):
         cls.run(*args, **kwargs)
 
     @classmethod
-    @context.create_for_job
-    @context.method_using_current_job("mock_registry", "logger", "profiler")
-    def test(cls, mock_registry, logger, profiler, *args, **kwargs):
+    def test(cls, *args, **kwargs):
         """
         Test the import with auto-mocking, creating a job context
         """
 
-        mock_registry.register_auto_mocks_for_local_testing()
+        def job_finally(func):
+            @context.function_using_current_job("logger", "profiler", "notifier")
+            def decorated(logger, profiler, notifier, *args, **kwargs):
+                try:
+                    func(*args, **kwargs)
+                finally:
+                    print '*********** LOGS: ***********'
+                    print logger
 
-        try:
+                    print '*********** PROFILING: ***********'
+                    print profiler
+
+                    print '*********** NOTIFICATIONS: ***********'
+                    print notifier
+
+            return decorated
+
+        @context.create_for_job
+        @job_finally
+        @context.function_using_current_job("mock_registry")
+        def do_test(mock_registry, *args, **kwargs):
+            mock_registry.register_auto_mocks_for_local_testing()
+
             importer = cls(*args, **kwargs)
             importer.run_import()
-        finally:
-            print '*********** LOGS: ***********'
-            print logger
 
-            print '*********** PROFILING: ***********'
-            print profiler
+        do_test(*args, **kwargs)
 
     @classmethod
     def test_from_command_line(cls, sysargs=None):
