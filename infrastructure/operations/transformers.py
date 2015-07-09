@@ -92,3 +92,15 @@ def update_with_static_values(static_values):
         return dict(_input.items() + static_values_items)
 
     return generic_map(update_with_static_values_for_input)
+
+
+def generator_to_tuples():
+    """
+    Consume a generator into a tuple
+    """
+
+    @context.job_step
+    def do_generator_to_tuples(inputs):
+        return tuple(inputs)
+
+    return do_generator_to_tuples
