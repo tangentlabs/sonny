@@ -15,7 +15,7 @@ where ``IMPORT_CONF`` should be the appropriate environment. It defaults to ``lo
 
 To pass named arguments:
 
-``./run.py path.to.importer.package.ImporterClass example=value demo=argument``
+``./run.py path.to.importer.package.ImporterClass example=value demo=argument list_argument[]=first list_argument[]=second``
 
 To test a job:
 
