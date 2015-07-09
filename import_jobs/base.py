@@ -79,13 +79,64 @@ class ImporterRunningMixin(object):
     def kwargs_from_command_line(cls, sysargs):
         """
         Decompose kwargs from command line
+
+        We allow two formats:
+
+        * For single string values:
+            parameter=value
+
+            which results to {"parameter": "value"}
+
+        * For list of string values:
+            parameter[]=value1 parameter[]=value2
+
+            which results to {"parameter": ["value1", "value2"]}
+
+        So for example:
+            simple=value list[]=first list[]=second singleton[]=alone
+
+        results to {
+            "simple": "value",
+            "list": ["first", "second"],
+            "singleton": "alone",
+        }
         """
 
         splitted_kwargs = [kwarg.split('=') for kwarg in sysargs]
-        kwargs = {
-            splitted_kwarg[0]: '='.join(splitted_kwarg[1:])
+        kwargs_list = [
+            (splitted_kwarg[0], '='.join(splitted_kwarg[1:]))
             for splitted_kwarg in splitted_kwargs
+        ]
+        kwargs_lists = {
+            key_aggregate: [
+                value
+                for key, value in kwargs_list
+                if key_aggregate == key
+            ]
+            for key_aggregate in set(key for key, _ in kwargs_list)
         }
+        kwargs = {}
+        for key_aggregate, values in kwargs_lists.iteritems():
+            if key_aggregate.endswith('[]'):
+                key = key_aggregate[:-2]
+                value = values
+            else:
+                key = key_aggregate
+                value = values[0]
+                if len(values) != 1:
+                    raise Exception("You defined '%(key)s' multiple times:\n"
+                                    "Define only in one format:\n"
+                                    "  %(key)s=value for a single value, or\n"
+                                    "  %(key)s[]=value1 %(key)s[]=value2 "
+                                    "for list" % {'key': key})
+
+            if key in kwargs:
+                raise Exception("You defined both '%(key)s' and '%(key)s[]':\n"
+                                "Define only in one format:\n  %(key)s=value for a "
+                                "single value, or\n  %(key)s[]=value1 "
+                                "%(key)s[]=value2 for list" % {'key': key})
+
+            kwargs[key] = value
 
         return kwargs
 
