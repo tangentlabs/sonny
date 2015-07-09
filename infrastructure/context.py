@@ -36,6 +36,10 @@ class Context(object):
         # Context.register_job_step_method_wrapper
         self.job_step_wrappers = []
         self.job_step_method_wrappers = []
+        # Automatic wrappers for each job  that want to gather information
+        # about the runtime of a job. These wrappers are registered by the
+        # Context.register_job_wrapper
+        self.job_wrappers = []
 
     def new_job(self):
         """
@@ -68,6 +72,11 @@ class Context(object):
 
         return decorator
 
+    def register_job_wrapper(self, wrapper):
+        self.job_wrappers.append(wrapper)
+
+        return wrapper
+
     def register_job_step_wrapper(self, wrapper):
         self.job_step_wrappers.append(wrapper)
 
@@ -77,6 +86,21 @@ class Context(object):
         self.job_step_method_wrappers.append(wrapper)
 
         return wrapper
+
+    def decorate_job(self, func):
+        """
+        A decorator to wrap a job (that is a function or static method) with
+        the context's registered decorators.
+
+        Because order of imports matters in Python, you should use the
+        late-binding stand-alone decorator create_for_job, so that the step is
+        wrapped when it's called.
+        """
+        decorated = func
+        for wrapper in self.job_wrappers:
+            decorated = wrapper(decorated)
+
+        return decorated
 
     def job_step(self, func):
         """
@@ -292,8 +316,9 @@ def create_for_job(func):
     """
     @wraps(func)
     def decorated(*args, **kwargs):
+        decorated_with_context = context.decorate_job(func)
         with context.new_job():
-            return func(*args, **kwargs)
+            return decorated_with_context(*args, **kwargs)
 
     return decorated
 
