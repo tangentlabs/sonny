@@ -1,3 +1,6 @@
 # Python
 *.py[oc]
 
+# LibreOffice
+*.~lock*
+
