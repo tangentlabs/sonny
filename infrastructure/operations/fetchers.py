@@ -23,6 +23,10 @@ class BaseFileFetcher(Mockable):
             for filename in filenames
         ]
 
+    @utils.must_be_implemented_by_subclasses
+    def fetch_from_search(self, *args, **kwargs):
+        pass
+
     def __repr__(self):
         return self.__class__.__name__
 
@@ -62,6 +66,12 @@ class FtpFetcher(BaseFileFetcher):
         return local_filename
 
 
+@BaseFileFetcher.auto_mock_for_local_testing
+class EmailFetcher(BaseFileFetcher):
+    # TODO: stub
+    pass
+
+
 @BaseFileFetcher.register_default_noop
 class NoOpFetcher(BaseFileFetcher):
     def __init__(self, *args, **kwargs):
@@ -70,3 +80,7 @@ class NoOpFetcher(BaseFileFetcher):
     @context.job_step_method
     def fetch_file(self, filename):
         return filename
+
+    @context.job_step_method
+    def fetch_from_search(self, *args, **kwargs):
+        return kwargs.get('filenames') or []
