@@ -52,27 +52,26 @@ from ftplib import FTP
 from StringIO import StringIO
 
 
-class ExcelCellTypes(object):  # noqa
-    DATE = 'date'
-
-    MappingFromRaw = {
-        3: DATE,
-    }
-
-
 class ExcelLoader(BaseLoader):
     XLRD_WARNING_LOG_PREFIX = 'WARNING *** '
     XLRD_ERROR_LOG_PREFIX = 'ERROR *** '
 
-    def __init__(self, sheet_index=0):
+    def __init__(self, sheet_index=0, skip_start_empty_rows=True,
+                 skip_start_empty_columns=True):
         self.sheet_index = sheet_index
+        self.skip_start_empty_rows = skip_start_empty_rows
+        self.skip_start_empty_columns = skip_start_empty_columns
 
     @context.job_step_method
     def get_all_data_with_headers(self, filename):
         workbook = self._load_workbook(filename)
         sheet = workbook.sheet_by_index(self.sheet_index)
-        headers = self._get_sheet_headers(sheet)
-        data = self._get_sheet_data(sheet, headers, start_row=1)
+        first_row_index, first_column_index = \
+            self._get_first_row_and_first_column_indexes(sheet)
+        headers = \
+            self._get_sheet_headers(sheet, first_row_index, first_column_index)
+        data = self._get_sheet_data(sheet, headers, first_row_index,
+                                    first_column_index)
 
         return data
 
@@ -91,31 +90,73 @@ class ExcelLoader(BaseLoader):
             elif logline.startswith(self.XLRD_ERROR_LOG_PREFIX):
                 logger.error(logline[self.XLRD_ERROR_LOG_PREFIX:])
 
-    def _get_sheet_headers(self, sheet):
-        return [
-            sheet.cell_value(0, column_index)
+    def _get_first_row_and_first_column_indexes(self, sheet):
+        if self.skip_start_empty_rows:
+            for row_index in xrange(0, sheet.nrows):
+                if not self._row_is_empty(sheet, row_index):
+                    first_row_index = row_index
+                    break
+            else:
+                # TODO: Perhaps we need to raise an error?
+                first_row_index = sheet.nrows
+        else:
+            first_row_index = 0
+
+        if self.skip_start_empty_columns:
+            for column_index in xrange(0, sheet.ncols):
+                if not self._column_is_empty(sheet, column_index):
+                    first_column_index = column_index
+                    break
+            else:
+                # TODO: Perhaps we need to raise an error?
+                first_column_index = sheet.nrows
+        else:
+            first_column_index = 0
+
+        return first_row_index, first_column_index
+
+    def _row_is_empty(self, sheet, row_index):
+        return all(
+            sheet.cell(row_index, column_index).ctype == xlrd.biffh.XL_CELL_EMPTY
             for column_index in xrange(0, sheet.ncols)
+        )
+
+    def _column_is_empty(self, sheet, column_index):
+        return all(
+            sheet.cell(row_index, column_index).ctype == xlrd.biffh.XL_CELL_EMPTY
+            for row_index in xrange(0, sheet.nrows)
+        )
+
+    def _get_sheet_headers(self, sheet, first_row_index, first_column_index):
+        return [
+            sheet.cell_value(first_row_index, column_index)
+            for column_index in xrange(first_column_index, sheet.ncols)
         ]
 
-    def _get_sheet_data(self, sheet, headers, start_row):
+    def _get_sheet_data(self, sheet, headers, first_row_index,
+                        first_column_index):
         return (
             {
                 header: self._get_sheet_cell_value(sheet, row_index, column_index)
-                for column_index, header in enumerate(headers)
+                for column_index, header in enumerate(headers, first_column_index)
             }
-            for row_index in xrange(start_row, sheet.nrows)
+            for row_index in xrange(first_row_index + 1, sheet.nrows)
         )
 
     def _get_sheet_cell_value(self, sheet, row, column):
         value = sheet.cell_value(row, column)
 
-        cell_type_raw = sheet.cell_type(row, column)
-        cell_type = ExcelCellTypes.MappingFromRaw.get(cell_type_raw)
+        cell_type = sheet.cell_type(row, column)
 
-        if cell_type == ExcelCellTypes.DATE:
+        if cell_type == xlrd.biffh.XL_CELL_EMPTY:
+            value = self._get_sheet_cell_value_as_empty(sheet, value)
+        elif cell_type == xlrd.biffh.XL_CELL_DATE:
             value = self._get_sheet_cell_value_as_date(sheet, value)
 
         return value
+
+    def _get_sheet_cell_value_as_empty(self, sheet, value):
+        return None
 
     def _get_sheet_cell_value_as_date(self, sheet, value):
         date_tuple = xlrd.xldate_as_tuple(value, sheet.book.datemode)
