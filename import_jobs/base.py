@@ -10,6 +10,11 @@ class ImporterRunningMixin(object):
     Helper functionality to run an importing job
     """
 
+    test_defaults = {}
+    """
+    Default test arguments
+    """
+
     @classmethod
     @context.create_for_job
     def run(cls, *args, **kwargs):
@@ -28,8 +33,8 @@ class ImporterRunningMixin(object):
 
         if sysargs is None:
             sysargs = sys.argv[1:]
-        args, kwargs = cls.args_and_kwargs_from_command_line(sysargs)
-        cls.run(*args, **kwargs)
+        kwargs = cls.kwargs_from_command_line(sysargs)
+        cls.run(**kwargs)
 
     @classmethod
     def test(cls, *args, **kwargs):
@@ -50,11 +55,14 @@ class ImporterRunningMixin(object):
             print '*********** NOTIFICATIONS: ***********'
             print job.notifier
 
+        test_kwargs = dict(cls.test_defaults)
+        test_kwargs.update(kwargs)
+
         cls.run \
             .bind(cls) \
             .with_before(register_auto_mocks_for_local_testing) \
             .with_finally(print_metrics) \
-            .call(*args, **kwargs)
+            .call(**test_kwargs)
 
     @classmethod
     def test_from_command_line(cls, sysargs=None):
@@ -64,32 +72,22 @@ class ImporterRunningMixin(object):
 
         if sysargs is None:
             sysargs = sys.argv[1:]
-        args, kwargs = cls.args_and_kwargs_from_command_line(sysargs)
-        cls.test(*args, **kwargs)
+        kwargs = cls.kwargs_from_command_line(sysargs)
+        cls.test(**kwargs)
 
     @classmethod
-    def args_and_kwargs_from_command_line(cls, sysargs):
+    def kwargs_from_command_line(cls, sysargs):
         """
-        Find out which command line arguments are positional, and which named
+        Decompose kwargs from command line
         """
 
-        if '--' not in sysargs:
-            args = sysargs
-            kwargs = {}
-
-            return args, kwargs
-
-        dash_dash_index = sysargs.index('--')
-        args, kwargs_list = \
-            sysargs[:dash_dash_index], sysargs[dash_dash_index + 1:]
-
-        splitted_kwargs = [kwarg.split('=') for kwarg in kwargs_list]
+        splitted_kwargs = [kwarg.split('=') for kwarg in sysargs]
         kwargs = {
             splitted_kwarg[0]: '='.join(splitted_kwarg[1:])
             for splitted_kwarg in splitted_kwargs
         }
 
-        return args, kwargs
+        return kwargs
 
 
 class BaseImporter(ImporterRunningMixin):
