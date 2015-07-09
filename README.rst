@@ -13,9 +13,9 @@ It's enough to do:
 
 where ``IMPORT_CONF`` should be the appropriate environment. It defaults to ``local``.
 
-To pass arguments, positional or named:
+To pass named arguments:
 
-``./run.py path.to.importer.package.ImporterClass arg1 arg2 -- param3=arg3 param4=arg4``
+``./run.py path.to.importer.package.ImporterClass example=value demo=argument``
 
 To test a job:
 
