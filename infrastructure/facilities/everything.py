@@ -6,4 +6,5 @@ from infrastructure.facilities import (  # noqa
     config,
     db_registry,
     ftp_registry,
+    email_registry,
 )

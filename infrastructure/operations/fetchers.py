@@ -69,7 +69,9 @@ class FtpFetcher(BaseFileFetcher):
 @BaseFileFetcher.auto_mock_for_local_testing
 class EmailFetcher(BaseFileFetcher):
     # TODO: stub
-    pass
+
+    def __init__(self, source):
+        self.source = source
 
 
 @BaseFileFetcher.register_default_noop
