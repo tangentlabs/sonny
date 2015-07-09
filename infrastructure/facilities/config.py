@@ -20,6 +20,10 @@ class Config(object):
     def get_job_environment_config(self, job_config_filename):
         with open(job_config_filename, "rb") as _file:
             job_config = yaml.load(_file)
+            job_default_config = job_config['default']
             job_environment_config = job_config[self.config_environment]
 
-            return job_environment_config
+            complete_job_environment_config = dict(job_default_config)
+            complete_job_environment_config.update(job_environment_config)
+
+            return complete_job_environment_config
