@@ -3,9 +3,6 @@ from infrastructure import context
 
 def _input_matches_static_values(static_values, _input):
     for key, value in static_values.iteritems():
-        if key not in _input:
-            return False
-
         if _input[key] != value:
             return False
 
