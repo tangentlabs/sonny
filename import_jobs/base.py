@@ -153,6 +153,10 @@ class BaseImporter(ImporterRunningMixin):
     for each environment
     """
 
+    @context.register_current_job_importer
+    def __new__(cls, *args, **kwargs):
+        return super(BaseImporter, cls).__new__(cls, *args, **kwargs)
+
     @abstractmethod
     def run_import(self):
         """

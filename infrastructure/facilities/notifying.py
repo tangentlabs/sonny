@@ -1,7 +1,8 @@
 from functools import wraps
 from abc import ABCMeta, abstractmethod
 
-from infrastructure.context import function_using_current_job, context
+from infrastructure.context import \
+    method_using_current_job, function_using_current_job, context
 
 
 class BaseNotifier(object):
@@ -15,8 +16,11 @@ class BaseNotifier(object):
     def notify(self, recipients, message):
         pass
 
-    def notify_dev_team_for_job_completion(self):
-        self.notify(["dev_team"], "Job complete!")
+    @method_using_current_job
+    def notify_dev_team_for_job_completion(self, job):
+        job_name = '%s.%s' % (job.importer_class.__module__,
+                              job.importer_class.__name__)
+        self.notify(["dev_team"], "Job '%s' complete!" % job_name)
 
 
 @context.register_job_wrapper
