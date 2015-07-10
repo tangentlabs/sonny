@@ -1,17 +1,17 @@
 from functools import wraps
+from abc import ABCMeta, abstractmethod
 
-import utils
-
-from infrastructure.context import \
-    function_using_current_job, method_using_current_job, context
+from infrastructure.context import function_using_current_job, context
 
 
 class BaseNotifier(object):
-    @utils.must_be_implemented_by_subclasses
+    __metaclass__ = ABCMeta
+
+    @abstractmethod
     def __init__(self, *args, **kwargs):
         pass
 
-    @utils.must_be_implemented_by_subclasses
+    @abstractmethod
     def notify(self, recipients, message):
         pass
 

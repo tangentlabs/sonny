@@ -1,6 +1,5 @@
 import os
-
-import utils
+from abc import ABCMeta, abstractmethod
 
 from infrastructure import context
 
@@ -8,11 +7,13 @@ from infrastructure.facilities.mocking import Mockable
 
 
 class BaseFileDeleter(Mockable):
-    @utils.must_be_implemented_by_subclasses
+    __metaclass__ = ABCMeta
+
+    @abstractmethod
     def __init__(self, *args, **kwargs):
         pass
 
-    @utils.must_be_implemented_by_subclasses
+    @abstractmethod
     def delete_file(self, filename):
         pass
 

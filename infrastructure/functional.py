@@ -1,4 +1,4 @@
-import utils
+from abc import ABCMeta, abstractmethod
 
 
 class Pipeline(object):
@@ -16,6 +16,8 @@ class Pipeline(object):
 
 
 class BaseOperation(object):
+    __metaclass__ = ABCMeta
+
     def pipe(self, func):
         return PipeOperation(self, WithInputOperation(func))
 
@@ -28,11 +30,11 @@ class BaseOperation(object):
     def tee(self, *operations):
         return FanOutOperation(self, *operations)
 
-    @utils.must_be_implemented_by_subclasses
+    @abstractmethod
     def with_no_input(self):
         pass
 
-    @utils.must_be_implemented_by_subclasses
+    @abstractmethod
     def taking_input(self, value):
         pass
 

@@ -1,6 +1,5 @@
 from datetime import date
-
-import utils
+from abc import ABCMeta, abstractmethod
 
 from infrastructure import context
 
@@ -15,6 +14,8 @@ from infrastructure.operations import file_deleters
 
 
 class FetchLoadInsertDeleteCleanupImporter(BaseImporter):
+    __metaclass__ = ABCMeta
+
     """
     As the name describes:
     * Fetch a file
@@ -61,7 +62,7 @@ class FetchLoadInsertDeleteCleanupImporter(BaseImporter):
         return filenames
 
     @context.job_step_method
-    @utils.must_be_implemented_by_subclasses
+    @abstractmethod
     def get_files_to_fetch(self):
         """The filenames to fetch from the remote location"""
         pass
@@ -76,6 +77,8 @@ class FetchLoadInsertDeleteCleanupImporter(BaseImporter):
 
 
 class FtpCsvDbImporter(FetchLoadInsertDeleteCleanupImporter):
+    __metaclass__ = ABCMeta
+
     """
     A more specific importer:
     * Use FTP for importing
@@ -95,7 +98,7 @@ class FtpCsvDbImporter(FetchLoadInsertDeleteCleanupImporter):
     def get_files_to_fetch(self):
         return self.get_ftp_files_to_fetch()
 
-    @utils.must_be_implemented_by_subclasses
+    @abstractmethod
     def ftp_files_to_fetch(self):
         pass
 
@@ -105,6 +108,8 @@ class FtpCsvDbImporter(FetchLoadInsertDeleteCleanupImporter):
 
 
 class EmailLoadTransformInsertDeleteImporter(BaseImporter):
+    __metaclass__ = ABCMeta
+
     """
     * Fetch today's files from email using config search params
     * Load them

@@ -2,8 +2,7 @@ import csv
 import xlrd
 import datetime
 from StringIO import StringIO
-
-import utils
+from abc import ABCMeta, abstractmethod
 
 from infrastructure import context
 
@@ -11,11 +10,13 @@ from infrastructure.facilities.mocking import Mockable
 
 
 class BaseLoader(Mockable):
-    @utils.must_be_implemented_by_subclasses
+    __metaclass__ = ABCMeta
+
+    @abstractmethod
     def __init__(self, *args, **kwargs):
         pass
 
-    @utils.must_be_implemented_by_subclasses
+    @abstractmethod
     def get_all_data_with_headers(self, filename):
         pass
 

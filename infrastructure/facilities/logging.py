@@ -1,28 +1,32 @@
 from functools import wraps
+from abc import ABCMeta, abstractmethod
 
 import utils
+
 from infrastructure.context import \
     function_using_current_job, method_using_current_job, context
 
 
 class BaseLogger(object):
-    @utils.must_be_implemented_by_subclasses
+    __metaclass__ = ABCMeta
+
+    @abstractmethod
     def __init__(self, *args, **kwargs):
         pass
 
-    @utils.must_be_implemented_by_subclasses
+    @abstractmethod
     def debug(self, *args, **kwargs):
         pass
 
-    @utils.must_be_implemented_by_subclasses
+    @abstractmethod
     def info(self, *args, **kwargs):
         pass
 
-    @utils.must_be_implemented_by_subclasses
+    @abstractmethod
     def warn(self, *args, **kwargs):
         pass
 
-    @utils.must_be_implemented_by_subclasses
+    @abstractmethod
     def error(self, *args, **kwargs):
         pass
 

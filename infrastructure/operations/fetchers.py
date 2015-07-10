@@ -5,8 +5,7 @@ import tempfile
 from email import message_from_string
 from email.parser import HeaderParser
 from email.header import decode_header
-
-import utils
+from abc import ABCMeta, abstractmethod
 
 from infrastructure import context
 
@@ -14,11 +13,13 @@ from infrastructure.facilities.mocking import Mockable
 
 
 class BaseFileFetcher(Mockable):
-    @utils.must_be_implemented_by_subclasses
+    __metaclass__ = ABCMeta
+
+    @abstractmethod
     def __init__(self, *args, **kwargs):
         pass
 
-    @utils.must_be_implemented_by_subclasses
+    @abstractmethod
     def fetch_file(self, filename):
         return filename
 
@@ -28,7 +29,7 @@ class BaseFileFetcher(Mockable):
             for filename in filenames
         ]
 
-    @utils.must_be_implemented_by_subclasses
+    @abstractmethod
     def fetch_from_search(self, *args, **kwargs):
         pass
 
@@ -91,6 +92,10 @@ class FtpFetcher(BaseFileFetcher):
 
         return local_filename
 
+    @context.job_step_method
+    def fetch_from_search(self, maillbox, **search_params):
+        raise Exception("This fetcher doesn't support 'fetch_from_search'")
+
 
 class ImapContextManager(object):
     """
@@ -139,6 +144,10 @@ class EmailFetcher(BaseFileFetcher):
         self.source = source
         self.pattern = pattern.lower()
         self.header_parser = HeaderParser()
+
+    @context.job_step_method
+    def fetch_file(self, filename):
+        raise Exception("This fetcher doesn't support 'fetch_file'")
 
     @context.job_step_method
     def fetch_from_search(self, maillbox, **search_params):

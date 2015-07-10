@@ -1,20 +1,23 @@
-import utils
+from abc import ABCMeta, abstractmethod
 
-from infrastructure.context import \
-    function_using_current_job, method_using_current_job, context
+from infrastructure.context import method_using_current_job
 
 
 class BaseRegistry(object):
-    @utils.must_be_implemented_by_subclasses
+    __metaclass__ = ABCMeta
+
+    @abstractmethod
     def __init__(self, *args, **kwargs):
         pass
 
-    @utils.must_be_implemented_by_subclasses
+    @abstractmethod
     def __getitem__(self, key):
         pass
 
 
 class GenericConfigRegistry(BaseRegistry):
+    __metaclass__ = ABCMeta
+
     registry_config_name = None
     """
     The name of the atrtribute to get from config
