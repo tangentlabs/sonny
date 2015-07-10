@@ -1,14 +1,17 @@
+from datetime import date
+
 import utils
 
 from infrastructure import context
 
 from import_jobs.base import BaseImporter
 
-from infrastructure.operations.transformers import dicts_to_tuples
-from infrastructure.operations.fetchers import FtpFetcher
-from infrastructure.operations.loaders import CsvLoader
-from infrastructure.operations.savers import DbSaver
-from infrastructure.operations.file_deleters import LocalFileDeleter
+from infrastructure.operations import fetchers
+from infrastructure.operations import loaders
+from infrastructure.operations import transformers
+from infrastructure.operations import formatters
+from infrastructure.operations import savers
+from infrastructure.operations import file_deleters
 
 
 class FetchLoadInsertDeleteCleanupImporter(BaseImporter):
@@ -44,7 +47,7 @@ class FetchLoadInsertDeleteCleanupImporter(BaseImporter):
         local_filenames = self.fetcher(self.file_server).fetch_files(filenames)
         for local_filename in local_filenames:
             data = self._loader().get_all_data_with_headers(local_filename)
-            data = dicts_to_tuples(self.insert_query_fields)(data)
+            data = transformers.dicts_to_tuples(self.insert_query_fields)(data)
             self.saver(self.insert_query).save(data)
         self.deleter().delete_files(local_filenames)
         self.saver(self.post_job_query).save_no_data()
@@ -74,16 +77,16 @@ class FetchLoadInsertDeleteCleanupImporter(BaseImporter):
 
 class FtpCsvDbImporter(FetchLoadInsertDeleteCleanupImporter):
     """
-    A more specific improter:
+    A more specific importer:
     * Use FTP for importing
     * Use CSV for loading
     * Use a DB for inserting
     * Use a local file deleter
     """
-    fetcher = FtpFetcher
-    _loader = CsvLoader
-    saver = DbSaver
-    deleter = LocalFileDeleter
+    fetcher = fetchers.FtpFetcher
+    _loader = loaders.CsvLoader
+    saver = savers.DbSaver
+    deleter = file_deleters.LocalFileDeleter
 
     def __init__(self, ftp_files_to_fetch=None):
         super(FtpCsvDbImporter, self).__init__(ftp_files_to_fetch)
@@ -99,3 +102,66 @@ class FtpCsvDbImporter(FetchLoadInsertDeleteCleanupImporter):
     @property
     def file_server(self):
         return self.ftp_server
+
+
+class EmailLoadTransformInsertDeleteImporter(BaseImporter):
+    """
+    * Fetch today's files from email using config search params
+    * Load them
+    * Transform them
+    * Insert them, potentionally in multiple queries
+    * Delete the files
+    """
+
+    email_source = None
+    file_pattern = '*.xls'
+    insert_queries = None
+
+    fetcher = fetchers.EmailFetcher
+    _loader = loaders.ExcelLoader
+    saver = savers.DbSaver
+    file_deleter = file_deleters.LocalFileDeleter
+
+    def __init__(self, _today=None, files_to_fetch=None):
+        self._today = _today or date.today()
+        self.files_to_fetch = files_to_fetch
+
+    @context.job_step_method
+    def run_import(self):
+        search_kwargs = self.get_search_kwargs()
+        local_filenames = self.fetcher(self.email_source, self.file_pattern)\
+            .fetch_from_search('INBOX', **search_kwargs)
+        for local_filename in local_filenames:
+            data = self._loader().get_all_data_with_headers(local_filename)
+            data = self.transform_data(data)
+
+            if len(self.insert_queries) > 1:
+                # TODO: Perhaps we should be loading the file twice, instead of
+                # creating a potentionally big tuple in-memory?
+                data = transformers.generator_to_tuples()(data)
+
+            for insert_query in self.insert_queries:
+                self.saver(insert_query).save(data)
+
+        self.file_deleter().delete_files(local_filenames)
+
+    @context.job_step_method
+    def get_search_kwargs(self):
+        if self.files_to_fetch is not None:
+            return {
+                'filenames': self.files_to_fetch,
+            }
+        else:
+            kwargs = self.get_email_search_kwargs()
+            kwargs.update({
+                'Date__contains': formatters.date_format.imap(self._today),
+            })
+
+            return kwargs
+
+    def get_email_search_kwargs(self):
+        return self.job_environment_config['email_search_query']
+
+    @context.job_step_method
+    def transform_data(self, data):
+        return data
