@@ -7,7 +7,11 @@ All the importing that needs to be done
 Usage
 ====
 
-It's enough to do:
+To see all jobs defined:
+
+``./list.py``
+
+To run a job it's enough to do:
 
 ``IMPORT_CONF=live ./run.py path.to.importer.package.ImporterClass``
 
