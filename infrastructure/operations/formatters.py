@@ -17,4 +17,5 @@ def register_date_format(name):
     return decorator
 
 
-register_date_format("rfc_2822")(date_format("%d %b %Y"))
+register_date_format("rfc_3501")(date_format("%d-%b-%Y"))
+register_date_format("imap")(date_format.rfc_3501)
