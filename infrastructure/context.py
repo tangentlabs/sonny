@@ -1,4 +1,5 @@
 from functools import wraps
+from abc import ABCMeta
 
 import utils
 
@@ -391,6 +392,34 @@ def create_for_job(func):
     """
 
     return JobWrapper(func)
+
+
+def register_current_job_importer(func):
+    """
+    Attach the importer instance to the Job
+    """
+
+    @wraps(func)
+    @method_using_current_job
+    def decorated(self_or_cls, job, *args, **kwargs):
+        if type(self_or_cls) in (type(object), ABCMeta):
+            cls = self_or_cls
+            importer_class = cls
+        else:
+            self = self_or_cls
+            importer_class = type(self)
+
+        if getattr(job, 'importer_class', None):
+            raise Exception("Attempting to register run two importers in same "
+                            "job: %s, while running %s" %
+                            (importer_class.__name__,
+                             job.importer_class.__name__))
+
+        job.importer_class = importer_class
+
+        return func(self_or_cls, *args, **kwargs)
+
+    return decorated
 
 
 def job_step(func):
