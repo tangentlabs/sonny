@@ -59,11 +59,3 @@ def is_argumentless_decorator(decorator_args):
 
     potentional_callable = decorator_args[0]
     return is_callable(potentional_callable)
-
-
-def must_be_implemented_by_subclasses(method):
-    @wraps(method)
-    def decorated(*args, **kwargs):
-        raise NotImplementedError(get_callable_name(method))
-
-    return decorated

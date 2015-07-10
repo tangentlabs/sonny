@@ -2,6 +2,7 @@
 
 from pydoc import locate
 import pkgutil
+import inspect
 
 import import_jobs
 from import_jobs.base import BaseImporter
@@ -12,7 +13,8 @@ def get_subpackages_recursive(package, is_package=True):
         return []
 
     return sum([
-        [locate(modname)] + get_subpackages_recursive(locate(modname), sub_package_is_package)
+        [locate(modname)] + get_subpackages_recursive(locate(modname),
+                                                      sub_package_is_package)
         for _, modname, sub_package_is_package
         in pkgutil.iter_modules(package.__path__, package.__name__ + '.')
     ], [])
@@ -29,7 +31,7 @@ def get_importer_classes(packages):
         for potentional_importer in potentional_importers
         if type(potentional_importer) == type(BaseImporter)
         and issubclass(potentional_importer, BaseImporter)
-        and potentional_importer != BaseImporter
+        and not inspect.isabstract(potentional_importer)
     )
 
 

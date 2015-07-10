@@ -1,5 +1,6 @@
 import time
 from functools import wraps
+from abc import ABCMeta, abstractmethod
 
 import utils
 from infrastructure.context import \
@@ -7,11 +8,13 @@ from infrastructure.context import \
 
 
 class BaseProfiler(object):
-    @utils.must_be_implemented_by_subclasses
+    __metaclass__ = ABCMeta
+
+    @abstractmethod
     def __init__(self, *args, **kwargs):
         pass
 
-    @utils.must_be_implemented_by_subclasses
+    @abstractmethod
     def job_step(self, name):
         pass
 

@@ -1,6 +1,5 @@
 import sys
-
-import utils
+from abc import ABCMeta, abstractmethod
 
 from infrastructure import context
 
@@ -142,6 +141,8 @@ class ImporterRunningMixin(object):
 
 
 class BaseImporter(ImporterRunningMixin):
+    __metaclass__ = ABCMeta
+
     """
     A basic interface for importers
     """
@@ -152,7 +153,7 @@ class BaseImporter(ImporterRunningMixin):
     for each environment
     """
 
-    @utils.must_be_implemented_by_subclasses
+    @abstractmethod
     def run_import(self):
         """
         The main function that does all the importing
