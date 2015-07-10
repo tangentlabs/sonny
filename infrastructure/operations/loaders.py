@@ -1,4 +1,7 @@
 import csv
+import xlrd
+import datetime
+from StringIO import StringIO
 
 import utils
 
@@ -42,14 +45,6 @@ class CsvLoader(BaseLoader):
                 for header, value in zip(headers, row)
             }
             yield datum
-
-
-import csv
-import sys
-import xlrd
-import datetime
-from ftplib import FTP
-from StringIO import StringIO
 
 
 class ExcelLoader(BaseLoader):
