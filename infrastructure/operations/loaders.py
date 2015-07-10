@@ -143,15 +143,10 @@ class ExcelLoader(BaseLoader):
 
         cell_type = sheet.cell_type(row, column)
 
-        if cell_type == xlrd.biffh.XL_CELL_EMPTY:
-            value = self._get_sheet_cell_value_as_empty(sheet, value)
-        elif cell_type == xlrd.biffh.XL_CELL_DATE:
+        if cell_type == xlrd.biffh.XL_CELL_DATE:
             value = self._get_sheet_cell_value_as_date(sheet, value)
 
         return value
-
-    def _get_sheet_cell_value_as_empty(self, sheet, value):
-        return None
 
     def _get_sheet_cell_value_as_date(self, sheet, value):
         date_tuple = xlrd.xldate_as_tuple(value, sheet.book.datemode)
