@@ -92,14 +92,15 @@ class FtpCsvDbImporter(FetchLoadInsertDeleteCleanupImporter):
     deleter = file_deleters.LocalFileDeleter
 
     def __init__(self, ftp_files_to_fetch=None):
-        super(FtpCsvDbImporter, self).__init__(ftp_files_to_fetch)
+        super(FtpCsvDbImporter, self).__init__(
+            files_to_fetch=ftp_files_to_fetch)
 
     @context.job_step_method
     def get_files_to_fetch(self):
         return self.get_ftp_files_to_fetch()
 
     @abstractmethod
-    def ftp_files_to_fetch(self):
+    def get_ftp_files_to_fetch(self):
         pass
 
     @property
