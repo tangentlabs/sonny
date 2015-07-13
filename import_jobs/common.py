@@ -51,11 +51,13 @@ class FetchLoadInsertDeleteCleanupImporter(BaseImporter):
             filenames = filenames_or_search_kwargs
             local_filenames = self.fetcher(self.file_server).fetch_files(filenames)
 
-        for local_filename in local_filenames:
-            data = self._loader().get_all_data_with_headers(local_filename)
-            data = self.transform_data(data)
-            self.saver(self.insert_query).save(data)
-        self.deleter().delete_files(local_filenames)
+        try:
+            for local_filename in local_filenames:
+                data = self._loader().get_all_data_with_headers(local_filename)
+                data = self.transform_data(data)
+                self.saver(self.insert_query).save(data)
+        finally:
+            self.deleter().delete_files(local_filenames)
         self.saver(self.post_job_query).save_no_data()
 
     @context.job_step_method
@@ -149,19 +151,21 @@ class EmailLoadTransformInsertDeleteImporter(BaseImporter):
         search_kwargs = self.get_search_kwargs()
         local_filenames = self.fetcher(self.email_source, self.file_pattern)\
             .fetch_from_search('INBOX', **search_kwargs)
-        for local_filename in local_filenames:
-            data = self._loader().get_all_data_with_headers(local_filename)
-            data = self.transform_data(data)
 
-            if len(self.insert_queries) > 1:
-                # TODO: Perhaps we should be loading the file twice, instead of
-                # creating a potentionally big tuple in-memory?
-                data = transformers.generator_to_tuples()(data)
+        try:
+            for local_filename in local_filenames:
+                data = self._loader().get_all_data_with_headers(local_filename)
+                data = self.transform_data(data)
 
-            for insert_query in self.insert_queries:
-                self.saver(insert_query).save(data)
+                if len(self.insert_queries) > 1:
+                    # TODO: Perhaps we should be loading the file twice,
+                    # instead of creating a potentionally big tuple in-memory?
+                    data = transformers.generator_to_tuples()(data)
 
-        self.file_deleter().delete_files(local_filenames)
+                for insert_query in self.insert_queries:
+                    self.saver(insert_query).save(data)
+        finally:
+            self.file_deleter().delete_files(local_filenames)
 
     @context.job_step_method
     def get_search_kwargs(self):
