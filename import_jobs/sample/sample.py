@@ -17,21 +17,6 @@ class SampleImporter(common.FtpCsvDbImporter):
 
     ftp_server = "toolkit"
 
-    insert_query_fields = [
-        "ACCNO",
-        "STBR",
-        "CUSTOMER",
-        "LIMIT",
-        "ADDRESS01",
-        "ADDRESS02",
-        "ADDRESS03",
-        "ADDRESS04",
-        "ADDRESS05",
-        "TELEPHONE",
-        "TERMS",
-        "OPENED",
-    ]
-
     insert_query = {
         "database": "dashboard_live",
         "file": location("sample.sql"),

@@ -25,7 +25,6 @@ class FetchLoadInsertDeleteCleanupImporter(BaseImporter):
     * Run a post-job script
     """
     file_server = None
-    insert_query_fields = None
     insert_query = None
     post_job_query = None
 
@@ -48,7 +47,6 @@ class FetchLoadInsertDeleteCleanupImporter(BaseImporter):
         local_filenames = self.fetcher(self.file_server).fetch_files(filenames)
         for local_filename in local_filenames:
             data = self._loader().get_all_data_with_headers(local_filename)
-            data = transformers.dicts_to_tuples(self.insert_query_fields)(data)
             self.saver(self.insert_query).save(data)
         self.deleter().delete_files(local_filenames)
         self.saver(self.post_job_query).save_no_data()
