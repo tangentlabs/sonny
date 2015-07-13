@@ -84,6 +84,9 @@ def generic_map(func):
 def update_with_static_values(static_values):
     """
     Update ech dict with static values
+
+    >>> list(update_with_static_values({'a':1, 'b':2})([{'a':3, 'c':4}, {}]))
+    [{'a': 1, 'b':2, 'c':4}]
     """
 
     static_values_items = static_values.items()
@@ -94,9 +97,33 @@ def update_with_static_values(static_values):
     return generic_map(update_with_static_values_for_input)
 
 
+def update_with_dynamic_values(dynamic_values):
+    """
+    Update ech dict with dynamic values, using functions
+    >>> list(update_with_dynamic_values({'a': lambda _input: _input['b'] or 5})
+        ([{'b':2, 'c': 3}, {'a':1}]))
+    [{'a': 2, 'b':2, 'c': 3}, {'a': 5}]
+    """
+
+    dynamic_values_items = dynamic_values.items()
+
+    def update_with_static_values_for_input(_input):
+        updated = dict(_input)
+        updated.update({
+            key: func(_input)
+            for key, func in dynamic_values_items
+        })
+
+        return updated
+
+    return generic_map(update_with_static_values_for_input)
+
+
 def generator_to_tuples():
     """
     Consume a generator into a tuple
+    >>> generator_to_tuples(xrange(5))
+    tuple(xrange(5))
     """
 
     @context.job_step
