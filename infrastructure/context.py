@@ -319,6 +319,8 @@ class JobWrapper(object):
     job run
     """
 
+    __name__ = 'JobWrapper'
+
     def __init__(self, func):
         self.func = func
 
