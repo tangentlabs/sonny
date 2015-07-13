@@ -85,16 +85,42 @@ class FtpFetcher(BaseFileFetcher):
         self.source = source
 
     @context.job_step_method
+    def fetch_files(self, filenames):
+        with FtpContextManager(self.source) as ftp:
+            return self._fetch_files_with_ftp(ftp, filenames)
+
+    @context.job_step_method
     def fetch_file(self, filename):
         with FtpContextManager(self.source) as ftp:
-            with TemporaryFileContextManager() as (local_filename, local_file):
-                ftp.retrbinary('RETR %s' % filename, local_file.write)
+            return self._fetch_file_with_ftp(ftp, filename)
+
+    @context.job_step_method
+    def fetch_from_search(self, directory, pattern="*"):
+        with FtpContextManager(self.source) as ftp:
+            ftp.cwd(directory)
+            filenames = ftp.nlst()
+            filtered = self._filter_files_by_filename(filenames, pattern)
+
+            return self._fetch_files_with_ftp(ftp, filtered)
+
+    def _fetch_files_with_ftp(self, ftp, filenames):
+        return [
+            self._fetch_file_with_ftp(ftp, filename)
+            for filename in filenames
+        ]
+
+    def _fetch_file_with_ftp(self, ftp, filename):
+        with TemporaryFileContextManager() as (local_filename, local_file):
+            ftp.retrbinary('RETR %s' % filename, local_file.write)
 
         return local_filename
 
-    @context.job_step_method
-    def fetch_from_search(self, maillbox, **search_params):
-        raise Exception("This fetcher doesn't support 'fetch_from_search'")
+    def _filter_files_by_filename(self, filenames, pattern):
+        return [
+            filename
+            for filename in filenames
+            if fnmatch.fnmatch(filename, pattern)
+        ]
 
 
 class ImapContextManager(object):

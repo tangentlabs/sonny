@@ -43,26 +43,40 @@ class FetchLoadInsertDeleteCleanupImporter(BaseImporter):
 
     @context.job_step_method
     def run_import(self):
-        filenames = self._get_files_to_fetch()
-        local_filenames = self.fetcher(self.file_server).fetch_files(filenames)
+        filenames_or_search_kwargs, is_pattern = self._get_files_or_search_to_fetch()
+        if is_pattern:
+            search_kwargs = filenames_or_search_kwargs
+            local_filenames = self.fetcher(self.file_server).fetch_files_from_search(**search_kwargs)
+        else:
+            filenames = filenames_or_search_kwargs
+            local_filenames = self.fetcher(self.file_server).fetch_files(filenames)
+
         for local_filename in local_filenames:
             data = self._loader().get_all_data_with_headers(local_filename)
+            data = self.transform_data(data)
             self.saver(self.insert_query).save(data)
         self.deleter().delete_files(local_filenames)
         self.saver(self.post_job_query).save_no_data()
 
-    def _get_files_to_fetch(self):
+    @context.job_step_method
+    def transform_data(self, data):
+        return data
+
+    def _get_files_or_search_to_fetch(self):
         if self.files_to_fetch:
+            is_pattern = False
             filenames = self.files_to_fetch
         else:
-            filenames = self.get_files_to_fetch()
+            filenames, is_pattern = self.get_files_or_search_to_fetch()
 
-        return filenames
+        return filenames, is_pattern
 
     @context.job_step_method
     @abstractmethod
-    def get_files_to_fetch(self):
-        """The filenames to fetch from the remote location"""
+    def get_files_or_search_to_fetch(self):
+        """
+        The filenames, or search pattern, to fetch from the remote location
+        """
         pass
 
     @classmethod
@@ -94,11 +108,11 @@ class FtpCsvDbImporter(FetchLoadInsertDeleteCleanupImporter):
             files_to_fetch=ftp_files_to_fetch)
 
     @context.job_step_method
-    def get_files_to_fetch(self):
-        return self.get_ftp_files_to_fetch()
+    def get_files_or_search_to_fetch(self):
+        return self.get_ftp_files_or_search_to_fetch()
 
     @abstractmethod
-    def get_ftp_files_to_fetch(self):
+    def get_ftp_files_or_search_to_fetch(self):
         pass
 
     @property

@@ -26,7 +26,11 @@ class SampleImporter(common.FtpCsvDbImporter):
         "file": location("sample_post.sql"),
     }
 
-    test_files_to_fetch = [location("sample.csv")]
+    test_defaults = {
+        "ftp_files_to_fetch": [location("sample.csv")],
+    }
 
-    def get_ftp_files_to_fetch(self):
-        return ['NEW_Accounts_%s.csv' % date.today().strftime('%d%m%Y')]
+    def get_ftp_files_or_search_to_fetch(self):
+        is_pattern = False
+        filenames = ['NEW_Accounts_%s.csv' % date.today().strftime('%d%m%Y')]
+        return filenames, is_pattern
