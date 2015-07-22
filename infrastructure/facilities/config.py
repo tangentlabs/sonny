@@ -5,9 +5,11 @@ from importlib import import_module
 from infrastructure.context import \
     function_using_current_job, method_using_current_job, context
 
+from infrastructure.facilities.base import BaseFacility
+
 
 @context.register_job_facility_factory("config")
-class Config(object):
+class Config(BaseFacility):
     CONF_ENV_VAR_NAME = "IMPORT_CONF"
 
     def __init__(self, job):

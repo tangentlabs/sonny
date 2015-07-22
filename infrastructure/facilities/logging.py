@@ -6,13 +6,21 @@ import utils
 from infrastructure.context import \
     function_using_current_job, method_using_current_job, context
 
+from infrastructure.facilities.base import BaseFacility
 
-class BaseLogger(object):
+
+class BaseLogger(BaseFacility):
     __metaclass__ = ABCMeta
 
     @abstractmethod
     def __init__(self, *args, **kwargs):
         pass
+
+    @method_using_current_job
+    def __exit__(self, job, _type, value, traceback):
+        if job.test:
+            print '*********** LOGS: ***********'
+            print self
 
     @abstractmethod
     def debug(self, *args, **kwargs):

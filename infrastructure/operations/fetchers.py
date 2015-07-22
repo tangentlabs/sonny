@@ -1,3 +1,4 @@
+import os
 import fnmatch
 from ftplib import FTP
 import imaplib
@@ -28,6 +29,10 @@ class BaseFileFetcher(Mockable):
             self.fetch_file(filename)
             for filename in filenames
         ]
+
+    @abstractmethod
+    def search_files(self, *args, **kwargs):
+        pass
 
     @abstractmethod
     def fetch_from_search(self, *args, **kwargs):
@@ -95,13 +100,29 @@ class FtpFetcher(BaseFileFetcher):
             return self._fetch_file_with_ftp(ftp, filename)
 
     @context.job_step_method
+    def search_files(self, directory, pattern="*"):
+        with FtpContextManager(self.source) as ftp:
+            filenames = self._search_files_with_ftp(ftp, directory, pattern)
+            filenames = [
+                os.path.join(directory, filename)
+                for filename in filenames
+            ]
+
+            return filenames
+
+    @context.job_step_method
     def fetch_from_search(self, directory, pattern="*"):
         with FtpContextManager(self.source) as ftp:
-            ftp.cwd(directory)
-            filenames = ftp.nlst()
-            filtered = self._filter_files_by_filename(filenames, pattern)
+            filenames = self._search_files_with_ftp(ftp, directory, pattern)
 
-            return self._fetch_files_with_ftp(ftp, filtered)
+            return self._fetch_files_with_ftp(ftp, filenames)
+
+    def _search_files_with_ftp(self, ftp, directory, pattern="*"):
+        ftp.cwd(directory)
+        filenames = ftp.nlst()
+        filtered = self._filter_files_by_filename(filenames, pattern)
+
+        return filtered
 
     def _fetch_files_with_ftp(self, ftp, filenames):
         return [
@@ -174,6 +195,10 @@ class EmailFetcher(BaseFileFetcher):
     @context.job_step_method
     def fetch_file(self, filename):
         raise Exception("This fetcher doesn't support 'fetch_file'")
+
+    @context.job_step_method
+    def search_files(self, *args, **kwargs):
+        raise Exception("This fetcher doesn't support 'search_files'")
 
     @context.job_step_method
     def fetch_from_search(self, maillbox, **search_params):
@@ -285,4 +310,8 @@ class NoOpFetcher(BaseFileFetcher):
 
     @context.job_step_method
     def fetch_from_search(self, *args, **kwargs):
+        return kwargs.get('filenames') or []
+
+    @context.job_step_method
+    def search_files(self, *args, **kwargs):
         return kwargs.get('filenames') or []

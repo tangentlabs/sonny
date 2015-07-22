@@ -1,8 +1,10 @@
 from infrastructure.context import method_using_current_job, context
 
+from infrastructure.facilities.base import BaseFacility
+
 
 @context.register_job_facility_factory("mock_registry")
-class MockRegistry(object):
+class MockRegistry(BaseFacility):
     auto_mocks_for_local_testing = set()
     """
     Classes that should be automatically mocked when testing locally
@@ -12,6 +14,7 @@ class MockRegistry(object):
         self.mocks = {}
         self._job = job
 
+    def __enter__(self):
         # Automatically mock when running in a test
         if self._job.test:
             self.register_auto_mocks_for_local_testing()
