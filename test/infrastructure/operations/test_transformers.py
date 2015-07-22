@@ -3,7 +3,7 @@
 import unittest
 from ddt import ddt, data, unpack
 
-from infrastructure import context
+from infrastructure.context import helpers
 from infrastructure.facilities import *  # noqa
 
 from infrastructure.operations import transformers
@@ -34,7 +34,7 @@ class TestKeepKeys(unittest.TestCase):
         (['a', 'c'], [{'a': 1, 'b': 2}, {'b': 3, 'c': 4}, {'a': 5, 'c': 6}, {'d': 7}], [{'a': 1}, {'c': 4}, {'a': 5, 'c': 6}, {}]),
     )
     @unpack
-    @context.create_for_job
+    @helpers.create_for_job
     def test_transformer_output(self, keys, inputs, expected):
         transformer = self.transformer(keys)
         result = list(transformer(inputs))
@@ -72,7 +72,7 @@ class TestDictsToTuples(unittest.TestCase):
         ], None, (KeyError,)),
     )
     @unpack
-    @context.create_for_job
+    @helpers.create_for_job
     def test_transformer_output(self, keys, inputs, expected, raises):
         transformer = self.transformer(keys)
 
@@ -121,7 +121,7 @@ class TestCastDictValues(unittest.TestCase):
         ]),
     )
     @unpack
-    @context.create_for_job
+    @helpers.create_for_job
     def test_transformer_output(self, casts, inputs, expected):
         transformer = self.transformer(casts)
 
@@ -144,7 +144,7 @@ class TestGenericMap(unittest.TestCase):
         (nuller, [(1, 2), (3, 4)], [None, None]),
     )
     @unpack
-    @context.create_for_job
+    @helpers.create_for_job
     def test_transformer_output(self, casts, inputs, expected):
         transformer = self.transformer(casts)
 
@@ -171,7 +171,7 @@ class TestUpdateWithStaticValues(unittest.TestCase):
         (static_values, [{'a': 3, 'c': 5}], [{'a': 1, 'b': 2, 'c': 5}]),
     )
     @unpack
-    @context.create_for_job
+    @helpers.create_for_job
     def test_transformer_output(self, casts, inputs, expected):
         transformer = self.transformer(casts)
 
@@ -198,7 +198,7 @@ class TestUpdateWithDynamicValues(unittest.TestCase):
         (dynamic_values, [{'a': 3, 'c': 5}], [{'a': 3, 'b': 2, 'c': 5}]),
     )
     @unpack
-    @context.create_for_job
+    @helpers.create_for_job
     def test_transformer_output(self, casts, inputs, expected):
         transformer = self.transformer(casts)
 

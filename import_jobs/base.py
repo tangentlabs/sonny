@@ -1,11 +1,11 @@
 from abc import ABCMeta, abstractmethod
 
-from infrastructure import context
+from infrastructure.context import helpers
 
 from import_jobs.runner import ImporterRunningMixin
 
 
-class BaseImporter(context.get_helpers_mixin(), ImporterRunningMixin):
+class BaseImporter(helpers.get_helpers_mixin(), ImporterRunningMixin):
     __metaclass__ = ABCMeta
 
     """
@@ -18,7 +18,7 @@ class BaseImporter(context.get_helpers_mixin(), ImporterRunningMixin):
     for each environment
     """
 
-    @context.register_current_job_importer
+    @helpers.register_current_job_importer
     def __new__(cls, *args, **kwargs):
         return super(BaseImporter, cls).__new__(cls, *args, **kwargs)
 

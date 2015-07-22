@@ -2,7 +2,7 @@ from abc import ABCMeta, abstractmethod
 
 import MySQLdb
 
-from infrastructure import context
+from infrastructure.context import helpers
 
 from infrastructure.facilities.mocking import Mockable
 
@@ -28,7 +28,7 @@ class BaseSaver(Mockable):
 
 @BaseSaver.auto_mock_for_local_testing
 class DbSaver(BaseSaver):
-    @context.method_using_current_job("db_registry")
+    @helpers.method_using_current_job("db_registry")
     def __init__(self, db_registry, destination):
         self.db_registry = db_registry
         self.destination = destination
@@ -48,12 +48,12 @@ class DbSaver(BaseSaver):
         )
         self.cursor = self.connection.cursor()
 
-    @context.job_step_method
+    @helpers.job_step_method
     def save(self, data):
         self.cursor.executemany(self.query, data)
         self.connection.commit()
 
-    @context.job_step_method
+    @helpers.job_step_method
     def save_no_data(self):
         self.save([])
 
@@ -63,12 +63,12 @@ class PrintSaver(BaseSaver):
     def __init__(self, *args, **kwargs):
         pass
 
-    @context.job_step_method
+    @helpers.job_step_method
     def save(self, data):
         print 'Save with data'
         for datum in data:
             print datum
 
-    @context.job_step_method
+    @helpers.job_step_method
     def save_no_data(self):
         print 'Save with no data'

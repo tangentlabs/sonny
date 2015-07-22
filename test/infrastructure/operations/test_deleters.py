@@ -5,7 +5,7 @@ import tempfile
 
 import unittest
 
-from infrastructure import context
+from infrastructure.context import helpers
 from infrastructure.facilities import *  # noqa
 
 from infrastructure.operations.file_deleters import \
@@ -33,14 +33,14 @@ class TestLocalFileDeleter(unittest.TestCase):
     def file_exists(self, filename):
         return os.path.isfile(filename)
 
-    @context.create_for_job
+    @helpers.create_for_job
     def test_deleter_deletes(self):
         with TempFilesContextManager() as (filename,):
             self.assertTrue(self.file_exists(filename))
             self.deleter().delete_file(filename)
             self.assertFalse(self.file_exists(filename))
 
-    @context.create_for_job
+    @helpers.create_for_job
     def test_deleter_only_deletes_file_provided(self):
         with TempFilesContextManager(file_count=2) as (filename1, filename2):
             self.assertTrue(self.file_exists(filename1))
@@ -56,14 +56,14 @@ class TestNoOpFileDeleter(unittest.TestCase):
     def file_exists(self, filename):
         return os.path.isfile(filename)
 
-    @context.create_for_job
+    @helpers.create_for_job
     def test_deleter_doesnt_delete(self):
         with TempFilesContextManager() as (filename,):
             self.assertTrue(self.file_exists(filename))
             self.deleter().delete_file(filename)
             self.assertTrue(self.file_exists(filename))
 
-    @context.create_for_job
+    @helpers.create_for_job
     def test_deleter_works_with_bogus_file(self):
         filename = "completey bogus filename"
         self.deleter().delete_file(filename)

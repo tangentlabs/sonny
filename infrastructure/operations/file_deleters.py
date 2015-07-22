@@ -1,7 +1,7 @@
 import os
 from abc import ABCMeta, abstractmethod
 
-from infrastructure import context
+from infrastructure.context import helpers
 
 from infrastructure.facilities.mocking import Mockable
 
@@ -27,7 +27,7 @@ class LocalFileDeleter(BaseFileDeleter):
     def __init__(self):
         pass
 
-    @context.job_step_method
+    @helpers.job_step_method
     def delete_file(self, filename):
         os.remove(filename)
 
@@ -37,6 +37,6 @@ class NoOpFileDeleter(BaseFileDeleter):
     def __init__(self):
         pass
 
-    @context.job_step_method
+    @helpers.job_step_method
     def delete_file(self, filename):
         pass

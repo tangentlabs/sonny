@@ -4,7 +4,7 @@ import datetime
 from StringIO import StringIO
 from abc import ABCMeta, abstractmethod
 
-from infrastructure import context
+from infrastructure.context import helpers
 
 from infrastructure.facilities.mocking import Mockable
 
@@ -28,7 +28,7 @@ class CsvLoader(BaseLoader):
     def __init__(self):
         pass
 
-    @context.job_step_method
+    @helpers.job_step_method
     def get_all_data_with_headers(self, filename):
         with open(filename, 'rb') as _file:
             data = self.get_all_data_with_headers_from_file(_file)
@@ -58,7 +58,7 @@ class ExcelLoader(BaseLoader):
         self.skip_start_empty_rows = skip_start_empty_rows
         self.skip_start_empty_columns = skip_start_empty_columns
 
-    @context.job_step_method
+    @helpers.job_step_method
     def get_all_data_with_headers(self, filename):
         workbook = self._load_workbook(filename)
         sheet = workbook.sheet_by_index(self.sheet_index)
@@ -78,7 +78,7 @@ class ExcelLoader(BaseLoader):
 
         return workbook
 
-    @context.method_using_current_job("logger")
+    @helpers.method_using_current_job("logger")
     def _log_import_logs(self, logger, logfile):
         for logline in logfile:
             if logline.startswith(self.XLRD_WARNING_LOG_PREFIX):
