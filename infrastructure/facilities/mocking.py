@@ -12,6 +12,10 @@ class MockRegistry(object):
         self.mocks = {}
         self._job = job
 
+        # Automatically mock when running in a test
+        if self._job.test:
+            self.register_auto_mocks_for_local_testing()
+
     def register_mock(self, _type, mocked):
         self.mocks[_type] = mocked
 
