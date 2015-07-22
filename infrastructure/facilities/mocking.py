@@ -1,9 +1,9 @@
-from infrastructure.context import method_using_current_job, context
+from infrastructure.context import helpers
 
 from infrastructure.facilities.base import BaseFacility
 
 
-@context.register_job_facility_factory("mock_registry")
+@helpers.register_job_facility_factory("mock_registry")
 class MockRegistry(BaseFacility):
     auto_mocks_for_local_testing = set()
     """
@@ -51,7 +51,7 @@ class MockRegistry(BaseFacility):
 
 
 class Mockable(object):
-    @method_using_current_job("mock_registry")
+    @helpers.method_using_current_job("mock_registry")
     def __new__(cls, mock_registry, *args, **kwargs):
         if mock_registry.should_mock(cls):
             mocked = mock_registry.mock(cls)

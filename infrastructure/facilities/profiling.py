@@ -3,8 +3,7 @@ from functools import wraps
 from abc import ABCMeta, abstractmethod
 
 import utils
-from infrastructure.context import \
-    function_using_current_job, method_using_current_job, context
+from infrastructure.context import helpers
 
 from infrastructure.facilities.base import BaseFacility
 
@@ -16,7 +15,7 @@ class BaseProfiler(BaseFacility):
     def __init__(self, *args, **kwargs):
         pass
 
-    @method_using_current_job
+    @helpers.method_using_current_job
     def __exit__(self, job, _type, value, traceback):
         if job.test:
             print '********* PROFILING: *********'
@@ -27,9 +26,9 @@ class BaseProfiler(BaseFacility):
         pass
 
 
-@context.register_job_step_wrapper
+@helpers.register_job_step_wrapper
 def profile(func):
-    @function_using_current_job("profiler")
+    @helpers.function_using_current_job("profiler")
     @wraps(func)
     def decorated(profiler, *args, **kwargs):
         with profiler.job_step(utils.get_callable_name(func)):
@@ -38,9 +37,9 @@ def profile(func):
     return decorated
 
 
-@context.register_job_step_method_wrapper
+@helpers.register_job_step_method_wrapper
 def profile_method(func):
-    @method_using_current_job("profiler")
+    @helpers.method_using_current_job("profiler")
     @wraps(func)
     def decorated(self_or_cls, profiler, *args, **kwargs):
         with profiler.job_step(utils.get_callable_name(func)):
@@ -87,7 +86,7 @@ class ProfilingSection(object):
         )
 
 
-@context.register_job_facility_factory("profiler")
+@helpers.register_job_facility_factory("profiler")
 class SimpleProfiler(BaseProfiler):
     def __init__(self, job):
         self._job = job

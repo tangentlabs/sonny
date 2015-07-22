@@ -3,7 +3,7 @@
 import unittest
 from ddt import ddt, data, unpack
 
-from infrastructure import context
+from infrastructure.context import helpers
 from infrastructure.facilities import *  # noqa
 
 from infrastructure.operations.fetchers import NoOpFetcher
@@ -20,7 +20,7 @@ class TestNoOpFetcher(unittest.TestCase):
         (u"nonsensical$<>??<!£~@:}{£$%}\z/,.x'#;][p]+_+_)()_*(&*%&^*$%^&£$%!¬",),
     )
     @unpack
-    @context.create_for_job
+    @helpers.create_for_job
     def test_noop_fetcher_returns_filename_passed(self, filename):
         result = self.fetcher().fetch_file(filename)
 

@@ -2,7 +2,7 @@
 
 import unittest
 
-from infrastructure import context
+from infrastructure.context import helpers
 from infrastructure.facilities import *  # noqa
 
 from infrastructure.operations.savers import PrintSaver
@@ -14,7 +14,7 @@ from infrastructure.operations.savers import PrintSaver
 class TestPrintSaver(unittest.TestCase):
     saver = PrintSaver
 
-    @context.create_for_job
+    @helpers.create_for_job
     def test_print_saver_works(self):
         self.saver().save([])
         self.saver().save_no_data()

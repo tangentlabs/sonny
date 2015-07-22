@@ -1,7 +1,7 @@
 import unittest
 from ddt import ddt, data, unpack
 
-from infrastructure import context
+from infrastructure.context import helpers
 from infrastructure.facilities import *  # noqa
 
 from infrastructure.operations.loaders import CsvLoader
@@ -28,7 +28,7 @@ class TestCsvLoader(unittest.TestCase):
         ('''C1,C2\n " a1 ", " b1 "''', [{'C1': ' a1 ', 'C2': ' b1 '}]),
     )
     @unpack
-    @context.create_for_job
+    @helpers.create_for_job
     def test_loader_output(self, contents, expected):
         _file = contents.split('\n')
 

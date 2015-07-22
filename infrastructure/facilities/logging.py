@@ -3,8 +3,7 @@ from abc import ABCMeta, abstractmethod
 
 import utils
 
-from infrastructure.context import \
-    function_using_current_job, method_using_current_job, context
+from infrastructure.context import helpers
 
 from infrastructure.facilities.base import BaseFacility
 
@@ -16,7 +15,7 @@ class BaseLogger(BaseFacility):
     def __init__(self, *args, **kwargs):
         pass
 
-    @method_using_current_job
+    @helpers.method_using_current_job
     def __exit__(self, job, _type, value, traceback):
         if job.test:
             print '*********** LOGS: ***********'
@@ -39,9 +38,9 @@ class BaseLogger(BaseFacility):
         pass
 
 
-@context.register_job_step_wrapper
+@helpers.register_job_step_wrapper
 def log_call(func):
-    @function_using_current_job("logger")
+    @helpers.function_using_current_job("logger")
     @wraps(func)
     def decorated(logger, *args, **kwargs):
         logger.debug('** Calling: %s with *%s, **%s',
@@ -51,9 +50,9 @@ def log_call(func):
     return decorated
 
 
-@context.register_job_step_method_wrapper
+@helpers.register_job_step_method_wrapper
 def log_method_call(func):
-    @method_using_current_job("logger")
+    @helpers.method_using_current_job("logger")
     @wraps(func)
     def decorated(self_or_cls, logger, *args, **kwargs):
         logger.debug('** Calling: %s with *%s, **%s',
@@ -63,7 +62,7 @@ def log_method_call(func):
     return decorated
 
 
-@context.register_job_facility_factory("logger")
+@helpers.register_job_facility_factory("logger")
 class InMemoryLogger(BaseLogger):
     def __init__(self, job):
         self._logs = []

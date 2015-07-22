@@ -8,7 +8,7 @@ from email.parser import HeaderParser
 from email.header import decode_header
 from abc import ABCMeta, abstractmethod
 
-from infrastructure import context
+from infrastructure.context import helpers
 
 from infrastructure.facilities.mocking import Mockable
 
@@ -51,7 +51,7 @@ class FtpContextManager(object):
         self.source = source
         self.ftp = None
 
-    @context.method_using_current_job("ftp_registry")
+    @helpers.method_using_current_job("ftp_registry")
     def __enter__(self, ftp_registry):
         source = ftp_registry["servers"][self.source]
         host = ftp_registry["hosts"][source["host"]]
@@ -89,17 +89,17 @@ class FtpFetcher(BaseFileFetcher):
     def __init__(self, source):
         self.source = source
 
-    @context.job_step_method
+    @helpers.job_step_method
     def fetch_files(self, filenames):
         with FtpContextManager(self.source) as ftp:
             return self._fetch_files_with_ftp(ftp, filenames)
 
-    @context.job_step_method
+    @helpers.job_step_method
     def fetch_file(self, filename):
         with FtpContextManager(self.source) as ftp:
             return self._fetch_file_with_ftp(ftp, filename)
 
-    @context.job_step_method
+    @helpers.job_step_method
     def search_files(self, directory, pattern="*"):
         with FtpContextManager(self.source) as ftp:
             filenames = self._search_files_with_ftp(ftp, directory, pattern)
@@ -110,7 +110,7 @@ class FtpFetcher(BaseFileFetcher):
 
             return filenames
 
-    @context.job_step_method
+    @helpers.job_step_method
     def fetch_from_search(self, directory, pattern="*"):
         with FtpContextManager(self.source) as ftp:
             filenames = self._search_files_with_ftp(ftp, directory, pattern)
@@ -154,7 +154,7 @@ class ImapContextManager(object):
         self.mailbox = mailbox
         self.connection = None
 
-    @context.method_using_current_job("email_registry")
+    @helpers.method_using_current_job("email_registry")
     def __enter__(self, email_registry):
         server = email_registry["servers"][self.source]
         host = email_registry["hosts"][server["host"]]
@@ -192,15 +192,15 @@ class EmailFetcher(BaseFileFetcher):
         self.pattern = pattern.lower()
         self.header_parser = HeaderParser()
 
-    @context.job_step_method
+    @helpers.job_step_method
     def fetch_file(self, filename):
         raise Exception("This fetcher doesn't support 'fetch_file'")
 
-    @context.job_step_method
+    @helpers.job_step_method
     def search_files(self, *args, **kwargs):
         raise Exception("This fetcher doesn't support 'search_files'")
 
-    @context.job_step_method
+    @helpers.job_step_method
     def fetch_from_search(self, maillbox, **search_params):
         with ImapContextManager(self.source, maillbox) as connection:
             message_ids = self._search_for_emails_in_server(
@@ -304,14 +304,14 @@ class NoOpFetcher(BaseFileFetcher):
     def __init__(self, *args, **kwargs):
         pass
 
-    @context.job_step_method
+    @helpers.job_step_method
     def fetch_file(self, filename):
         return filename
 
-    @context.job_step_method
+    @helpers.job_step_method
     def fetch_from_search(self, *args, **kwargs):
         return kwargs.get('filenames') or []
 
-    @context.job_step_method
+    @helpers.job_step_method
     def search_files(self, *args, **kwargs):
         return kwargs.get('filenames') or []

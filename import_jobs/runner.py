@@ -1,6 +1,6 @@
 import sys
 
-from infrastructure import context
+from infrastructure.context import helpers
 
 
 class ImporterRunningMixin(object):
@@ -14,7 +14,7 @@ class ImporterRunningMixin(object):
     """
 
     @classmethod
-    @context.create_for_job
+    @helpers.create_for_job
     def run(cls, *args, **kwargs):
         """
         Run the import, creating a job context
@@ -35,7 +35,7 @@ class ImporterRunningMixin(object):
         cls.run(**kwargs)
 
     @classmethod
-    @context.create_for_test_job
+    @helpers.create_for_test_job
     def test(cls, *args, **kwargs):
         """
         Test the import creating a test job context

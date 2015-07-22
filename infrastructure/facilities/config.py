@@ -2,13 +2,12 @@ import os
 import yaml
 from importlib import import_module
 
-from infrastructure.context import \
-    function_using_current_job, method_using_current_job, context
+from infrastructure.context import helpers
 
 from infrastructure.facilities.base import BaseFacility
 
 
-@context.register_job_facility_factory("config")
+@helpers.register_job_facility_factory("config")
 class Config(BaseFacility):
     CONF_ENV_VAR_NAME = "IMPORT_CONF"
 
@@ -31,12 +30,12 @@ class Config(BaseFacility):
             return complete_job_environment_config
 
 
-@context.register_importer_helper_mixin
+@helpers.register_importer_helper_mixin
 class ConfigHelperMixin(object):
     job_config_filename = None
 
     @property
-    @method_using_current_job("config")
+    @helpers.method_using_current_job("config")
     def job_environment_config(self, config):
         if not hasattr(self, "_job_environment_config"):
             self._job_environment_config = \

@@ -1,6 +1,6 @@
 from abc import ABCMeta, abstractmethod
 
-from infrastructure.context import method_using_current_job
+from infrastructure.context import helpers
 
 from infrastructure.facilities.base import BaseFacility
 
@@ -28,7 +28,7 @@ class GenericConfigRegistry(BaseRegistry):
     def __init__(self, job):
         self._registry = None
 
-    @method_using_current_job("config")
+    @helpers.method_using_current_job("config")
     def _get_registry(self, config):
         return getattr(config, self.registry_config_name)
 
