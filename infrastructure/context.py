@@ -41,6 +41,9 @@ class Context(object):
         # about the runtime of a job. These wrappers are registered by the
         # Context.register_job_wrapper
         self.job_wrappers = []
+        # Mixin helper classes for job classes, that provide some helper
+        # methods to the class that subclasses context.get_helpers_mixin()
+        self.importer_helper_mixins = []
 
     def new_job(self):
         """
@@ -87,6 +90,23 @@ class Context(object):
         self.job_step_method_wrappers.append(wrapper)
 
         return wrapper
+
+    def register_importer_helper_mixin(self, cls):
+        self.importer_helper_mixins.append(cls)
+
+    def get_helpers_mixin(self):
+        """
+        Create a mixin subclassing all the helper mixins registered with this
+        context.
+
+        It is better to use the get_helpers_mixin defined in this module, for
+        better portability
+        """
+        super_mixin = type('ContextHelpersMixin',
+                           tuple(self.importer_helper_mixins),
+                           {})
+
+        return super_mixin
 
     def decorate_job(self, func):
         """
@@ -454,3 +474,14 @@ def job_step_method(func):
         return decorated_with_context(*args, **kwargs)
 
     return decorated
+
+
+def get_helpers_mixin():
+    """
+    Create a mixin subclassing all the helper mixins registered with this
+    context.
+
+    It is better to use this function, instead of context.get_helpers_mixin,
+    for better protability
+    """
+    return context.get_helpers_mixin()

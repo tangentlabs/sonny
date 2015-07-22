@@ -27,3 +27,17 @@ class Config(object):
             complete_job_environment_config.update(job_environment_config)
 
             return complete_job_environment_config
+
+
+@context.register_importer_helper_mixin
+class ConfigHelperMixin(object):
+    job_config_filename = None
+
+    @property
+    @method_using_current_job("config")
+    def job_environment_config(self, config):
+        if not hasattr(self, "_job_environment_config"):
+            self._job_environment_config = \
+                config.get_job_environment_config(self.job_config_filename)
+
+        return self._job_environment_config
