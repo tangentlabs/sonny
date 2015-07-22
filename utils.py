@@ -59,3 +59,42 @@ def is_argumentless_decorator(decorator_args):
 
     potentional_callable = decorator_args[0]
     return is_callable(potentional_callable)
+
+
+def combine_context_managers(*context_managers):
+    """
+    Combine context managers into a new one, so that they enter and exit in the
+    right order, even if there is a error in the enter or exit of one of them
+    """
+    class CombinedContextManager(object):
+        def __init__(self, first, second):
+            self.first = first
+            self.second = second
+
+        def __enter__(self):
+            """
+            Ensure that the first one exits if the second one fails to enter
+            """
+            result = self.first.__enter__()
+            try:
+                self.second.__enter__()
+            except Exception as exc:
+                self.first.__exit__(type(exc), exc, None)
+                raise
+
+            return result
+
+        def __exit__(self, _type, value, traceback):
+            """
+            Ensure the first one exits even if the second one fails to exit
+            """
+            try:
+                self.second.__exit__(_type, value, traceback)
+            finally:
+                self.first.__exit__(_type, value, traceback)
+
+    combined = context_managers[0]
+    for _next in context_managers[1:]:
+        combined = CombinedContextManager(combined, _next)
+
+    return combined

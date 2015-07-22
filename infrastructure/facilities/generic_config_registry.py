@@ -2,8 +2,10 @@ from abc import ABCMeta, abstractmethod
 
 from infrastructure.context import method_using_current_job
 
+from infrastructure.facilities.base import BaseFacility
 
-class BaseRegistry(object):
+
+class BaseRegistry(BaseFacility):
     __metaclass__ = ABCMeta
 
     @abstractmethod

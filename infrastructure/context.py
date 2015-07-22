@@ -51,12 +51,18 @@ class Context(object):
         """
         job = Job(self, test=test)
 
-        for attribute_name, attribute_factory in \
-                self.job_facilities_factories.iteritems():
-            attribute = attribute_factory(job)
-            setattr(job, attribute_name, attribute)
-
-        return job
+        attributes = {
+            attribute_name: attribute_factory(job)
+            for attribute_name, attribute_factory
+            in self.job_facilities_factories.iteritems()
+        }
+        job._add_attributes(attributes)
+        if attributes:
+            combined_context_manager = \
+                utils.combine_context_managers(job, *attributes.itervalues())
+            return combined_context_manager
+        else:
+            return job
 
     def _push(self, job):
         self.job_stack.append(job)
@@ -179,6 +185,9 @@ class Job(object):
         self.test = test
 
         self._push(JobStep(self, None, "<root>"))
+
+    def _add_attributes(self, attributes):
+        self.__dict__.update(attributes)
 
     def __enter__(self):
         self.context._push(self)
@@ -346,68 +355,16 @@ class JobWrapper(object):
         self.func = func
         self.test = test
 
-        self.self_or_cls = None
-        self.before_funcs = tuple()
-        self.finally_funcs = tuple()
-
-    def _copy(self, **overrides):
-        wrapper = JobWrapper(self.func)
-        wrapper.self_or_cls = self.self_or_cls
-        wrapper.before_funcs = self.before_funcs
-        wrapper.finally_funcs = self.finally_funcs
-        for key, value in overrides.iteritems():
-            setattr(wrapper, key, value)
-
-        return wrapper
-
-    def bind(self, self_or_cls):
-        """
-        Bind the instance to an instance or class. This is necessary if you
-        want to add before and finally functions
-        """
-
-        return self._copy(self_or_cls=self_or_cls)
-
-    def with_before(self, *before_funcs):
-        """
-        Run functions just before calling the main function
-        """
-
-        return self._copy(before_funcs=before_funcs + self.before_funcs)
-
-    def with_finally(self, *finally_funcs):
-        """
-        Run functions just after the main function is called regardless of
-        exceptions
-        """
-
-        return self._copy(finally_funcs=self.finally_funcs + finally_funcs)
-
     def __call__(self, *args, **kwargs):
         return self.call(*args, **kwargs)
 
     def call(self, *args, **kwargs):
         decorated_with_context = self._decorate_func()
-        with context.new_job(test=self.test) as job:
-            self._call_before_funcs(job)
-            try:
-                if self.self_or_cls:
-                    return decorated_with_context(self.self_or_cls, *args, **kwargs)
-                else:
-                    return decorated_with_context(*args, **kwargs)
-            finally:
-                self._call_finally_funcs(job)
+        with context.new_job(test=self.test):
+            return decorated_with_context(*args, **kwargs)
 
     def _decorate_func(self):
         return context.decorate_job(self.func)
-
-    def _call_before_funcs(self, job):
-        for before_func in self.before_funcs:
-            before_func(job)
-
-    def _call_finally_funcs(self, job):
-        for finally_func in self.finally_funcs:
-            finally_func(job)
 
 
 def create_for_job(func):

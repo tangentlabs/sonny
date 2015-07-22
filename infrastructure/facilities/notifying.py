@@ -4,13 +4,21 @@ from abc import ABCMeta, abstractmethod
 from infrastructure.context import \
     method_using_current_job, function_using_current_job, context
 
+from infrastructure.facilities.base import BaseFacility
 
-class BaseNotifier(object):
+
+class BaseNotifier(BaseFacility):
     __metaclass__ = ABCMeta
 
     @abstractmethod
     def __init__(self, *args, **kwargs):
         pass
+
+    @method_using_current_job
+    def __exit__(self, job, _type, value, traceback):
+        if job.test:
+            print '********* NOTIFYING: *********'
+            print self
 
     @abstractmethod
     def notify(self, recipients, message):
