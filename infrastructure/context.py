@@ -45,11 +45,11 @@ class Context(object):
         # methods to the class that subclasses context.get_helpers_mixin()
         self.importer_helper_mixins = []
 
-    def new_job(self):
+    def new_job(self, test):
         """
         Create a new Job, using the registered facilities
         """
-        job = Job(self)
+        job = Job(self, test=test)
 
         for attribute_name, attribute_factory in \
                 self.job_facilities_factories.iteritems():
@@ -173,9 +173,10 @@ class Job(object):
     It keeps a stack trace of JobSteps, that the various facilities can use to
     keep information hierarchically.
     """
-    def __init__(self, context):
+    def __init__(self, context, test):
         self.context = context
         self.job_steps = []
+        self.test = test
 
         self._push(JobStep(self, None, "<root>"))
 
@@ -341,8 +342,9 @@ class JobWrapper(object):
 
     __name__ = 'JobWrapper'
 
-    def __init__(self, func):
+    def __init__(self, func, test):
         self.func = func
+        self.test = test
 
         self.self_or_cls = None
         self.before_funcs = tuple()
@@ -386,7 +388,7 @@ class JobWrapper(object):
 
     def call(self, *args, **kwargs):
         decorated_with_context = self._decorate_func()
-        with context.new_job() as job:
+        with context.new_job(test=self.test) as job:
             self._call_before_funcs(job)
             try:
                 if self.self_or_cls:
@@ -413,7 +415,15 @@ def create_for_job(func):
     Wrapper that runs the func inside a Job
     """
 
-    return JobWrapper(func)
+    return JobWrapper(func, test=False)
+
+
+def create_for_test_job(func):
+    """
+    Wrapper that runs the func inside a test Job
+    """
+
+    return JobWrapper(func, test=True)
 
 
 def register_current_job_importer(func):

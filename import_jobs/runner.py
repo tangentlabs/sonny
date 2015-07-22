@@ -35,13 +35,11 @@ class ImporterRunningMixin(object):
         cls.run(**kwargs)
 
     @classmethod
+    @context.create_for_test_job
     def test(cls, *args, **kwargs):
         """
-        Test the import with auto-mocking, creating a job context
+        Test the import creating a test job context
         """
-
-        def register_auto_mocks_for_local_testing(job):
-            job.mock_registry.register_auto_mocks_for_local_testing()
 
         def print_metrics(job):
             print '*********** LOGS: ***********'
@@ -56,11 +54,8 @@ class ImporterRunningMixin(object):
         test_kwargs = dict(cls.test_defaults)
         test_kwargs.update(kwargs)
 
-        cls.run \
-            .bind(cls) \
-            .with_before(register_auto_mocks_for_local_testing) \
-            .with_finally(print_metrics) \
-            .call(**test_kwargs)
+        importer = cls(*args, **test_kwargs)
+        importer.run_import()
 
     @classmethod
     def test_from_command_line(cls, sysargs=None):
