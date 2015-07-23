@@ -50,18 +50,6 @@ def log_call(func):
     return decorated
 
 
-@helpers.register_job_step_method_wrapper
-def log_method_call(func):
-    @helpers.method_using_current_job("logger")
-    @wraps(func)
-    def decorated(self_or_cls, logger, *args, **kwargs):
-        logger.debug('** Calling: %s with *%s, **%s',
-                     utils.get_callable_name(func), args, kwargs)
-        return func(self_or_cls, *args, **kwargs)
-
-    return decorated
-
-
 @helpers.register_job_facility_factory("logger")
 class InMemoryLogger(BaseLogger):
     def __init__(self, job):

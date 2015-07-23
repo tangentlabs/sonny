@@ -89,17 +89,17 @@ class FtpFetcher(BaseFileFetcher):
     def __init__(self, source):
         self.source = source
 
-    @helpers.job_step_method
+    @helpers.job_step
     def fetch_files(self, filenames):
         with FtpContextManager(self.source) as ftp:
             return self._fetch_files_with_ftp(ftp, filenames)
 
-    @helpers.job_step_method
+    @helpers.job_step
     def fetch_file(self, filename):
         with FtpContextManager(self.source) as ftp:
             return self._fetch_file_with_ftp(ftp, filename)
 
-    @helpers.job_step_method
+    @helpers.job_step
     def search_files(self, directory, pattern="*"):
         with FtpContextManager(self.source) as ftp:
             filenames = self._search_files_with_ftp(ftp, directory, pattern)
@@ -110,7 +110,7 @@ class FtpFetcher(BaseFileFetcher):
 
             return filenames
 
-    @helpers.job_step_method
+    @helpers.job_step
     def fetch_from_search(self, directory, pattern="*"):
         with FtpContextManager(self.source) as ftp:
             filenames = self._search_files_with_ftp(ftp, directory, pattern)
@@ -192,15 +192,15 @@ class EmailFetcher(BaseFileFetcher):
         self.pattern = pattern.lower()
         self.header_parser = HeaderParser()
 
-    @helpers.job_step_method
+    @helpers.job_step
     def fetch_file(self, filename):
         raise Exception("This fetcher doesn't support 'fetch_file'")
 
-    @helpers.job_step_method
+    @helpers.job_step
     def search_files(self, *args, **kwargs):
         raise Exception("This fetcher doesn't support 'search_files'")
 
-    @helpers.job_step_method
+    @helpers.job_step
     def fetch_from_search(self, maillbox, **search_params):
         with ImapContextManager(self.source, maillbox) as connection:
             message_ids = self._search_for_emails_in_server(
@@ -304,14 +304,14 @@ class NoOpFetcher(BaseFileFetcher):
     def __init__(self, *args, **kwargs):
         pass
 
-    @helpers.job_step_method
+    @helpers.job_step
     def fetch_file(self, filename):
         return filename
 
-    @helpers.job_step_method
+    @helpers.job_step
     def fetch_from_search(self, *args, **kwargs):
         return kwargs.get('filenames') or []
 
-    @helpers.job_step_method
+    @helpers.job_step
     def search_files(self, *args, **kwargs):
         return kwargs.get('filenames') or []

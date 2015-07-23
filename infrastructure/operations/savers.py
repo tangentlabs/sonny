@@ -48,12 +48,12 @@ class DbSaver(BaseSaver):
         )
         self.cursor = self.connection.cursor()
 
-    @helpers.job_step_method
+    @helpers.job_step
     def save(self, data):
         self.cursor.executemany(self.query, data)
         self.connection.commit()
 
-    @helpers.job_step_method
+    @helpers.job_step
     def save_no_data(self):
         self.save([])
 
@@ -63,12 +63,12 @@ class PrintSaver(BaseSaver):
     def __init__(self, *args, **kwargs):
         pass
 
-    @helpers.job_step_method
+    @helpers.job_step
     def save(self, data):
         print 'Save with data'
         for datum in data:
             print datum
 
-    @helpers.job_step_method
+    @helpers.job_step
     def save_no_data(self):
         print 'Save with no data'

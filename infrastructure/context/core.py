@@ -30,10 +30,8 @@ class Context(object):
         self.job_facilities_factories = {}
         # Automatic wrappers for each job step, that want to gather information
         # about the runtime of a step. These wrappers are registered by the
-        # Context.register_job_step_wrapper and
-        # Context.register_job_step_method_wrapper
+        # Context.register_job_step_wrapper method
         self.job_step_wrappers = []
-        self.job_step_method_wrappers = []
         # Automatic wrappers for each job  that want to gather information
         # about the runtime of a job. These wrappers are registered by the
         # Context.register_job_wrapper
@@ -89,11 +87,6 @@ class Context(object):
 
         return wrapper
 
-    def register_job_step_method_wrapper(self, wrapper):
-        self.job_step_method_wrappers.append(wrapper)
-
-        return wrapper
-
     def register_importer_helper_mixin(self, cls):
         self.importer_helper_mixins.append(cls)
 
@@ -139,25 +132,6 @@ class Context(object):
 
         decorated = func
         for wrapper in self.job_step_wrappers:
-            decorated = wrapper(decorated)
-
-        decorated = helpers.creating_job_step(decorated)
-
-        return decorated
-
-    def job_step_method(self, func):
-        """
-        A decorator to wrap a step (that is an instance or class method) with
-        the context's registered decorators.
-
-        Because order of imports matters in Python, you should use the
-        late-binding stand-alone decorator job_step, so that the step is
-        wrapped when it's called.
-        """
-        from infrastructure.context import helpers
-
-        decorated = func
-        for wrapper in self.job_step_method_wrappers:
             decorated = wrapper(decorated)
 
         decorated = helpers.creating_job_step(decorated)

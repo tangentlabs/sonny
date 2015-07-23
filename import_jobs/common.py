@@ -41,7 +41,7 @@ class FetchLoadInsertDeleteCleanupImporter(BaseImporter):
         else:
             self.files_to_fetch = files_to_fetch
 
-    @helpers.job_step_method
+    @helpers.job_step
     def run_import(self):
         filenames_or_search_kwargs, is_pattern = self._get_files_or_search_to_fetch()
         if is_pattern:
@@ -60,7 +60,7 @@ class FetchLoadInsertDeleteCleanupImporter(BaseImporter):
             self.deleter().delete_files(local_filenames)
         self.saver(self.post_job_query).save_no_data()
 
-    @helpers.job_step_method
+    @helpers.job_step
     def transform_data(self, data):
         return data
 
@@ -73,7 +73,7 @@ class FetchLoadInsertDeleteCleanupImporter(BaseImporter):
 
         return filenames, is_pattern
 
-    @helpers.job_step_method
+    @helpers.job_step
     @abstractmethod
     def get_files_or_search_to_fetch(self):
         """
@@ -109,7 +109,7 @@ class FtpCsvDbImporter(FetchLoadInsertDeleteCleanupImporter):
         super(FtpCsvDbImporter, self).__init__(
             files_to_fetch=ftp_files_to_fetch)
 
-    @helpers.job_step_method
+    @helpers.job_step
     def get_files_or_search_to_fetch(self):
         return self.get_ftp_files_or_search_to_fetch()
 
@@ -146,7 +146,7 @@ class EmailLoadTransformInsertDeleteImporter(BaseImporter):
         self._today = _today or date.today()
         self.files_to_fetch = files_to_fetch
 
-    @helpers.job_step_method
+    @helpers.job_step
     def run_import(self):
         search_kwargs = self.get_search_kwargs()
         local_filenames = self.fetcher(self.email_source, self.file_pattern)\
@@ -167,7 +167,7 @@ class EmailLoadTransformInsertDeleteImporter(BaseImporter):
         finally:
             self.file_deleter().delete_files(local_filenames)
 
-    @helpers.job_step_method
+    @helpers.job_step
     def get_search_kwargs(self):
         if self.files_to_fetch is not None:
             return {
@@ -184,6 +184,6 @@ class EmailLoadTransformInsertDeleteImporter(BaseImporter):
     def get_email_search_kwargs(self):
         return self.job_environment_config['email_search_query']
 
-    @helpers.job_step_method
+    @helpers.job_step
     def transform_data(self, data):
         return data

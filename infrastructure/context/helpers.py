@@ -194,22 +194,6 @@ def job_step(func):
     return decorated
 
 
-def job_step_method(func):
-    """
-    The late-bindind decorator version of Context.job_step_method.
-
-    Use this so that the step is always wrapped using facilities that where
-    loaded after your step was declared.
-    """
-    @wraps(func)
-    def decorated(*args, **kwargs):
-        decorated_with_context = context.job_step_method(func)
-
-        return decorated_with_context(*args, **kwargs)
-
-    return decorated
-
-
 def get_helpers_mixin():
     """
     Create a mixin subclassing all the helper mixins registered with this
@@ -231,10 +215,6 @@ def register_importer_helper_mixin(cls):
 
 def register_job_step_wrapper(wrapper):
     return context.register_job_step_wrapper(wrapper)
-
-
-def register_job_step_method_wrapper(wrapper):
-    return context.register_job_step_method_wrapper(wrapper)
 
 
 def register_job_wrapper(wrapper):

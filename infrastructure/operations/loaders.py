@@ -28,7 +28,7 @@ class CsvLoader(BaseLoader):
     def __init__(self):
         pass
 
-    @helpers.job_step_method
+    @helpers.job_step
     def get_all_data_with_headers(self, filename):
         with open(filename, 'rb') as _file:
             data = self.get_all_data_with_headers_from_file(_file)
@@ -58,7 +58,7 @@ class ExcelLoader(BaseLoader):
         self.skip_start_empty_rows = skip_start_empty_rows
         self.skip_start_empty_columns = skip_start_empty_columns
 
-    @helpers.job_step_method
+    @helpers.job_step
     def get_all_data_with_headers(self, filename):
         workbook = self._load_workbook(filename)
         sheet = workbook.sheet_by_index(self.sheet_index)
