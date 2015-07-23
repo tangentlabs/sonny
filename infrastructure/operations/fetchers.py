@@ -51,7 +51,7 @@ class FtpContextManager(object):
         self.source = source
         self.ftp = None
 
-    @helpers.method_using_current_job("ftp_registry")
+    @helpers.using_current_job("ftp_registry")
     def __enter__(self, ftp_registry):
         source = ftp_registry["servers"][self.source]
         host = ftp_registry["hosts"][source["host"]]
@@ -154,7 +154,7 @@ class ImapContextManager(object):
         self.mailbox = mailbox
         self.connection = None
 
-    @helpers.method_using_current_job("email_registry")
+    @helpers.using_current_job("email_registry")
     def __enter__(self, email_registry):
         server = email_registry["servers"][self.source]
         host = email_registry["hosts"][server["host"]]

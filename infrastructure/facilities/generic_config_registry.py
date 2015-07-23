@@ -28,7 +28,7 @@ class GenericConfigRegistry(BaseRegistry):
     def __init__(self, job):
         self._registry = None
 
-    @helpers.method_using_current_job("config")
+    @helpers.using_current_job("config")
     def _get_registry(self, config):
         return getattr(config, self.registry_config_name)
 

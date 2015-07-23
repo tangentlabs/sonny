@@ -78,7 +78,7 @@ class ExcelLoader(BaseLoader):
 
         return workbook
 
-    @helpers.method_using_current_job("logger")
+    @helpers.using_current_job("logger")
     def _log_import_logs(self, logger, logfile):
         for logline in logfile:
             if logline.startswith(self.XLRD_WARNING_LOG_PREFIX):

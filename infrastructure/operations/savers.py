@@ -28,7 +28,7 @@ class BaseSaver(Mockable):
 
 @BaseSaver.auto_mock_for_local_testing
 class DbSaver(BaseSaver):
-    @helpers.method_using_current_job("db_registry")
+    @helpers.using_current_job("db_registry")
     def __init__(self, db_registry, destination):
         self.db_registry = db_registry
         self.destination = destination

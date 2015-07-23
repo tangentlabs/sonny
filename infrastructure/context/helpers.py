@@ -23,13 +23,52 @@ def creating_job_step(func):
     """
     Wraps a step inside a new JobStep
     """
-    @function_using_current_job
+    @using_current_job
     @wraps(func)
     def decorated(job, *args, **kwargs):
         with job.new_job_step(utils.get_callable_name(func)):
             return func(*args, **kwargs)
 
     return decorated
+
+
+def using_current_job(*attributes):
+    """
+    Decorate a method or a function automatically
+
+    @using_current_job
+    def f(job, a, b):
+        pass
+
+    @using_current_job("logger", "profiler")
+    def g(logger, profiler, a, b):
+        pass
+
+    class A(object):
+        def f(self, job, a, b):
+            pass
+
+        @classmethod
+        @using_current_job
+        def f(cls, job, a, b):
+            pass
+
+        @using_current_job("logger", "profiler")
+        def g(self, logger, profiler, a, b):
+            pass
+    """
+    def decorator(func):
+        if utils.is_method_or_class_method(func):
+            return method_using_current_job(*attributes)(func)
+        else:
+            return function_using_current_job(*attributes)(func)
+
+    if utils.is_argumentless_decorator(attributes):
+        func = attributes[0]
+        attributes = tuple()
+        return decorator(func)
+    else:
+        return decorator
 
 
 def function_using_current_job(*attributes):
@@ -76,13 +115,18 @@ def method_using_current_job(*attributes):
     job (context.current_job), or the list of requested job attributes, if they
     are provided:
 
-    @function_using_current_job
-    def f(job, a, b):
-        pass
+    class A(object):
+        def f(self, job, a, b):
+            pass
 
-    @function_using_current_job("logger", "profiler")
-    def g(logger, profiler, a, b):
-        pass
+        @classmethod
+        @method_using_current_job
+        def f(cls, job, a, b):
+            pass
+
+        @method_using_current_job("logger", "profiler")
+        def g(self, logger, profiler, a, b):
+            pass
     """
     def decorator(func):
         @wraps(func)
@@ -156,7 +200,7 @@ def register_current_job_importer(func):
     """
 
     @wraps(func)
-    @method_using_current_job
+    @using_current_job
     def decorated(self_or_cls, job, *args, **kwargs):
         if type(self_or_cls) in (type(object), ABCMeta):
             cls = self_or_cls
