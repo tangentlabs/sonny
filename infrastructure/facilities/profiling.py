@@ -37,17 +37,6 @@ def profile(func):
     return decorated
 
 
-@helpers.register_job_step_method_wrapper
-def profile_method(func):
-    @helpers.method_using_current_job("profiler")
-    @wraps(func)
-    def decorated(self_or_cls, profiler, *args, **kwargs):
-        with profiler.job_step(utils.get_callable_name(func)):
-            return func(self_or_cls, *args, **kwargs)
-
-    return decorated
-
-
 class ProfilingSection(object):
     def __init__(self, profiler, job_step, name, parent, duration=None):
         self.profiler = profiler
