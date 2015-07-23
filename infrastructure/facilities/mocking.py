@@ -51,7 +51,7 @@ class MockRegistry(BaseFacility):
 
 
 class Mockable(object):
-    @helpers.method_using_current_job("mock_registry")
+    @helpers.using_current_job("mock_registry")
     def __new__(cls, mock_registry, *args, **kwargs):
         if mock_registry.should_mock(cls):
             mocked = mock_registry.mock(cls)

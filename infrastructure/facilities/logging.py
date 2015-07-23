@@ -15,7 +15,7 @@ class BaseLogger(BaseFacility):
     def __init__(self, *args, **kwargs):
         pass
 
-    @helpers.method_using_current_job
+    @helpers.using_current_job
     def __exit__(self, job, _type, value, traceback):
         if job.test:
             print '*********** LOGS: ***********'
@@ -40,7 +40,7 @@ class BaseLogger(BaseFacility):
 
 @helpers.register_job_step_wrapper
 def log_call(func):
-    @helpers.function_using_current_job("logger")
+    @helpers.using_current_job("logger")
     @wraps(func)
     def decorated(logger, *args, **kwargs):
         logger.debug('** Calling: %s with *%s, **%s',

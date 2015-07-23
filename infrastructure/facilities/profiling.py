@@ -15,7 +15,7 @@ class BaseProfiler(BaseFacility):
     def __init__(self, *args, **kwargs):
         pass
 
-    @helpers.method_using_current_job
+    @helpers.using_current_job
     def __exit__(self, job, _type, value, traceback):
         if job.test:
             print '********* PROFILING: *********'
@@ -28,7 +28,7 @@ class BaseProfiler(BaseFacility):
 
 @helpers.register_job_step_wrapper
 def profile(func):
-    @helpers.function_using_current_job("profiler")
+    @helpers.using_current_job("profiler")
     @wraps(func)
     def decorated(profiler, *args, **kwargs):
         with profiler.job_step(utils.get_callable_name(func)):

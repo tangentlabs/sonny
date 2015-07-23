@@ -13,7 +13,7 @@ class BaseNotifier(BaseFacility):
     def __init__(self, *args, **kwargs):
         pass
 
-    @helpers.method_using_current_job
+    @helpers.using_current_job
     def __exit__(self, job, _type, value, traceback):
         if job.test:
             print '********* NOTIFYING: *********'
@@ -23,7 +23,7 @@ class BaseNotifier(BaseFacility):
     def notify(self, recipients, message):
         pass
 
-    @helpers.method_using_current_job
+    @helpers.using_current_job
     def notify_dev_team_for_job_completion(self, job):
         job_name = '%s.%s' % (job.importer_class.__module__,
                               job.importer_class.__name__)
@@ -33,7 +33,7 @@ class BaseNotifier(BaseFacility):
 @helpers.register_job_wrapper
 def notify_dev_team_for_job_completion(func):
     @wraps(func)
-    @helpers.function_using_current_job("notifier")
+    @helpers.using_current_job("notifier")
     def decorated(notifier, *args, **kwargs):
         try:
             return func(*args, **kwargs)

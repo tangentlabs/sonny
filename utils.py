@@ -40,6 +40,21 @@ def get_callable_name(func):
         return get_function_name(func)
 
 
+def is_method_or_class_method(func):
+    """
+    Decide if a function is a method or class method, by looking at the
+    method attributes, and the variable names
+    """
+    if hasattr(func, 'im_func'):
+        return True
+
+    # 'self_or_cls' is used by some helper functions, that don't know if they
+    # methods or class methods, but want to use the self/cls argument anyway
+    return hasattr(func, 'func_code') \
+        and func.func_code.co_argcount >= 1 \
+        and func.func_code.co_varnames[0] in ('self', 'cls', 'self_or_cls')
+
+
 def is_argumentless_decorator(decorator_args):
     """
     Find out if a decorator is used as a function decorator with no arguments

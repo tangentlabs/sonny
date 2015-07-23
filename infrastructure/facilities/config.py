@@ -35,7 +35,7 @@ class ConfigHelperMixin(object):
     job_config_filename = None
 
     @property
-    @helpers.method_using_current_job("config")
+    @helpers.using_current_job("config")
     def job_environment_config(self, config):
         if not hasattr(self, "_job_environment_config"):
             self._job_environment_config = \
