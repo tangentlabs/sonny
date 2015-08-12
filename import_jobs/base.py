@@ -2,30 +2,36 @@ from abc import ABCMeta, abstractmethod
 
 from infrastructure.context import helpers
 
+from infrastructure.facilities import everything # noqa
+
 from import_jobs.runner import ImporterRunningMixin
 
 
-class BaseImporter(helpers.get_helpers_mixin(), ImporterRunningMixin):
+class Importer(ImporterRunningMixin):
     __metaclass__ = ABCMeta
 
-    """
-    A basic interface for importers
-    """
+    class JobSettings(object):
+        """
+        Any facility-specific, per-importer overrides should go here, and will
+        be picked up by the `job` wrapper, when you `run`
+        """
+        test_defaults = {}
 
-    job_config_filename = None
-    """
-    Config for specific import. It should be a YAML that contains the config
-    for each environment
-    """
+    def __init__(self):
+        self.name = '%s:%s' % \
+            (self.__class__.__module__, self.__class__.__name__)
 
-    @helpers.register_current_job_importer
-    def __new__(cls, *args, **kwargs):
-        return super(BaseImporter, cls).__new__(cls, *args, **kwargs)
+    @helpers.job
+    def run_import(self, job):
+        self.job = job
+        self.do_run()
 
+    @helpers.test_job
+    def test_import(self, job):
+        self.job = job
+        self.do_run()
+
+    @helpers.step
     @abstractmethod
-    def run_import(self):
-        """
-        The main function that does all the importing
-        """
-
+    def do_run(self):
         pass
