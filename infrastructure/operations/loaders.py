@@ -28,7 +28,7 @@ class CsvLoader(BaseLoader):
     def __init__(self):
         pass
 
-    @helpers.job_step
+    @helpers.step
     def get_all_data_with_headers(self, filename):
         with open(filename, 'rb') as _file:
             data = self.get_all_data_with_headers_from_file(_file)
@@ -58,7 +58,7 @@ class ExcelLoader(BaseLoader):
         self.skip_start_empty_rows = skip_start_empty_rows
         self.skip_start_empty_columns = skip_start_empty_columns
 
-    @helpers.job_step
+    @helpers.step
     def get_all_data_with_headers(self, filename):
         workbook = self._load_workbook(filename)
         sheet = workbook.sheet_by_index(self.sheet_index)
@@ -78,13 +78,13 @@ class ExcelLoader(BaseLoader):
 
         return workbook
 
-    @helpers.using_current_job("logger")
-    def _log_import_logs(self, logger, logfile):
+    def _log_import_logs(self, logfile):
+        job = helpers.get_current_job()
         for logline in logfile:
             if logline.startswith(self.XLRD_WARNING_LOG_PREFIX):
-                logger.warn(logline[self.XLRD_WARNING_LOG_PREFIX:])
+                job.logger.warn(logline[self.XLRD_WARNING_LOG_PREFIX:])
             elif logline.startswith(self.XLRD_ERROR_LOG_PREFIX):
-                logger.error(logline[self.XLRD_ERROR_LOG_PREFIX:])
+                job.logger.error(logline[self.XLRD_ERROR_LOG_PREFIX:])
 
     def _get_first_row_and_first_column_indexes(self, sheet):
         if self.skip_start_empty_rows:

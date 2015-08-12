@@ -4,6 +4,7 @@ from infrastructure.facilities import (  # noqa
     profiling,
     notifying,
     config,
+    job_config,
     db_registry,
     ftp_registry,
     email_registry,

@@ -14,7 +14,6 @@ class ImporterRunningMixin(object):
     """
 
     @classmethod
-    @helpers.create_for_job
     def run(cls, *args, **kwargs):
         """
         Run the import, creating a job context
@@ -35,27 +34,16 @@ class ImporterRunningMixin(object):
         cls.run(**kwargs)
 
     @classmethod
-    @helpers.create_for_test_job
     def test(cls, *args, **kwargs):
         """
         Test the import creating a test job context
         """
 
-        def print_metrics(job):
-            print '*********** LOGS: ***********'
-            print job.logger
-
-            print '*********** PROFILING: ***********'
-            print job.profiler
-
-            print '*********** NOTIFICATIONS: ***********'
-            print job.notifier
-
-        test_kwargs = dict(cls.test_defaults)
+        test_kwargs = dict(cls.JobSettings.test_defaults)
         test_kwargs.update(kwargs)
 
         importer = cls(*args, **test_kwargs)
-        importer.run_import()
+        importer.test_import()
 
     @classmethod
     def test_from_command_line(cls, sysargs=None):

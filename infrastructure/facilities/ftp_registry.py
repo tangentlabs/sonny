@@ -3,6 +3,6 @@ from infrastructure.facilities.generic_config_registry import GenericConfigRegis
 from infrastructure.context import helpers
 
 
-@helpers.register_job_facility_factory("ftp_registry")
+@helpers.register_facility("ftp_registry")
 class FtpRegistry(GenericConfigRegistry):
     registry_config_name = "ftp_registry"

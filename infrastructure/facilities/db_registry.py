@@ -3,6 +3,6 @@ from infrastructure.facilities.generic_config_registry import GenericConfigRegis
 from infrastructure.context import helpers
 
 
-@helpers.register_job_facility_factory("db_registry")
+@helpers.register_facility("db_registry")
 class DbRegistry(GenericConfigRegistry):
     registry_config_name = "db_registry"

@@ -5,7 +5,7 @@ import pkgutil
 import inspect
 
 import import_jobs
-from import_jobs.base import BaseImporter
+from import_jobs.base import Importer
 
 
 def get_subpackages_recursive(package, is_package=True):
@@ -29,8 +29,9 @@ def get_importer_classes(packages):
     return set(
         potentional_importer
         for potentional_importer in potentional_importers
-        if type(potentional_importer) == type(BaseImporter)
-        and issubclass(potentional_importer, BaseImporter)
+        if issubclass(type(potentional_importer), type)
+        and not inspect.isabstract(potentional_importer)
+        and issubclass(potentional_importer, Importer)
         and not inspect.isabstract(potentional_importer)
     )
 

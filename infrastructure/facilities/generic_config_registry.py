@@ -1,23 +1,9 @@
-from abc import ABCMeta, abstractmethod
+from abc import ABCMeta
 
-from infrastructure.context import helpers
-
-from infrastructure.facilities.base import BaseFacility
+from infrastructure.facilities.base import Facility
 
 
-class BaseRegistry(BaseFacility):
-    __metaclass__ = ABCMeta
-
-    @abstractmethod
-    def __init__(self, *args, **kwargs):
-        pass
-
-    @abstractmethod
-    def __getitem__(self, key):
-        pass
-
-
-class GenericConfigRegistry(BaseRegistry):
+class GenericConfigRegistry(Facility):
     __metaclass__ = ABCMeta
 
     registry_config_name = None
@@ -25,12 +11,13 @@ class GenericConfigRegistry(BaseRegistry):
     The name of the atrtribute to get from config
     """
 
-    def __init__(self, job):
+    def enter_job(self, job, facility_settings):
+        super(GenericConfigRegistry, self).enter_job(job, facility_settings)
+
         self._registry = None
 
-    @helpers.using_current_job("config")
-    def _get_registry(self, config):
-        return getattr(config, self.registry_config_name)
+    def _get_registry(self):
+        return getattr(self.job.config, self.registry_config_name)
 
     @property
     def registry(self):
