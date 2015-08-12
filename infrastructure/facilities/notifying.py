@@ -3,18 +3,15 @@ from abc import ABCMeta, abstractmethod
 
 from infrastructure.context import helpers
 
-from infrastructure.facilities.base import BaseFacility
+from infrastructure.facilities.base import Facility
 
 
-class BaseNotifier(BaseFacility):
+class BaseNotifier(Facility):
     __metaclass__ = ABCMeta
 
-    @abstractmethod
-    def __init__(self, *args, **kwargs):
-        pass
+    def exit_job(self, job, exc_type, exc_value, traceback):
+        self.notify_dev_team_for_job_completion()
 
-    @helpers.using_current_job
-    def __exit__(self, job, _type, value, traceback):
         if job.test:
             print '********* NOTIFYING: *********'
             print self
@@ -23,29 +20,15 @@ class BaseNotifier(BaseFacility):
     def notify(self, recipients, message):
         pass
 
-    @helpers.using_current_job
-    def notify_dev_team_for_job_completion(self, job):
-        job_name = '%s.%s' % (job.importer_class.__module__,
-                              job.importer_class.__name__)
-        self.notify(["dev_team"], "Job '%s' complete!" % job_name)
+    def notify_dev_team_for_job_completion(self):
+        self.notify(["dev_team"], "Job '%s' complete!" % self.job.name)
 
 
-@helpers.register_job_wrapper
-def notify_dev_team_for_job_completion(func):
-    @wraps(func)
-    @helpers.using_current_job("notifier")
-    def decorated(notifier, *args, **kwargs):
-        try:
-            return func(*args, **kwargs)
-        finally:
-            notifier.notify_dev_team_for_job_completion()
-
-    return decorated
-
-
-@helpers.register_job_facility_factory("notifier")
+@helpers.register_facility("notifier")
 class InMemoryNotifier(BaseNotifier):
-    def __init__(self, *args, **kwargs):
+    def enter_job(self, job, facility_settings):
+        super(InMemoryNotifier, self).enter_job(job, facility_settings)
+
         self.notifications = {}
 
     def notify(self, recipients, message):

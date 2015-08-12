@@ -2,39 +2,30 @@ import time
 from functools import wraps
 from abc import ABCMeta, abstractmethod
 
-import utils
 from infrastructure.context import helpers
 
-from infrastructure.facilities.base import BaseFacility
+from infrastructure.facilities.base import Facility
 
 
-class BaseProfiler(BaseFacility):
+class BaseProfiler(Facility):
     __metaclass__ = ABCMeta
 
-    @abstractmethod
-    def __init__(self, *args, **kwargs):
-        pass
-
-    @helpers.using_current_job
-    def __exit__(self, job, _type, value, traceback):
+    def exit_job(self, job, exc_type, exc_value, traceback):
         if job.test:
             print '********* PROFILING: *********'
             print self
 
+    def wrap_step(self, step, func):
+        @wraps(func)
+        def wrapped(*args, **kwargs):
+            with self.job_step(step.name):
+                return func(*args, **kwargs)
+
+        return wrapped
+
     @abstractmethod
     def job_step(self, name):
         pass
-
-
-@helpers.register_job_step_wrapper
-def profile(func):
-    @helpers.using_current_job("profiler")
-    @wraps(func)
-    def decorated(profiler, *args, **kwargs):
-        with profiler.job_step(utils.get_callable_name(func)):
-            return func(*args, **kwargs)
-
-    return decorated
 
 
 class ProfilingSection(object):
@@ -68,23 +59,24 @@ class ProfilingSection(object):
     def __str__(self, indent=""):
         return ''.join(
             "\n%s[%s] %s: %.3f%s" %
-            (indent, profiling_section.job_step.full_name,
+            (indent, profiling_section.job_step.name,
              profiling_section.name, profiling_section.duration or -1,
              profiling_section.__str__(indent="  " + indent))
             for profiling_section in self.profiling_sections
         )
 
 
-@helpers.register_job_facility_factory("profiler")
+@helpers.register_facility("profiler")
 class SimpleProfiler(BaseProfiler):
-    def __init__(self, job):
-        self._job = job
+    def enter_job(self, job, facility_settings):
+        super(SimpleProfiler, self).enter_job(job, facility_settings)
+
         self.profiling_section = \
-            ProfilingSection(self, self._job.current_section, "<root>", None)
+            ProfilingSection(self, self.job.current_step, "<root>", None)
 
     def job_step(self, name):
         profiling_section = ProfilingSection(
-            self, self._job.current_section, name, self.profiling_section)
+            self, self.job.current_step, name, self.profiling_section)
 
         return profiling_section
 

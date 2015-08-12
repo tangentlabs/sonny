@@ -1,22 +1,20 @@
 from infrastructure.context import helpers
 
-from infrastructure.facilities.base import BaseFacility
+from infrastructure.facilities.base import Facility
 
 
-@helpers.register_job_facility_factory("mock_registry")
-class MockRegistry(BaseFacility):
+@helpers.register_facility("mock_registry")
+class MockRegistry(Facility):
     auto_mocks_for_local_testing = set()
     """
     Classes that should be automatically mocked when testing locally
     """
 
-    def __init__(self, job):
-        self.mocks = {}
-        self._job = job
+    def enter_job(self, job, facility_settings):
+        super(MockRegistry, self).enter_job(job, facility_settings)
 
-    def __enter__(self):
-        # Automatically mock when running in a test
-        if self._job.test:
+        if self.job.test:
+            self.mocks = {}
             self.register_auto_mocks_for_local_testing()
 
     def register_mock(self, _type, mocked):
@@ -51,10 +49,10 @@ class MockRegistry(BaseFacility):
 
 
 class Mockable(object):
-    @helpers.using_current_job("mock_registry")
-    def __new__(cls, mock_registry, *args, **kwargs):
-        if mock_registry.should_mock(cls):
-            mocked = mock_registry.mock(cls)
+    def __new__(cls, *args, **kwargs):
+        job = helpers.get_current_job()
+        if job.mock_registry.should_mock(cls):
+            mocked = job.mock_registry.mock(cls)
             return mocked(*args, **kwargs)
         else:
             return object.__new__(cls, *args, **kwargs)

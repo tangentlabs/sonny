@@ -28,15 +28,15 @@ class BaseSaver(Mockable):
 
 @BaseSaver.auto_mock_for_local_testing
 class DbSaver(BaseSaver):
-    @helpers.using_current_job("db_registry")
-    def __init__(self, db_registry, destination):
-        self.db_registry = db_registry
+    def __init__(self, destination):
+        job = helpers.get_current_job()
+        self.db_registry = job.db_registry
         self.destination = destination
         with open(destination['file'], 'rb') as _file:
             self.query = _file.read()
 
         database = self.db_registry["databases"][self.destination["database"]]
-        host = db_registry["hosts"][database["host"]]
+        host = self.db_registry["hosts"][database["host"]]
         user = host["users"][database["user"]]
         db = host["databases"][database["database"]]
         self.connection = MySQLdb.connect(
@@ -48,12 +48,12 @@ class DbSaver(BaseSaver):
         )
         self.cursor = self.connection.cursor()
 
-    @helpers.job_step
+    @helpers.step
     def save(self, data):
         self.cursor.executemany(self.query, data)
         self.connection.commit()
 
-    @helpers.job_step
+    @helpers.step
     def save_no_data(self):
         self.save([])
 
@@ -63,12 +63,12 @@ class PrintSaver(BaseSaver):
     def __init__(self, *args, **kwargs):
         pass
 
-    @helpers.job_step
+    @helpers.step
     def save(self, data):
         print 'Save with data'
         for datum in data:
             print datum
 
-    @helpers.job_step
+    @helpers.step
     def save_no_data(self):
         print 'Save with no data'

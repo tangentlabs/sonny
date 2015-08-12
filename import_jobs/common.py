@@ -1,9 +1,11 @@
 from datetime import date
-from abc import ABCMeta, abstractmethod
+from abc import abstractmethod, abstractproperty
 
 from infrastructure.context import helpers
 
-from import_jobs.base import BaseImporter
+from infrastructure.facilities import everything  # noqa
+
+from import_jobs.base import Importer
 
 from infrastructure.operations import fetchers
 from infrastructure.operations import loaders
@@ -13,9 +15,7 @@ from infrastructure.operations import savers
 from infrastructure.operations import file_deleters
 
 
-class FetchLoadInsertDeleteCleanupImporter(BaseImporter):
-    __metaclass__ = ABCMeta
-
+class FetchLoadInsertDeleteCleanupImporter(Importer):
     """
     As the name describes:
     * Fetch a file
@@ -24,25 +24,33 @@ class FetchLoadInsertDeleteCleanupImporter(BaseImporter):
     * Delete the fetched files
     * Run a post-job script
     """
-    file_server = None
-    insert_query = None
-    post_job_query = None
+    @abstractproperty # noqa
+    def file_server(self): pass # noqa
+    @abstractproperty # noqa
+    def insert_query(self): pass # noqa
+    def post_job_query(self): pass # noqa
 
-    fetcher = None
-    _loader = None
-    saver = None
-    deleter = None
+    @abstractproperty # noqa
+    def fetcher(self): pass # noqa
+    @abstractproperty # noqa
+    def _loader(self): pass # noqa
+    @abstractproperty # noqa
+    def saver(self): pass # noqa
+    @abstractproperty # noqa
+    def deleter(self): pass # noqa
 
     test_files_to_fetch = None
 
     def __init__(self, files_to_fetch=None):
+        super(FetchLoadInsertDeleteCleanupImporter, self).__init__()
+
         if isinstance(files_to_fetch, (str, unicode)):
             self.files_to_fetch = [files_to_fetch]
         else:
             self.files_to_fetch = files_to_fetch
 
-    @helpers.job_step
-    def run_import(self):
+    @helpers.step
+    def do_run(self):
         filenames_or_search_kwargs, is_pattern = self._get_files_or_search_to_fetch()
         if is_pattern:
             search_kwargs = filenames_or_search_kwargs
@@ -60,7 +68,7 @@ class FetchLoadInsertDeleteCleanupImporter(BaseImporter):
             self.deleter().delete_files(local_filenames)
         self.saver(self.post_job_query).save_no_data()
 
-    @helpers.job_step
+    @helpers.step
     def transform_data(self, data):
         return data
 
@@ -73,7 +81,7 @@ class FetchLoadInsertDeleteCleanupImporter(BaseImporter):
 
         return filenames, is_pattern
 
-    @helpers.job_step
+    @helpers.step
     @abstractmethod
     def get_files_or_search_to_fetch(self):
         """
@@ -81,18 +89,8 @@ class FetchLoadInsertDeleteCleanupImporter(BaseImporter):
         """
         pass
 
-    @classmethod
-    def test(cls, *args, **kwargs):
-        if not args and not kwargs:
-            if cls.test_files_to_fetch:
-                args = cls.test_files_to_fetch
-
-        super(FetchLoadInsertDeleteCleanupImporter, cls).test(*args, **kwargs)
-
 
 class FtpCsvDbImporter(FetchLoadInsertDeleteCleanupImporter):
-    __metaclass__ = ABCMeta
-
     """
     A more specific importer:
     * Use FTP for importing
@@ -109,7 +107,7 @@ class FtpCsvDbImporter(FetchLoadInsertDeleteCleanupImporter):
         super(FtpCsvDbImporter, self).__init__(
             files_to_fetch=ftp_files_to_fetch)
 
-    @helpers.job_step
+    @helpers.step
     def get_files_or_search_to_fetch(self):
         return self.get_ftp_files_or_search_to_fetch()
 
@@ -122,9 +120,7 @@ class FtpCsvDbImporter(FetchLoadInsertDeleteCleanupImporter):
         return self.ftp_server
 
 
-class EmailLoadTransformInsertDeleteImporter(BaseImporter):
-    __metaclass__ = ABCMeta
-
+class EmailLoadTransformInsertDeleteImporter(Importer):
     """
     * Fetch today's files from email using config search params
     * Load them
@@ -133,9 +129,11 @@ class EmailLoadTransformInsertDeleteImporter(BaseImporter):
     * Delete the files
     """
 
-    email_source = None
+    @abstractproperty # noqa
+    def email_source(self): pass # noqa
     file_pattern = '*.xls'
-    insert_queries = None
+    @abstractproperty # noqa
+    def insert_queries(self): pass # noqa
 
     fetcher = fetchers.EmailFetcher
     _loader = loaders.ExcelLoader
@@ -143,11 +141,13 @@ class EmailLoadTransformInsertDeleteImporter(BaseImporter):
     file_deleter = file_deleters.LocalFileDeleter
 
     def __init__(self, _today=None, files_to_fetch=None):
+        super(EmailLoadTransformInsertDeleteImporter, self).__init__()
+
         self._today = _today or date.today()
         self.files_to_fetch = files_to_fetch
 
-    @helpers.job_step
-    def run_import(self):
+    @helpers.step
+    def do_run(self):
         search_kwargs = self.get_search_kwargs()
         local_filenames = self.fetcher(self.email_source, self.file_pattern)\
             .fetch_from_search('INBOX', **search_kwargs)
@@ -167,7 +167,7 @@ class EmailLoadTransformInsertDeleteImporter(BaseImporter):
         finally:
             self.file_deleter().delete_files(local_filenames)
 
-    @helpers.job_step
+    @helpers.step
     def get_search_kwargs(self):
         if self.files_to_fetch is not None:
             return {
@@ -182,8 +182,8 @@ class EmailLoadTransformInsertDeleteImporter(BaseImporter):
             return kwargs
 
     def get_email_search_kwargs(self):
-        return self.job_environment_config['email_search_query']
+        return self.job.job_config['email_search_query']
 
-    @helpers.job_step
+    @helpers.step
     def transform_data(self, data):
         return data

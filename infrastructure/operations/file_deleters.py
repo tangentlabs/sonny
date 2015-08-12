@@ -27,7 +27,7 @@ class LocalFileDeleter(BaseFileDeleter):
     def __init__(self):
         pass
 
-    @helpers.job_step
+    @helpers.step
     def delete_file(self, filename):
         os.remove(filename)
 
@@ -37,6 +37,6 @@ class NoOpFileDeleter(BaseFileDeleter):
     def __init__(self):
         pass
 
-    @helpers.job_step
+    @helpers.step
     def delete_file(self, filename):
         pass

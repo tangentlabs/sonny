@@ -8,7 +8,7 @@ def keep_keys(keys):
     Do a filter on columns
     """
 
-    @helpers.job_step
+    @helpers.step
     def do_keep_keys(inputs):
         return (
             {
@@ -28,7 +28,7 @@ def dicts_to_tuples(keys):
     on columns, if not all dict keys are in the `keys`
     """
 
-    @helpers.job_step
+    @helpers.step
     def do_dicts_to_tuples(inputs):
         return (
             tuple(
@@ -56,7 +56,7 @@ def cast_dicts_values(keys_casts):
     Cast (some of) the dict's values, using a dictionary of casters
     """
 
-    @helpers.job_step
+    @helpers.step
     def do_cast_dicts_values(inputs):
         return (
             {
@@ -74,7 +74,7 @@ def generic_map(func):
     A generic mapper using a function that operates on rows
     """
 
-    @helpers.job_step
+    @helpers.step
     def do_generic_map(inputs):
         return itertools.imap(func, inputs)
 
@@ -126,7 +126,7 @@ def generator_to_tuples():
     tuple(xrange(5))
     """
 
-    @helpers.job_step
+    @helpers.step
     def do_generator_to_tuples(inputs):
         return tuple(inputs)
 

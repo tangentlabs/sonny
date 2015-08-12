@@ -1,68 +1,22 @@
 from functools import wraps
 from abc import ABCMeta, abstractmethod
 
-import utils
-
 from infrastructure.context import helpers
 
-from infrastructure.facilities.base import BaseFacility
+from infrastructure.facilities.base import Facility
 
 
-class BaseLogger(BaseFacility):
+class BaseLogger(Facility):
     __metaclass__ = ABCMeta
 
-    @abstractmethod
-    def __init__(self, *args, **kwargs):
-        pass
-
-    @helpers.using_current_job
-    def __exit__(self, job, _type, value, traceback):
+    def exit_job(self, job, exc_type, exc_value, traceback):
         if job.test:
             print '*********** LOGS: ***********'
             print self
 
     @abstractmethod
-    def debug(self, *args, **kwargs):
-        pass
-
-    @abstractmethod
-    def info(self, *args, **kwargs):
-        pass
-
-    @abstractmethod
-    def warn(self, *args, **kwargs):
-        pass
-
-    @abstractmethod
-    def error(self, *args, **kwargs):
-        pass
-
-
-@helpers.register_job_step_wrapper
-def log_call(func):
-    @helpers.using_current_job("logger")
-    @wraps(func)
-    def decorated(logger, *args, **kwargs):
-        logger.debug('** Calling: %s with *%s, **%s',
-                     utils.get_callable_name(func), args, kwargs)
-        return func(*args, **kwargs)
-
-    return decorated
-
-
-@helpers.register_job_facility_factory("logger")
-class InMemoryLogger(BaseLogger):
-    def __init__(self, job):
-        self._logs = []
-        self._job = job
-
     def _log(self, level, message, args, kwargs):
-        if args:
-            log_string = message % args
-        else:
-            log_string = message % kwargs
-        log_string = "[%s] %s" % (level, log_string)
-        self._logs.append((self._job.current_section.full_name, log_string))
+        pass
 
     def debug(self, message, *args, **kwargs):
         self._log("DEBUG", message, args, kwargs)
@@ -76,8 +30,32 @@ class InMemoryLogger(BaseLogger):
     def error(self, message, *args, **kwargs):
         self._log("ERROR", message, args, kwargs)
 
+
+@helpers.register_facility("logger")
+class InMemoryLogger(BaseLogger):
+    def enter_job(self, job, facility_settings):
+        super(InMemoryLogger, self).enter_job(job, facility_settings)
+
+        self._logs = []
+
+    def wrap_step(self, step, func):
+        @wraps(func)
+        def wrapped(*args, **kwargs):
+            self.debug('** Calling: %s with *%s, **%s',
+                       step.name, args, kwargs)
+            return func(*args, **kwargs)
+
+        return wrapped
+
+    def _log(self, level, message, args, kwargs):
+        if args:
+            log_string = message % args
+        else:
+            log_string = message % kwargs
+        self._logs.append((level, self.job.current_step.name, log_string))
+
     def __str__(self):
         return '\n'.join(
-            "[%s] %s" % (section_full_name, log_string)
-            for section_full_name, log_string in self._logs
+            "[%s] [%s] %s" % (level, section_full_name, log_string)
+            for level, section_full_name, log_string in self._logs
         )
