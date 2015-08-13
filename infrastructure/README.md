@@ -188,7 +188,7 @@ class MyImporter(Importer):
         # use the with syntaxt
         files = self.fetch_files()
         data = self.load_files(files)
-        with self.job.new_step(name='filter_data'):
+        with helpers.with_step(name='filter_data'):
             data = filter(lambda x, y: x != 0, data)
             if len(data) == alert_when_line_size:
                 # You can use any facility that job has

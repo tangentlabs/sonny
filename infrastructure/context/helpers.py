@@ -16,6 +16,13 @@ def register_facility(name):
     return decorator
 
 
+def with_job(**kwargs):
+    """
+    Create a context manager for a job
+    """
+    return context.new_job(**kwargs)
+
+
 def job(func, test=False):
     """
     Method/function decorator for running a job
@@ -24,7 +31,7 @@ def job(func, test=False):
     def decorated(*args, **kwargs):
         name = get_importer_name(args)
         job_settings = get_importer_job_settings(args)
-        with context.new_job(name=name, job_settings=job_settings, test=test) as job:
+        with with_job(name=name, job_settings=job_settings, test=test) as job:
             return func(*args, job=job, **kwargs)
 
     return decorated
@@ -34,6 +41,13 @@ def test_job(func):
     return job(func, test=True)
 
 
+def with_step(**kwargs):
+    """
+    Create a context manager for a step
+    """
+    return context.current_job.new_step(**kwargs)
+
+
 def step(func):
     """
     Method/function decorator for running a step
@@ -41,7 +55,7 @@ def step(func):
     @wraps(func)
     def decorated(*args, **kwargs):
         name = get_callable_name(func)
-        with context.current_job.new_step(name=name) as step:
+        with with_step(name=name) as step:
             wrapped = step.wrap_step_function(func)
             return wrapped(*args, **kwargs)
 
