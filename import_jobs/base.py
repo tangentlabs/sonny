@@ -1,4 +1,5 @@
 from abc import ABCMeta, abstractmethod
+from datetime import date
 
 from infrastructure.context import helpers
 
@@ -17,9 +18,15 @@ class Importer(ImporterRunningMixin):
         """
         test_defaults = {}
 
-    def __init__(self):
+    def __init__(self, files_to_fetch=None, _today=None):
         self.name = '%s:%s' % \
             (self.__class__.__module__, self.__class__.__name__)
+
+        if isinstance(files_to_fetch, (str, unicode)):
+            files_to_fetch = [files_to_fetch]
+        self._files_to_fetch = files_to_fetch
+
+        self._today = _today or date.today()
 
     @helpers.job
     def run_import(self, job):
@@ -38,3 +45,10 @@ class Importer(ImporterRunningMixin):
         The importing function
         """
         pass
+
+    @property
+    def files_to_fetch(self):
+        if self._files_to_fetch is not None:
+            return self._files_to_fetch
+
+        return self.get_files_to_fetch()

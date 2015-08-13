@@ -1,4 +1,3 @@
-from datetime import date
 from abc import abstractmethod, abstractproperty
 
 from infrastructure.context import helpers
@@ -39,19 +38,9 @@ class FetchLoadInsertDeleteCleanupImporter(Importer):
     @abstractproperty # noqa
     def deleter(self): pass # noqa
 
-    test_files_to_fetch = None
-
-    def __init__(self, files_to_fetch=None):
-        super(FetchLoadInsertDeleteCleanupImporter, self).__init__()
-
-        if isinstance(files_to_fetch, (str, unicode)):
-            self.files_to_fetch = [files_to_fetch]
-        else:
-            self.files_to_fetch = files_to_fetch
-
     @helpers.step
     def do_run(self):
-        filenames_or_search_kwargs, is_pattern = self._get_files_or_search_to_fetch()
+        filenames_or_search_kwargs, is_pattern = self.files_or_search_to_fetch
         if is_pattern:
             search_kwargs = filenames_or_search_kwargs
             local_filenames = self.fetcher(self.file_server).fetch_files_from_search(**search_kwargs)
@@ -72,7 +61,8 @@ class FetchLoadInsertDeleteCleanupImporter(Importer):
     def transform_data(self, data):
         return data
 
-    def _get_files_or_search_to_fetch(self):
+    @property
+    def files_or_search_to_fetch(self):
         if self.files_to_fetch:
             is_pattern = False
             filenames = self.files_to_fetch
@@ -103,9 +93,9 @@ class FtpCsvDbImporter(FetchLoadInsertDeleteCleanupImporter):
     saver = savers.DbSaver
     deleter = file_deleters.LocalFileDeleter
 
-    def __init__(self, ftp_files_to_fetch=None):
+    def __init__(self, ftp_files_to_fetch=None, **kwargs):
         super(FtpCsvDbImporter, self).__init__(
-            files_to_fetch=ftp_files_to_fetch)
+            files_to_fetch=ftp_files_to_fetch, **kwargs)
 
     @helpers.step
     def get_files_or_search_to_fetch(self):
@@ -139,12 +129,6 @@ class EmailLoadTransformInsertDeleteImporter(Importer):
     _loader = loaders.ExcelLoader
     saver = savers.DbSaver
     file_deleter = file_deleters.LocalFileDeleter
-
-    def __init__(self, _today=None, files_to_fetch=None):
-        super(EmailLoadTransformInsertDeleteImporter, self).__init__()
-
-        self._today = _today or date.today()
-        self.files_to_fetch = files_to_fetch
 
     @helpers.step
     def do_run(self):
