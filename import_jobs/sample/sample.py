@@ -2,8 +2,6 @@ from datetime import date
 
 import utils
 
-from infrastructure.facilities import everything  # noqa
-
 from import_jobs import common
 
 location = utils.make_location(__file__)
