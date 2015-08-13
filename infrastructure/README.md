@@ -89,6 +89,16 @@ class Hider(Facility):
         return wrapped
 ```
 
+Add it to [infrastructure/everything.py](https://github.com/tangentlabs/wolseley-importing/blob/master/infrastructure/everything.py)
+
+```python
+from infrastructure.facilityies import (
+    ...
+    hider,
+    ...
+)
+```
+
 Philosophy behind the choices:
 ====
 
@@ -152,6 +162,12 @@ Annotated developer's guides:
 # How To write an importer:
 
 ```python
+import utils
+
+# Use this helper function to load files relatively to the local directory
+location = utils.make_location(__file__)
+
+
 # Using a class-based importer provides some useful automation and boilerplate.
 class MyImporter(Importer):
     # Per-importer settings, that can be overriden
@@ -286,4 +302,15 @@ class Log5FirstLines(Facility):
             return spy_iterable
 
         return decorated
+```
+
+```python
+# To automatically load it for all import jobs, you should add it in the
+# infrastructure/everything.py
+from infrastructure.facility import (
+    ...
+    logger,
+    log5firstlines,
+    ...
+)
 ```

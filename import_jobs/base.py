@@ -34,4 +34,7 @@ class Importer(ImporterRunningMixin):
     @helpers.step
     @abstractmethod
     def do_run(self):
+        """
+        The importing function
+        """
         pass

@@ -1,7 +1,5 @@
 import sys
 
-from infrastructure.context import helpers
-
 
 class ImporterRunningMixin(object):
     """
@@ -79,7 +77,7 @@ class ImporterRunningMixin(object):
         results to {
             "simple": "value",
             "list": ["first", "second"],
-            "singleton": "alone",
+            "singleton": ["alone"],
         }
         """
 
