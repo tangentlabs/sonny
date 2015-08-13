@@ -15,13 +15,12 @@ class BaseProfiler(Facility):
             print '********* PROFILING: *********'
             print self
 
-    def wrap_step(self, step, func):
-        @wraps(func)
-        def wrapped(*args, **kwargs):
-            with self.job_step(step.name):
-                return func(*args, **kwargs)
+    def enter_step(self, step):
+        job_step = self.job_step(step.name)
+        job_step.__enter__()
 
-        return wrapped
+    def exit_step(self, step, exc_type, exc_value, traceback):
+        self.profiling_section.__exit__(exc_type, exc_value, traceback)
 
     @abstractmethod
     def job_step(self, name):
@@ -72,7 +71,7 @@ class SimpleProfiler(BaseProfiler):
         super(SimpleProfiler, self).enter_job(job, facility_settings)
 
         self.profiling_section = \
-            ProfilingSection(self, self.job.current_step, "<root>", None)
+            ProfilingSection(self, None, "<root>", None)
 
     def job_step(self, name):
         profiling_section = ProfilingSection(

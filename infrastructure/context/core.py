@@ -61,15 +61,15 @@ class Job(object):
 
     def __enter__(self):
         self.context._push_job(self)
+        self._enter_facilities()
         self._first_step = self.new_step(name='<root>')
         self._first_step.__enter__()
-        self._enter_facilities()
 
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
-        self._exit_facilities(exc_type, exc_value, traceback)
         self._first_step.__exit__(exc_type, exc_value, traceback)
+        self._exit_facilities(exc_type, exc_value, traceback)
         self.context._pop_job(self)
 
     def _create_facilities(self):
