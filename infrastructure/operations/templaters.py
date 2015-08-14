@@ -1,17 +1,15 @@
 import yaml
 
-from abc import ABCMeta, abstractmethod
+from abc import abstractmethod
 
 from jinja2 import Template, Environment, FileSystemLoader
 
 from infrastructure.context import helpers
 
-from infrastructure.facilities.mocking import Mockable
+from infrastructure.operations.base import BaseOperation
 
 
-class BaseTemplater(Mockable):
-    __metaclass__ = ABCMeta
-
+class BaseTemplater(BaseOperation):
     @abstractmethod
     def render(self, template_context):
         pass

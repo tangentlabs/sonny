@@ -6,20 +6,14 @@ import tempfile
 from email import message_from_string
 from email.parser import HeaderParser
 from email.header import decode_header
-from abc import ABCMeta, abstractmethod
+from abc import abstractmethod
 
 from infrastructure.context import helpers
 
-from infrastructure.facilities.mocking import Mockable
+from infrastructure.operations.base import BaseOperation
 
 
-class BaseFileFetcher(Mockable):
-    __metaclass__ = ABCMeta
-
-    @abstractmethod
-    def __init__(self, *args, **kwargs):
-        pass
-
+class BaseFileFetcher(BaseOperation):
     @abstractmethod
     def fetch_file(self, filename):
         return filename

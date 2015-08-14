@@ -1,18 +1,12 @@
 import os
-from abc import ABCMeta, abstractmethod
+from abc import abstractmethod
 
 from infrastructure.context import helpers
 
-from infrastructure.facilities.mocking import Mockable
+from infrastructure.operations.base import BaseOperation
 
 
-class BaseFileDeleter(Mockable):
-    __metaclass__ = ABCMeta
-
-    @abstractmethod
-    def __init__(self, *args, **kwargs):
-        pass
-
+class BaseFileDeleter(BaseOperation):
     @abstractmethod
     def delete_file(self, filename):
         pass
