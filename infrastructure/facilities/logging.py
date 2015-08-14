@@ -53,7 +53,7 @@ class InMemoryLogger(BaseLogger):
             log_string = log_string % args
         else:
             log_string = log_string % kwargs
-        self._logs.append((level, self.job.current_step.name, log_string))
+        self._logs.append((level, self.job.current_step.name, log_string[:80]))
 
     def __str__(self):
         return '\n'.join(

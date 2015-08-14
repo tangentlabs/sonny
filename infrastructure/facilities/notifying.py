@@ -34,7 +34,7 @@ class InMemoryNotifier(BaseNotifier):
     def notify(self, recipients, message):
         for recipient in recipients:
             self.notifications.setdefault(recipient, [])\
-                .append(message)
+                .append(message[:80])
 
     def __str__(self):
         return '\n'.join(
