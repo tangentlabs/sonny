@@ -24,14 +24,14 @@ class Context(object):
 
         return klass
 
-    def new_job(self, **kargs):
+    def new_job(self, **kwargs):
         """
         Create a Job object, that must be used as a context manager, eg:
 
         with context.new_job():
             do_import()
         """
-        job = Job(self, **kargs)
+        job = Job(self, **kwargs)
         return job
 
     def _push_job(self, job):
@@ -62,13 +62,14 @@ class Job(object):
     def __enter__(self):
         self.context._push_job(self)
         self._enter_facilities()
-        self._first_step = self.new_step(name='<root>')
+        self._first_step = self.new_step(name='<root>', is_first=True)
         self._first_step.__enter__()
 
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
         self._first_step.__exit__(exc_type, exc_value, traceback)
+        self._prepare_exit_facilities(exc_type, exc_value, traceback)
         self._exit_facilities(exc_type, exc_value, traceback)
         self.context._pop_job(self)
 
@@ -91,6 +92,10 @@ class Job(object):
         custom_name = '%sFacilitySettings' % facility.__class__.__name__
         return getattr(self.job_settings, custom_name, default)
 
+    def _prepare_exit_facilities(self, exc_type, exc_value, traceback):
+        for facility in self.facilities_list[::-1]:
+            facility.prepare_exit_job(self, exc_type, exc_value, traceback)
+
     def _exit_facilities(self, exc_type, exc_value, traceback):
         for facility in self.facilities_list[::-1]:
             facility.exit_job(self, exc_type, exc_value, traceback)
@@ -99,8 +104,8 @@ class Job(object):
     def current_step(self):
         return self._steps[-1]
 
-    def new_step(self, name=None):
-        step = Step(self, name=name)
+    def new_step(self, **kwargs):
+        step = Step(self, **kwargs)
         return step
 
     def _push_step(self, step):
@@ -115,12 +120,13 @@ class Step(object):
     """
     A district and import step of a job
     """
-    def __init__(self, job, name):
+    def __init__(self, job, name, is_first=False):
         self.job = job
         self.name = name
         if self.name is None:
             self.name = "<Job step>"
         self.depth = None
+        self.is_first = is_first
 
     def __enter__(self):
         self.job._push_step(self)

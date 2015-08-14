@@ -1,4 +1,3 @@
-from functools import wraps
 from abc import ABCMeta, abstractmethod
 
 from infrastructure.context import helpers
@@ -10,8 +9,6 @@ class BaseNotifier(Facility):
     __metaclass__ = ABCMeta
 
     def exit_job(self, job, exc_type, exc_value, traceback):
-        self.notify_dev_team_for_job_completion()
-
         if job.test:
             print '********* NOTIFYING: *********'
             print self
@@ -19,9 +16,6 @@ class BaseNotifier(Facility):
     @abstractmethod
     def notify(self, recipients, message):
         pass
-
-    def notify_dev_team_for_job_completion(self):
-        self.notify(["dev_team"], "Job '%s' complete!" % self.job.name)
 
 
 @helpers.register_facility("notifier")

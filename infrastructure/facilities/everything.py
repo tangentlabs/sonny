@@ -7,6 +7,7 @@ from infrastructure.facilities import (  # noqa
     logging,
     profiling,
     notifying,
+    job_status,
     config,
     job_config,
     db_registry,

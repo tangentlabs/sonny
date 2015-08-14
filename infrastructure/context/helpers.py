@@ -62,6 +62,24 @@ def step(func):
     return decorated
 
 
+def ignore_exceptions(returning):
+    """
+    Ignore any exceptions raised from the function call
+    """
+    @wraps(ignore_exceptions)
+    def decorator(func):
+        @wraps(func)
+        def decorated(*args, **kwargs):
+            try:
+                return func(*args, **kwargs)
+            except Exception:
+                return returning
+
+        return decorated
+
+    return decorator
+
+
 def get_importer_job_settings(args):
     from import_jobs.base import Importer
 
