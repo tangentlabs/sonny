@@ -48,10 +48,11 @@ class InMemoryLogger(BaseLogger):
         return wrapped
 
     def _log(self, level, message, args, kwargs):
+        log_string = str(message)
         if args:
-            log_string = message % args
+            log_string = log_string % args
         else:
-            log_string = message % kwargs
+            log_string = log_string % kwargs
         self._logs.append((level, self.job.current_step.name, log_string))
 
     def __str__(self):
