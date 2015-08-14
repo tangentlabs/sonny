@@ -2,20 +2,14 @@ import csv
 import xlrd
 import datetime
 from StringIO import StringIO
-from abc import ABCMeta, abstractmethod
+from abc import abstractmethod
 
 from infrastructure.context import helpers
 
-from infrastructure.facilities.mocking import Mockable
+from infrastructure.operations.base import BaseOperation
 
 
-class BaseLoader(Mockable):
-    __metaclass__ = ABCMeta
-
-    @abstractmethod
-    def __init__(self, *args, **kwargs):
-        pass
-
+class BaseLoader(BaseOperation):
     @abstractmethod
     def get_all_data_with_headers(self, filename):
         pass

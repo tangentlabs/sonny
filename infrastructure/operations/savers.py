@@ -1,19 +1,13 @@
-from abc import ABCMeta, abstractmethod
+from abc import abstractmethod
 
 import MySQLdb
 
 from infrastructure.context import helpers
 
-from infrastructure.facilities.mocking import Mockable
+from infrastructure.operations.base import BaseOperation
 
 
-class BaseSaver(Mockable):
-    __metaclass__ = ABCMeta
-
-    @abstractmethod
-    def __init__(self, *args, **kwargs):
-        pass
-
+class BaseSaver(BaseOperation):
     @abstractmethod
     def save(self, data):
         pass
