@@ -13,10 +13,23 @@ class Facility(object):
         self.job = job
         self.facility_settings = facility_settings
 
-    def exit_job(self, job, exc_type, exc_value, traceback):
+    def prepare_exit_job(self, job, exc_type, exc_value, traceback):
         """
         Called when a job is about to exit. If there was an exception, it is
-        provided as arguments
+        provided as arguments.
+
+        This is the last chance to do anything job-wide
+        that uses other facilities.
+        """
+        pass
+
+    def exit_job(self, job, exc_type, exc_value, traceback):
+        """
+        Called when a job is ready to exit. If there was an exception, it is
+        provided as arguments.
+
+        At this point, no intra-facilities actions should be taken, as the
+        order of execution is not guaranteed.
         """
         pass
 
