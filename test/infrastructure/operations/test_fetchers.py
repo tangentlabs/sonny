@@ -20,8 +20,8 @@ class TestNoOpFetcher(unittest.TestCase):
         (u"nonsensical$<>??<!£~@:}{£$%}\z/,.x'#;][p]+_+_)()_*(&*%&^*$%^&£$%!¬",),
     )
     @unpack
-    @helpers.create_for_job
-    def test_noop_fetcher_returns_filename_passed(self, filename):
+    @helpers.job
+    def test_noop_fetcher_returns_filename_passed(self, filename, job):
         result = self.fetcher().fetch_file(filename)
 
         self.assertEquals(result, filename)
