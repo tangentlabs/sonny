@@ -28,8 +28,8 @@ class TestCsvLoader(unittest.TestCase):
         ('''C1,C2\n " a1 ", " b1 "''', [{'C1': ' a1 ', 'C2': ' b1 '}]),
     )
     @unpack
-    @helpers.create_for_job
-    def test_loader_output(self, contents, expected):
+    @helpers.job
+    def test_loader_output(self, contents, expected, job):
         _file = contents.split('\n')
 
         results = list(self._loader().get_all_data_with_headers_from_file(_file))

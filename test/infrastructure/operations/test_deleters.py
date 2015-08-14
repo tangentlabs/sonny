@@ -33,15 +33,15 @@ class TestLocalFileDeleter(unittest.TestCase):
     def file_exists(self, filename):
         return os.path.isfile(filename)
 
-    @helpers.create_for_job
-    def test_deleter_deletes(self):
+    @helpers.job
+    def test_deleter_deletes(self, job):
         with TempFilesContextManager() as (filename,):
             self.assertTrue(self.file_exists(filename))
             self.deleter().delete_file(filename)
             self.assertFalse(self.file_exists(filename))
 
-    @helpers.create_for_job
-    def test_deleter_only_deletes_file_provided(self):
+    @helpers.job
+    def test_deleter_only_deletes_file_provided(self, job):
         with TempFilesContextManager(file_count=2) as (filename1, filename2):
             self.assertTrue(self.file_exists(filename1))
             self.assertTrue(self.file_exists(filename2))
@@ -56,14 +56,14 @@ class TestNoOpFileDeleter(unittest.TestCase):
     def file_exists(self, filename):
         return os.path.isfile(filename)
 
-    @helpers.create_for_job
-    def test_deleter_doesnt_delete(self):
+    @helpers.job
+    def test_deleter_doesnt_delete(self, job):
         with TempFilesContextManager() as (filename,):
             self.assertTrue(self.file_exists(filename))
             self.deleter().delete_file(filename)
             self.assertTrue(self.file_exists(filename))
 
-    @helpers.create_for_job
-    def test_deleter_works_with_bogus_file(self):
+    @helpers.job
+    def test_deleter_works_with_bogus_file(self, job):
         filename = "completey bogus filename"
         self.deleter().delete_file(filename)

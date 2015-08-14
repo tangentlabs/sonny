@@ -14,7 +14,7 @@ from infrastructure.operations.savers import PrintSaver
 class TestPrintSaver(unittest.TestCase):
     saver = PrintSaver
 
-    @helpers.create_for_job
-    def test_print_saver_works(self):
+    @helpers.job
+    def test_print_saver_works(self, job):
         self.saver().save([])
         self.saver().save_no_data()

@@ -34,8 +34,8 @@ class TestKeepKeys(unittest.TestCase):
         (['a', 'c'], [{'a': 1, 'b': 2}, {'b': 3, 'c': 4}, {'a': 5, 'c': 6}, {'d': 7}], [{'a': 1}, {'c': 4}, {'a': 5, 'c': 6}, {}]),
     )
     @unpack
-    @helpers.create_for_job
-    def test_transformer_output(self, keys, inputs, expected):
+    @helpers.job
+    def test_transformer_output(self, keys, inputs, expected, job):
         transformer = self.transformer(keys)
         result = list(transformer(inputs))
 
@@ -72,8 +72,8 @@ class TestDictsToTuples(unittest.TestCase):
         ], None, (KeyError,)),
     )
     @unpack
-    @helpers.create_for_job
-    def test_transformer_output(self, keys, inputs, expected, raises):
+    @helpers.job
+    def test_transformer_output(self, keys, inputs, expected, raises, job):
         transformer = self.transformer(keys)
 
         if raises:
@@ -121,8 +121,8 @@ class TestCastDictValues(unittest.TestCase):
         ]),
     )
     @unpack
-    @helpers.create_for_job
-    def test_transformer_output(self, casts, inputs, expected):
+    @helpers.job
+    def test_transformer_output(self, casts, inputs, expected, job):
         transformer = self.transformer(casts)
 
         result = list(transformer(inputs))
@@ -144,8 +144,8 @@ class TestGenericMap(unittest.TestCase):
         (nuller, [(1, 2), (3, 4)], [None, None]),
     )
     @unpack
-    @helpers.create_for_job
-    def test_transformer_output(self, casts, inputs, expected):
+    @helpers.job
+    def test_transformer_output(self, casts, inputs, expected, job):
         transformer = self.transformer(casts)
 
         result = list(transformer(inputs))
@@ -171,8 +171,8 @@ class TestUpdateWithStaticValues(unittest.TestCase):
         (static_values, [{'a': 3, 'c': 5}], [{'a': 1, 'b': 2, 'c': 5}]),
     )
     @unpack
-    @helpers.create_for_job
-    def test_transformer_output(self, casts, inputs, expected):
+    @helpers.job
+    def test_transformer_output(self, casts, inputs, expected, job):
         transformer = self.transformer(casts)
 
         result = list(transformer(inputs))
@@ -198,8 +198,8 @@ class TestUpdateWithDynamicValues(unittest.TestCase):
         (dynamic_values, [{'a': 3, 'c': 5}], [{'a': 3, 'b': 2, 'c': 5}]),
     )
     @unpack
-    @helpers.create_for_job
-    def test_transformer_output(self, casts, inputs, expected):
+    @helpers.job
+    def test_transformer_output(self, casts, inputs, expected, job):
         transformer = self.transformer(casts)
 
         result = list(transformer(inputs))
