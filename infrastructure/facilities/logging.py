@@ -47,13 +47,25 @@ class InMemoryLogger(BaseLogger):
 
         return wrapped
 
-    def _log(self, level, message, args, kwargs):
+    def _log(self, level, message, args, kwargs, exception=None, traceback=None):
         log_string = str(message)
         if args:
             log_string = log_string % args
         else:
             log_string = log_string % kwargs
-        self._logs.append((level, self.job.current_step.name, log_string[:80]))
+        section_full_name = self.job.current_step.name
+        self._logs.append((level, section_full_name, log_string[:80]))
+
+    def error(self, message, *args, **kwargs):
+        if 'traceback' in kwargs:
+            traceback = kwargs.pop('traceback')
+        else:
+            traceback = None
+        if 'exception' in kwargs:
+            exception = kwargs.pop('exception')
+        else:
+            exception = None
+        self._log("ERROR", message, args, kwargs, exception=exception, traceback=traceback)
 
     def __str__(self):
         return '\n'.join(
