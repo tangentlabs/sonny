@@ -1,5 +1,7 @@
 import sys
 
+from infrastructure.context import helpers
+
 
 class ImporterRunningMixin(object):
     """
@@ -28,8 +30,10 @@ class ImporterRunningMixin(object):
 
         if sysargs is None:
             sysargs = sys.argv[1:]
-        kwargs = cls.kwargs_from_command_line(sysargs)
-        cls.run(**kwargs)
+
+        importer_cls = cls.get_importer_class_from_command_line(sysargs)
+        kwargs = importer_cls.kwargs_from_command_line(sysargs)
+        importer_cls.run(**kwargs)
 
     @classmethod
     def test(cls, *args, **kwargs):
@@ -51,13 +55,104 @@ class ImporterRunningMixin(object):
 
         if sysargs is None:
             sysargs = sys.argv[1:]
-        kwargs = cls.kwargs_from_command_line(sysargs)
-        cls.test(**kwargs)
+
+        importer_cls = cls.get_importer_class_from_command_line(sysargs)
+        kwargs = importer_cls.kwargs_from_command_line(sysargs)
+        importer_cls.test(**kwargs)
 
     @classmethod
     def kwargs_from_command_line(cls, sysargs):
         """
-        Decompose kwargs from command line
+        Get kwargs overrides for an importer instance
+        """
+        sys_kwargs = [arg for arg in sysargs if not arg.startswith('--')]
+        return cls.compose_args_from_command_line(sys_kwargs)
+
+    @classmethod
+    def get_importer_class_from_command_line(cls, sysargs):
+        """
+        Create an importer class with JobSettings overrides from the command
+        line
+        """
+        job_settings = cls.job_settings_from_command_line(sysargs)
+
+        return type(cls.__name__, (cls,), {'JobSettings': job_settings})
+
+    @classmethod
+    def job_settings_from_command_line(cls, sysargs):
+        """
+        Create JobSettings for an importer, with overrides from the command
+        line
+        """
+        raw_facility_settings = cls\
+            .raw_facilities_settings_from_command_line(sysargs)
+        facilities_settings = [
+            cls.create_overriden_facility_settings(
+                arg_name[2:], overriden_facility_settings)
+            for arg_name, overriden_facility_settings
+            in raw_facility_settings.iteritems()
+        ]
+        facilities_settings_dict = {
+            facility_settings.__name__: facility_settings
+            for facility_settings in facilities_settings
+        }
+
+        return type('JobSettings', (cls.JobSettings,),
+                    facilities_settings_dict)
+
+    @classmethod
+    def create_overriden_facility_settings(cls, facility_name,
+                                           overriden_facility_settings):
+        """
+        Create FacilitySettings for a facility, with overrides from the command
+        line
+        """
+        facility_class = helpers.find_facility_by_class_name(facility_name)
+        if not facility_class:
+            raise Exception("No known facility named '%s'" % facility_name)
+        facility_settings = helpers.get_facility_settings_for_job(
+            cls.JobSettings, facility_class)
+        facility_job_settings_name = \
+            '%sFacilitySettings' % facility_class.__name__
+
+        overriden_facility_settings = type(facility_job_settings_name,
+                                           (facility_settings,),
+                                           overriden_facility_settings)
+
+        return overriden_facility_settings
+
+    @classmethod
+    def raw_facilities_settings_from_command_line(cls, sysargs):
+        """
+        Facility settings overrides from command line. Same as class kwargs,
+        but they need to be prefixed with '--', and include facility name and
+        setting name:
+
+        --FacilityName.setting_name=value
+        --FacilityName.setting_name[]=value
+        """
+        sys_kwargs = [arg for arg in sysargs if arg.startswith('--')]
+        kwargs = cls.compose_args_from_command_line(sys_kwargs)
+        all_facility_settings = {}
+        for name, value in kwargs.iteritems():
+            try:
+                facility_name, setting_name = name.split('.')
+            except ValueError:
+                raise Exception(
+                    "Settings facilities must be in the following format:\n"
+                    "--FacilityName.setting_name=value\n"
+                    "--FacilityName.setting_name[]=value\n")
+
+            facility_settings = all_facility_settings.setdefault(facility_name,
+                                                                 {})
+            facility_settings[setting_name] = value
+
+        return all_facility_settings
+
+    @classmethod
+    def compose_args_from_command_line(cls, sysargs):
+        """
+        Decompose args from command line
 
         We allow two formats:
 

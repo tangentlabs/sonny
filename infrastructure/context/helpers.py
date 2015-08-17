@@ -2,7 +2,7 @@ from functools import wraps
 
 from utils import get_callable_name
 
-from infrastructure.context.core import context
+from infrastructure.context.core import context, Job
 
 
 def get_current_job():
@@ -98,3 +98,11 @@ def get_importer_name(args):
         return importer.name
 
     return None
+
+
+def find_facility_by_class_name(name):
+    return context.find_facility_by_class_name(name)
+
+
+def get_facility_settings_for_job(job_settings, facility_class):
+    return Job._get_facility_settings_from_job(job_settings, facility_class)

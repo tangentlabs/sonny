@@ -24,6 +24,16 @@ class Context(object):
 
         return klass
 
+    def find_facility_by_class_name(self, name):
+        """
+        Find a facility by matching fully or semi qualified class name
+        """
+        qualified_name = '.%s' % name
+        for facility_name, klass in self.facility_classes.iteritems():
+            klass_qualified_name = '.%s.%s' % (klass.__module__, klass.__name__)
+            if klass_qualified_name.endswith(qualified_name):
+                return klass
+
     def new_job(self, **kwargs):
         """
         Create a Job object, that must be used as a context manager, eg:
@@ -84,13 +94,15 @@ class Job(object):
 
     def _enter_facilities(self):
         for facility in self.facilities_list:
-            job_settings = self._get_facility_settings(facility)
-            facility.enter_job(self, job_settings)
+            facility_settings = self._get_facility_settings_from_job(
+                self.job_settings, facility.__class__)
+            facility.enter_job(self, facility_settings)
 
-    def _get_facility_settings(self, facility):
-        default = facility.FacilitySettings
-        custom_name = '%sFacilitySettings' % facility.__class__.__name__
-        return getattr(self.job_settings, custom_name, default)
+    @classmethod
+    def _get_facility_settings_from_job(cls, job_settings, facility_class):
+        default = facility_class.FacilitySettings
+        custom_name = '%sFacilitySettings' % facility_class.__name__
+        return getattr(job_settings, custom_name, default)
 
     def _prepare_exit_facilities(self, exc_type, exc_value, traceback):
         for facility in self.facilities_list[::-1]:
