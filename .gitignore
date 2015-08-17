@@ -4,3 +4,6 @@
 # LibreOffice
 *.~lock*
 
+# Local settings
+conf/local.py
+
