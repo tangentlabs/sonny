@@ -48,7 +48,7 @@ class DbLoader(BaseDbLoader):
     def _get_column_names(self):
         return tuple(
             name
-            for name, _, _, _, _, _
+            for name, _, _, _, _, _, _
             in self.cursor.description
         )
 
