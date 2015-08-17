@@ -29,6 +29,14 @@ To test a job, which mocks most functionality with side effects (eg FTP, DB, etc
 
 ``./test.py path.to.importer.package.ImporterClass``
 
+To selectively not mock some facilities, eg don't mock saving to DB:
+
+``./test.py path.to.importer.package.ImporterClass --MockRegistry.no_mock_classes[]=DbSaver --MockRegistry.mock_classes[]=DbLoader``
+
+Or, to selectively mock only some facilities, eg mock only fetching:
+
+``./run.py path.to.importer.package.ImporterClass --MockRegistry.mock_classes[]=FtpFetcher --MockRegistry.mock_classes[]=LocalFileDeleter``
+
 
 Tests
 ====

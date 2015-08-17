@@ -5,6 +5,23 @@ from infrastructure.facilities.base import Facility
 
 @helpers.register_facility("mock_registry")
 class MockRegistry(Facility):
+    class FacilitySettings(Facility.FacilitySettings):
+        mock_classes = []
+        """
+        List of class names to register for mocking on startup. The class name
+        can either be fully or partially qualified, eg either of those wokrs:
+
+        CustomOperation
+        custom.CustomOperation
+        infrastructure.operations.custom.CustomOperation
+        """
+
+        no_mock_classes = []
+        """
+        The opposite of mock_classes: don't mock these classes. This supersedes
+        mock_classes
+        """
+
     auto_mocks_for_local_testing = set()
     """
     Classes that should be automatically mocked when testing locally
@@ -16,20 +33,48 @@ class MockRegistry(Facility):
         self.mocks = {}
         if self.job.test:
             self.register_auto_mocks_for_local_testing()
+        self.register_startup_mocks()
+        self.unregister_startup_no_mocks()
 
     def register_mock(self, _type, mocked):
         self.mocks[_type] = mocked
 
         return self
 
+    def unregister_mock(self, _type):
+        if _type in self.mocks:
+            del self.mocks[_type]
+
     def register_mocks_using_default_noops(self, *types):
         for _type in types:
             mocked = _type._default_noop
             self.register_mock(_type, mocked)
 
+    def unregister_mocks(self, *types):
+        for _type in types:
+            self.unregister_mock(_type)
+
     def register_auto_mocks_for_local_testing(self):
         self.register_mocks_using_default_noops(
             *self.auto_mocks_for_local_testing)
+
+    def register_startup_mocks(self):
+        types = [
+            _type
+            for _type in self.auto_mocks_for_local_testing
+            if _type.__name__
+            in self.facility_settings.mock_classes
+        ]
+        self.register_mocks_using_default_noops(*types)
+
+    def unregister_startup_no_mocks(self):
+        types = [
+            _type
+            for _type in self.auto_mocks_for_local_testing
+            if _type.__name__
+            in self.facility_settings.no_mock_classes
+        ]
+        self.unregister_mocks(*types)
 
     def should_mock(self, _type):
         mocked = self.mock(_type)
