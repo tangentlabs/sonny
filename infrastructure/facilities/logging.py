@@ -1,4 +1,5 @@
 from functools import wraps
+from traceback import print_tb
 from abc import ABCMeta, abstractmethod
 
 from infrastructure.context import helpers
@@ -47,7 +48,8 @@ class InMemoryLogger(BaseLogger):
 
         return wrapped
 
-    def _log(self, level, message, args, kwargs, exception=None, traceback=None):
+    def _log(self, level, message, args, kwargs,
+             exception=None, traceback=None):
         log_string = str(message)
         if args:
             log_string = log_string % args
@@ -55,6 +57,18 @@ class InMemoryLogger(BaseLogger):
             log_string = log_string % kwargs
         section_full_name = self.job.current_step.name
         self._logs.append((level, section_full_name, log_string[:80]))
+
+        if not self.job.test:
+            self._to_stdout(level, section_full_name, log_string,
+                            exception=exception, traceback=traceback)
+
+    def _to_stdout(self, level, section_full_name, log_string,
+                   exception=None, traceback=None):
+            print "[%s] [%s] %s" % (level, section_full_name, log_string)
+            if traceback:
+                print_tb(traceback)
+            if exception:
+                print '%s:' % type(exception).__name__, exception
 
     def error(self, message, *args, **kwargs):
         if 'traceback' in kwargs:
@@ -65,7 +79,8 @@ class InMemoryLogger(BaseLogger):
             exception = kwargs.pop('exception')
         else:
             exception = None
-        self._log("ERROR", message, args, kwargs, exception=exception, traceback=traceback)
+        self._log("ERROR", message, args, kwargs,
+                  exception=exception, traceback=traceback)
 
     def __str__(self):
         return '\n'.join(
