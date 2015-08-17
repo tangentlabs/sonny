@@ -59,7 +59,9 @@ class DbLoader(BaseDbLoader):
     def get_single(self, parameters):
         self.cursor.execute(self.query, parameters)
         column_names = self._get_column_names()
-        return self._as_dict(column_names, self.cursor.fetchone())
+        row = self.cursor.fetchone()
+        assert row is not None
+        return self._as_dict(column_names, row)
 
     @helpers.step
     def get_multiple(self, parameters):
