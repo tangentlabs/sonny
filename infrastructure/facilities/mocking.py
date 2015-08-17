@@ -13,8 +13,8 @@ class MockRegistry(Facility):
     def enter_job(self, job, facility_settings):
         super(MockRegistry, self).enter_job(job, facility_settings)
 
+        self.mocks = {}
         if self.job.test:
-            self.mocks = {}
             self.register_auto_mocks_for_local_testing()
 
     def register_mock(self, _type, mocked):
@@ -32,9 +32,6 @@ class MockRegistry(Facility):
             *self.auto_mocks_for_local_testing)
 
     def should_mock(self, _type):
-        if not self.job.test:
-            return False
-
         mocked = self.mock(_type)
         return _type != mocked
 
