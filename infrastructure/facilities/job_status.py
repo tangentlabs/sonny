@@ -23,7 +23,8 @@ class JobStatus(Facility):
 
     def error(self, step, (exc_type, exc_value, traceback), message=None):
         self.errors.append((step.name, (exc_type, exc_value, traceback), message))
-        self.job.logger.error("Step '%s' raised '%s'", step.name, exc_type.__name__)
+        self.job.logger.error("Step '%s' raised '%s'", step.name, exc_type.__name__,
+                              exception=exc_value, traceback=traceback)
 
     def message_for_exception(self, exc_value, message):
         if not self.errors:
