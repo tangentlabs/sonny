@@ -21,6 +21,10 @@ To pass named arguments:
 
 ``./run.py path.to.importer.package.ImporterClass example=value demo=argument list_argument[]=first list_argument[]=second``
 
+To pass a boolean:
+
+``./run.py path.to.importer.package.ImporterClass flag1?=True flag2?=False``
+
 To pass facility settings overrides:
 
 ``./run.py path.to.impoerter.package.ImporterClass importer_arg=value --FacilityName.setting_name=value``
