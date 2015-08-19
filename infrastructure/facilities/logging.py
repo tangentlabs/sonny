@@ -1,5 +1,6 @@
 from functools import wraps
 from traceback import print_tb
+import warnings
 from abc import ABCMeta, abstractmethod
 
 from infrastructure.context import helpers
@@ -14,6 +15,18 @@ class BaseLogger(Facility):
         if job.test:
             print '*********** LOGS: ***********'
             print self
+
+    def wrap_step(self, step, func):
+        @wraps(func)
+        def wrapped(*args, **kwargs):
+            with warnings.catch_warnings(record=True) as caught_warninings:
+                try:
+                    return func(*args, **kwargs)
+                finally:
+                    for warning in caught_warninings:
+                        self.warn('%s', warning.message)
+
+        return wrapped
 
     @abstractmethod
     def _log(self, level, message, args, kwargs):
@@ -40,6 +53,8 @@ class InMemoryLogger(BaseLogger):
         self._logs = []
 
     def wrap_step(self, step, func):
+        func = super(InMemoryLogger, self).wrap_step(step, func)
+
         @wraps(func)
         def wrapped(*args, **kwargs):
             self.debug('** Calling: %s with *%s, **%s',
