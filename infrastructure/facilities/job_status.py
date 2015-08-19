@@ -16,7 +16,7 @@ class JobStatus(Facility):
         if exc_type:
             self.error(step, (exc_type, exc_value, traceback))
 
-    def prepare_exit_job(self, job, exc_type, exc_value, traceback):
+    def last_step(self, step, exc_type, exc_value, traceback):
         self.job.notifier.notify(["dev_team"],
                                  "Job '%s' completed with %s errors!" %
                                  (self.job.name, len(self.errors)))
