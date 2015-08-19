@@ -149,6 +149,8 @@ class ImporterRunningMixin(object):
 
         return all_facility_settings
 
+    # This starts to get ridiculous. Perhaps replace with eval?
+    # like: ./run.py importer kwargs='{"a": "b", "c": 1, "d": [2, "3", False]}'
     @classmethod
     def compose_args_from_command_line(cls, sysargs):
         """
@@ -165,6 +167,12 @@ class ImporterRunningMixin(object):
             parameter[]=value1 parameter[]=value2
 
             which results to {"parameter": ["value1", "value2"]}
+
+        * For boolean value:
+            parameter?=True
+            parameter?=False
+
+            which results to {"parameter": True} and {"parameter": False}
 
         So for example:
             simple=value list[]=first list[]=second singleton[]=alone
@@ -194,6 +202,16 @@ class ImporterRunningMixin(object):
             if key_aggregate.endswith('[]'):
                 key = key_aggregate[:-2]
                 value = values
+            elif key_aggregate.endswith('?'):
+                key = key_aggregate[:-1]
+                value = {'True': True, 'False': False}[values[0]]
+                if len(values) != 1:
+                    raise Exception("You defined '%(key)s?' multiple times:\n"
+                                    "Define only in one format:\n"
+                                    "  %(key)s=value for a single value, or\n"
+                                    "  %(key)s[]=value1 %(key)s[]=value2 for "
+                                    "list, or\n  %(key)s?=value for boolean"
+                                    % {'key': key})
             else:
                 key = key_aggregate
                 value = values[0]
@@ -201,14 +219,17 @@ class ImporterRunningMixin(object):
                     raise Exception("You defined '%(key)s' multiple times:\n"
                                     "Define only in one format:\n"
                                     "  %(key)s=value for a single value, or\n"
-                                    "  %(key)s[]=value1 %(key)s[]=value2 "
-                                    "for list" % {'key': key})
+                                    "  %(key)s[]=value1 %(key)s[]=value2 for "
+                                    "list, or\n  %(key)s?=value for boolean"
+                                    % {'key': key})
 
             if key in kwargs:
-                raise Exception("You defined both '%(key)s' and '%(key)s[]':\n"
-                                "Define only in one format:\n  %(key)s=value for a "
-                                "single value, or\n  %(key)s[]=value1 "
-                                "%(key)s[]=value2 for list" % {'key': key})
+                raise Exception("You defined more than one of '%(key)s', "
+                                "'%(key)s!' and '%(key)s[]':\n"
+                                "Define only in one format:\n  %(key)s=value "
+                                "for a single value, or\n  %(key)s[]=value1 "
+                                "%(key)s[]=value2 for list, or\n  "
+                                "%(key)s?=value for boolean" % {'key': key})
 
             kwargs[key] = value
 
