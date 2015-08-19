@@ -79,7 +79,6 @@ class Job(object):
 
     def __exit__(self, exc_type, exc_value, traceback):
         self._first_step.__exit__(exc_type, exc_value, traceback)
-        self._prepare_exit_facilities(exc_type, exc_value, traceback)
         self._exit_facilities(exc_type, exc_value, traceback)
         self.context._pop_job(self)
 
@@ -103,10 +102,6 @@ class Job(object):
         default = facility_class.FacilitySettings
         custom_name = '%sFacilitySettings' % facility_class.__name__
         return getattr(job_settings, custom_name, default)
-
-    def _prepare_exit_facilities(self, exc_type, exc_value, traceback):
-        for facility in self.facilities_list[::-1]:
-            facility.prepare_exit_job(self, exc_type, exc_value, traceback)
 
     def _exit_facilities(self, exc_type, exc_value, traceback):
         for facility in self.facilities_list[::-1]:
@@ -141,6 +136,9 @@ class Step(object):
         self.is_first = is_first
 
     def __enter__(self):
+        if self.is_first:
+            self._enter_facilities_first_step()
+
         self.job._push_step(self)
         self.depth = len(self.job._steps)
         self._enter_facilities()
@@ -151,13 +149,24 @@ class Step(object):
         self._exit_facilities(exc_type, exc_value, traceback)
         self.job._pop_step(self)
 
+        if self.is_first:
+            self._exit_facilities_last_step(exc_type, exc_value, traceback)
+
     def _enter_facilities(self):
         for facility in self.job.facilities_list:
             facility.enter_step(self)
 
+    def _enter_facilities_first_step(self):
+        for facility in self.job.facilities_list:
+            facility.first_step(self)
+
     def _exit_facilities(self, exc_type, exc_value, traceback):
         for facility in self.job.facilities_list[::-1]:
             facility.exit_step(self, exc_type, exc_value, traceback)
+
+    def _exit_facilities_last_step(self, exc_type, exc_value, traceback):
+        for facility in self.job.facilities_list[::-1]:
+            facility.last_step(self, exc_type, exc_value, traceback)
 
     def wrap_step_function(self, func):
         wrapped = func
