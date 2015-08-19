@@ -20,5 +20,6 @@ class DbRegistry(GenericConfigRegistry):
             "port": int(host['port']),
             "user": user['username'],
             "password": user['password'],
-            "database": db,
+            "database": db['name'],
+            "is_disposable": db.get('is_disposable', False),
         }
