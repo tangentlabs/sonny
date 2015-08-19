@@ -32,16 +32,13 @@ class DbLoader(BaseDbLoader):
         with open(source['file'], 'rb') as _file:
             self.query = _file.read()
 
-        database = self.db_registry["databases"][self.source["database"]]
-        host = self.db_registry["hosts"][database["host"]]
-        user = host["users"][database["user"]]
-        db = host["databases"][database["database"]]
+        database = self.db_registry.get_database(self.source["database"])
         self.connection = MySQLdb.connect(
-            host=host['host'],
-            port=int(host['port']),
-            user=user['username'],
-            passwd=user['password'],
-            db=db,
+            host=database['host'],
+            port=database['port'],
+            user=database['user'],
+            passwd=database['password'],
+            db=database['database'],
         )
         self.cursor = self.connection.cursor()
 
