@@ -1,5 +1,6 @@
 from functools import wraps
-from traceback import print_tb
+from traceback import format_tb
+from termcolor import colored
 import warnings
 from abc import ABCMeta, abstractmethod
 
@@ -28,6 +29,12 @@ class BaseLogger(Facility):
     ERROR = "ERROR"
 
     LOG_LEVELS = [DEBUG, INFO, WARNING, ERROR]
+    LOG_LEVEL_COLORS = {
+        DEBUG: "green",
+        INFO: "white",
+        WARNING: "yellow",
+        ERROR: "red",
+    }
 
     def enter_job(self, job, facility_settings):
         super(BaseLogger, self).enter_job(job, facility_settings)
@@ -71,6 +78,10 @@ class BaseLogger(Facility):
     def error(self, message, *args, **kwargs):
         self._log(self.ERROR, message, args, kwargs)
 
+    def _colored_for_level(self, message, level):
+        color = self.LOG_LEVEL_COLORS[level]
+        return colored(message, color)
+
 
 @helpers.register_facility("logger")
 class InMemoryLogger(BaseLogger):
@@ -109,11 +120,19 @@ class InMemoryLogger(BaseLogger):
 
     def _to_stdout(self, level, section_full_name, log_string,
                    exception=None, traceback=None):
-            print "[%s] [%s] %s" % (level, section_full_name, log_string)
-            if traceback:
-                print_tb(traceback)
-            if exception:
-                print '%s:' % type(exception).__name__, exception
+        print self._colored_for_level(
+            "[%s] [%s] %s" % (level, section_full_name, log_string),
+            level)
+
+        if traceback:
+            print self._colored_for_level(''.join(format_tb(traceback)), level)
+        if exception:
+            print self._colored_for_level(
+                "%s: %s" % (type(exception).__name__, exception),
+                level)
+
+    def _to_stdout_colored(self, message, level):
+        print self._colored_for_level(message, level)
 
     def error(self, message, *args, **kwargs):
         if 'traceback' in kwargs:
@@ -124,11 +143,12 @@ class InMemoryLogger(BaseLogger):
             exception = kwargs.pop('exception')
         else:
             exception = None
-        self._log("ERROR", message, args, kwargs,
+        self._log(self.ERROR, message, args, kwargs,
                   exception=exception, traceback=traceback)
 
     def __str__(self):
         return '\n'.join(
-            "[%s] [%s] %s" % (level, section_full_name, log_string)
+            colored("[%s] [%s] %s" % (level, section_full_name, log_string),
+                    self.LOG_LEVEL_COLORS[level])
             for level, section_full_name, log_string in self._logs
         )
