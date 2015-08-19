@@ -28,6 +28,7 @@ class DbSaver(BaseSaver):
         self.destination = destination
         with open(destination['file'], 'rb') as _file:
             self.query = _file.read()
+        self.multiple_queries = self._split_multiple_queries()
 
         database = self.db_registry.get_database(self.destination["database"])
         self.connection = MySQLdb.connect(
@@ -39,6 +40,16 @@ class DbSaver(BaseSaver):
         )
         self.cursor = self.connection.cursor()
 
+    def _split_multiple_queries(self):
+        """
+        A bit primitive way to split mutliple queries in a string, as MySQLdb
+        doesn't allow running multiple queries in one call.
+
+        Each query needs to end with a semicolon and a newline, and this is
+        optional for the last query
+        """
+        return filter(None, map(str.strip, self.query.split(';\n')))
+
     @helpers.step
     def save(self, data):
         self.cursor.executemany(self.query, data)
@@ -47,6 +58,12 @@ class DbSaver(BaseSaver):
     @helpers.step
     def save_no_data(self):
         self.save([[]])
+
+    @helpers.step
+    def save_no_data_multiple_queries(self):
+        for query in self.multiple_queries:
+            self.cursor.execute(query, [])
+        self.connection.commit()
 
 
 @BaseSaver.register_default_noop
