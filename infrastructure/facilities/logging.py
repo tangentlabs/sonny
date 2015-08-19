@@ -11,6 +11,30 @@ from infrastructure.facilities.base import Facility
 class BaseLogger(Facility):
     __metaclass__ = ABCMeta
 
+    class FacilitySettings(Facility.FacilitySettings):
+        log_level = "DEBUG"
+        """
+        Minimum log level to output. Levels are, ascending:
+
+        DEBUG
+        INFO
+        WARNING
+        ERROR
+        """
+
+    DEBUG = "DEBUG"
+    INFO = "INFO"
+    WARNING = "WARNING"
+    ERROR = "ERROR"
+
+    LOG_LEVELS = [DEBUG, INFO, WARNING, ERROR]
+
+    def enter_job(self, job, facility_settings):
+        super(BaseLogger, self).enter_job(job, facility_settings)
+
+        log_level_lindex = self.LOG_LEVELS.index(self.facility_settings.log_level)
+        self.log_level_to_print = set(self.LOG_LEVELS[log_level_lindex:])
+
     def exit_job(self, job, exc_type, exc_value, traceback):
         if job.test:
             print '*********** LOGS: ***********'
@@ -32,17 +56,20 @@ class BaseLogger(Facility):
     def _log(self, level, message, args, kwargs):
         pass
 
+    def _should_log_level(self, level):
+        return level in self.log_level_to_print
+
     def debug(self, message, *args, **kwargs):
-        self._log("DEBUG", message, args, kwargs)
+        self._log(self.DEBUG, message, args, kwargs)
 
     def info(self, message, *args, **kwargs):
-        self._log("INFO", message, args, kwargs)
+        self._log(self.INFO, message, args, kwargs)
 
     def warn(self, message, *args, **kwargs):
-        self._log("WARN", message, args, kwargs)
+        self._log(self.WARNING, message, args, kwargs)
 
     def error(self, message, *args, **kwargs):
-        self._log("ERROR", message, args, kwargs)
+        self._log(self.ERROR, message, args, kwargs)
 
 
 @helpers.register_facility("logger")
@@ -65,6 +92,9 @@ class InMemoryLogger(BaseLogger):
 
     def _log(self, level, message, args, kwargs,
              exception=None, traceback=None):
+        if not self._should_log_level(level):
+            return
+
         log_string = str(message)
         if args:
             log_string = log_string % args
