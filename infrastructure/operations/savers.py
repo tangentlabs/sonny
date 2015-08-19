@@ -46,7 +46,7 @@ class DbSaver(BaseSaver):
 
     @helpers.step
     def save_no_data(self):
-        self.save([])
+        self.save([[]])
 
 
 @BaseSaver.register_default_noop
