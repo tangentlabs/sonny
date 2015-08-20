@@ -7,6 +7,10 @@ from infrastructure.context import helpers
 from infrastructure.operations.base import BaseOperation
 
 
+class NoDBRowMatched(Exception):
+    pass
+
+
 class BaseDbLoader(BaseOperation):
     class OperationSettings(BaseOperation.OperationSettings):
         __job_settings_name__ = 'DbLoaderOperationSettings'
@@ -57,7 +61,8 @@ class DbLoader(BaseDbLoader):
         self.cursor.execute(self.query, parameters)
         column_names = self._get_column_names()
         row = self.cursor.fetchone()
-        assert row is not None
+        if row is None:
+            raise NoDBRowMatched()
         return self._as_dict(column_names, row)
 
     @helpers.step
@@ -95,4 +100,7 @@ class CachedDbLoader(BaseDbLoader):
 
     @helpers.step
     def get_multiple(self, parameters):
-        return self._get_cached_query(parameters)
+        row = self._get_cached_query(parameters)
+        if row is None:
+            raise NoDBRowMatched()
+        return row
