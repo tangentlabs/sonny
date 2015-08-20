@@ -1,6 +1,6 @@
 import os
 import fnmatch
-from ftplib import FTP
+from ftplib import FTP, error_perm
 import imaplib
 import tempfile
 from email import message_from_string
@@ -125,8 +125,14 @@ class FtpFetcher(BaseFileFetcher):
         ]
 
     def _fetch_file_with_ftp(self, ftp, filename):
-        with TemporaryFileContextManager() as (local_filename, local_file):
-            ftp.retrbinary('RETR %s' % filename, local_file.write)
+        try:
+            with TemporaryFileContextManager() as (local_filename, local_file):
+                ftp.retrbinary('RETR %s' % filename, local_file.write)
+        except error_perm:
+            helpers.get_current_job().logger.error("Failed to get FTP file %s "
+                                                   "while in %s",
+                                                   filename, ftp.pwd())
+            raise
 
         return local_filename
 
