@@ -60,7 +60,7 @@ class BaseLogger(Facility):
         return wrapped
 
     @abstractmethod
-    def _log(self, level, message, args, kwargs):
+    def _log(self, level, message, args, kwargs, exception=None, traceback=None):
         pass
 
     def _should_log_level(self, level):
@@ -76,7 +76,17 @@ class BaseLogger(Facility):
         self._log(self.WARNING, message, args, kwargs)
 
     def error(self, message, *args, **kwargs):
-        self._log(self.ERROR, message, args, kwargs)
+        if 'traceback' in kwargs:
+            traceback = kwargs.pop('traceback')
+        else:
+            traceback = None
+        if 'exception' in kwargs:
+            exception = kwargs.pop('exception')
+        else:
+            exception = None
+
+        self._log(self.ERROR, message, args, kwargs,
+                  exception=exception, traceback=traceback)
 
     def _colored_for_level(self, message, level):
         color = self.LOG_LEVEL_COLORS[level]
@@ -133,18 +143,6 @@ class InMemoryLogger(BaseLogger):
 
     def _to_stdout_colored(self, message, level):
         print self._colored_for_level(message, level)
-
-    def error(self, message, *args, **kwargs):
-        if 'traceback' in kwargs:
-            traceback = kwargs.pop('traceback')
-        else:
-            traceback = None
-        if 'exception' in kwargs:
-            exception = kwargs.pop('exception')
-        else:
-            exception = None
-        self._log(self.ERROR, message, args, kwargs,
-                  exception=exception, traceback=traceback)
 
     def __str__(self):
         return '\n'.join(
