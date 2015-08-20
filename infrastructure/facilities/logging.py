@@ -41,6 +41,7 @@ class BaseLogger(Facility):
 
         log_level_lindex = self.LOG_LEVELS.index(self.facility_settings.log_level)
         self.log_level_to_print = set(self.LOG_LEVELS[log_level_lindex:])
+        self.last_logged_exception = None
 
     def exit_job(self, job, exc_type, exc_value, traceback):
         if job.test:
@@ -84,6 +85,12 @@ class BaseLogger(Facility):
             exception = kwargs.pop('exception')
         else:
             exception = None
+
+        # Suppress traceback if it is the same exception
+        if exception:
+            if self.last_logged_exception == exception:
+                traceback = None
+            self.last_logged_exception = exception
 
         self._log(self.ERROR, message, args, kwargs,
                   exception=exception, traceback=traceback)
