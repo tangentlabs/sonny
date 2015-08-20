@@ -18,11 +18,23 @@ class BaseFileFetcher(BaseOperation):
     def fetch_file(self, filename):
         return filename
 
+    @abstractmethod
+    def fetch_file_that_exists(self, filename):
+        """
+        Return a file if it exists, else return an appropriate exception, if
+        that specifc file could not be fetched (eg permissions, doesn't exist),
+        without raising it.
+
+        If there was another error, non-specific to the file (eg connection
+        error, out of disk space), still raise the exception
+        """
+        return filename, None
+
     def fetch_files(self, filenames):
-        return [
-            self.fetch_file(filename)
-            for filename in filenames
-        ]
+        return map(self.fetch_file, filenames)
+
+    def fetch_files_that_exist(self, filenames):
+        return map(self.fetch_file_that_exists, filenames)
 
     @abstractmethod
     def search_files(self, *args, **kwargs):
@@ -89,9 +101,19 @@ class FtpFetcher(BaseFileFetcher):
             return self._fetch_files_with_ftp(ftp, filenames)
 
     @helpers.step
+    def fetch_files_that_exist(self, filenames):
+        with FtpContextManager(self.source) as ftp:
+            return self._fetch_files_that_exist_with_ftp(ftp, filenames)
+
+    @helpers.step
     def fetch_file(self, filename):
         with FtpContextManager(self.source) as ftp:
-            return self._fetch_file_with_ftp(ftp, filename)
+            return self._fetch_file(ftp, filename)
+
+    @helpers.step
+    def fetch_file_that_exists(self, filename):
+        with FtpContextManager(self.source) as ftp:
+            return self._fetch_file_that_exists_with_ftp(ftp, filename), None
 
     @helpers.step
     def search_files(self, directory, pattern="*"):
@@ -124,17 +146,32 @@ class FtpFetcher(BaseFileFetcher):
             for filename in filenames
         ]
 
+    def _fetch_files_that_exist_with_ftp(self, ftp, filenames):
+        return [
+            self._fetch_file_that_exists_with_ftp(ftp, filename)
+            for filename in filenames
+        ]
+
     def _fetch_file_with_ftp(self, ftp, filename):
-        try:
-            with TemporaryFileContextManager() as (local_filename, local_file):
-                ftp.retrbinary('RETR %s' % filename, local_file.write)
-        except error_perm:
-            helpers.get_current_job().logger.error("Failed to get FTP file %s "
-                                                   "while in %s",
-                                                   filename, ftp.pwd())
-            raise
+        local_filename, exception = \
+            self._fetch_file_that_exists_with_ftp(ftp, filename)
+
+        if exception:
+            helpers.get_current_job().logger.error(
+                "Failed to get FTP file %s while in %s",
+                filename, ftp.pwd())
+            raise exception
 
         return local_filename
+
+    def _fetch_file_that_exists_with_ftp(self, ftp, filename):
+        with TemporaryFileContextManager() as (local_filename, local_file):
+            try:
+                ftp.retrbinary('RETR %s' % filename, local_file.write)
+            except error_perm, e:
+                return None, e
+
+        return local_filename, None
 
     def _filter_files_by_filename(self, filenames, pattern):
         return [
@@ -195,6 +232,10 @@ class EmailFetcher(BaseFileFetcher):
     @helpers.step
     def fetch_file(self, filename):
         raise Exception("This fetcher doesn't support 'fetch_file'")
+
+    @helpers.step
+    def fetch_file_that_exists(self, filename):
+        raise Exception("This fetcher doesn't support 'fetch_file_that_exists'")
 
     @helpers.step
     def search_files(self, *args, **kwargs):
@@ -307,6 +348,10 @@ class NoOpFetcher(BaseFileFetcher):
     @helpers.step
     def fetch_file(self, filename):
         return filename
+
+    @helpers.step
+    def fetch_file_that_exists(self, filename):
+        return filename, None
 
     @helpers.step
     def fetch_from_search(self, *args, **kwargs):
