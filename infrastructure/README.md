@@ -192,7 +192,7 @@ class MyImporter(Importer):
             data = filter(lambda x, y: x != 0, data)
             if len(data) == alert_when_line_size:
                 # You can use any facility that job has
-                self.job.logger.warning('That weird line count again')
+                self.job.logger.warn('That weird line count again')
         self.save_to_db(data)
 
     @step
