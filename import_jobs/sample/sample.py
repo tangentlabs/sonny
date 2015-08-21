@@ -13,6 +13,8 @@ class SampleImporter(common.FtpCsvDbImporter):
     New customers for today
     """
 
+    uuid = '6e26c903-a4ca-4216-93b9-872765c6c888'
+
     ftp_server = "main"
 
     insert_query = {

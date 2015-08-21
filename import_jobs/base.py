@@ -1,4 +1,4 @@
-from abc import ABCMeta, abstractmethod
+from abc import ABCMeta, abstractmethod, abstractproperty
 from datetime import date
 
 from infrastructure.context import helpers
@@ -10,6 +10,14 @@ from import_jobs.runner import ImporterRunningMixin
 
 class Importer(ImporterRunningMixin):
     __metaclass__ = ABCMeta
+
+    @abstractproperty
+    def uuid(self):
+        """
+        You need to specify a UUID for each job. The easiest way to do this
+        is to get a new value from `uuid.uuid4()` and put that in the class
+        """
+        pass
 
     class JobSettings(object):
         """
