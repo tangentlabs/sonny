@@ -128,7 +128,14 @@ class InMemoryLogger(BaseLogger):
             log_string = log_string % args
         else:
             log_string = log_string % kwargs
-        section_full_name = self.job.current_step.name
+        try:
+            step = self.job.current_step
+        except IndexError:
+            step = None
+        if step:
+            section_full_name = step.name
+        else:
+            section_full_name = '<No section>'
         self._logs.append((level, section_full_name, log_string[:80]))
 
         if not self.job.test:
