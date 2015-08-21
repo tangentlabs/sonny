@@ -19,9 +19,9 @@ class TemporaryDB(Facility):
         """
         The cleanup SQL script per database
         """
-        force_run = False
+        should_run = False
         """
-        Force the script to be run, even outside of test mode
+        Should the scripts run
         """
 
     def first_step(self, step):
@@ -57,4 +57,4 @@ class TemporaryDB(Facility):
                             "non-disposable DB: %s" % db_name)
 
     def should_run(self):
-        return self.job.test or self.facility_settings.force_run
+        return self.facility_settings.should_run
