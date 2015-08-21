@@ -1,3 +1,4 @@
+import json
 from functools import wraps
 
 from infrastructure.context import helpers
@@ -12,9 +13,17 @@ class JobStatus(Facility):
 
         self.errors = []
 
+    def first_step(self, job):
+        if not self.job.test:
+            self.job.dashboard.register_job_start()
+
     def last_step(self, step, exc_type, exc_value, traceback):
         if exc_type:
             self.error(step, (exc_type, exc_value, traceback))
+
+        if not self.job.test:
+            succeeded = (exc_type, exc_value, traceback) == (None, None, None)
+            self.job.dashboard.register_job_end(succeeded)
 
         self.job.notifier.notify(["dev_team"],
                                  "Job '%s' completed with %s errors!" %

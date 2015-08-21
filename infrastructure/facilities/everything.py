@@ -14,4 +14,5 @@ from infrastructure.facilities import (  # noqa
     ftp_registry,
     email_registry,
     temporary_db,
+    dashboard,
 )
