@@ -8,6 +8,7 @@ from infrastructure.facilities.base import Facility
 
 class DashboardActionsMixin(object):
     class URLS:
+        JOB_REGISTER = "jobs/api/register/"
         JOB_RUN_START = "jobs/runs/api/start/"
         JOB_RUN_END = "jobs/runs/api/end/"
         JOB_RUN_PROFILING = "jobs/runs/api/profiling/"
@@ -70,6 +71,23 @@ class DashboardActionsMixin(object):
         if not ok:
             self.job.logger.error("Could not register job profiling to "
                                   "dashboard: name=%s uuid=%s run=%s",
+                                  self.job.name, self.job.uuid, self.job.run_id)
+            return False
+
+        return True
+
+    def discover_and_register_jobs(self):
+        try:
+            from infrastructure.discover_jobs import get_importers_details
+            ok, response = self.post(self.URLS.JOB_REGISTER, {
+                'jobs': json.dumps(get_importers_details()),
+            })
+        except Exception:
+            ok, response = False, None
+
+        if not ok:
+            self.job.logger.error("Could not register jobs to dashboard: "
+                                  "name=%s uuid=%s run=%s",
                                   self.job.name, self.job.uuid, self.job.run_id)
             return False
 
