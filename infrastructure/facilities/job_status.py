@@ -1,3 +1,5 @@
+import sys
+
 from functools import wraps
 
 from infrastructure.context import helpers
@@ -22,7 +24,7 @@ class JobStatus(Facility):
 
     def last_step(self, step, exc_type, exc_value, traceback):
         if exc_type:
-            self.error(step, (exc_type, exc_value, traceback))
+            self.error(exc_type, exc_value, traceback)
 
         if not self.job.test:
             succeeded = (exc_type, exc_value, traceback) == (None, None, None)
@@ -32,22 +34,26 @@ class JobStatus(Facility):
                                  "Job '%s' completed with %s errors!" %
                                  (self.job.name, len(self.errors)))
 
-    def error(self, step, (exc_type, exc_value, traceback), message=None):
+    def error(self, exc_type, exc_value, traceback, message=None):
+        if self._update_last_exception_message(exc_value, message):
+            return
+
+        step = self.job.current_step
         self.errors.append((step.name, (exc_type, exc_value, traceback), message))
         self.job.logger.error("Step '%s' raised '%s'", step.name, exc_type.__name__,
                               exception=exc_value, traceback=traceback)
 
-    def message_for_exception(self, exc_value, message):
+    def _update_last_exception_message(self, exc_value, message):
         if not self.errors:
-            self.error(None, (None, None, None), message)
-            return
+            return False
 
-        step, (exc_type, last_exc_value, traceback), last_message = self.errors[-1]
+        step, (exc_type, last_exc_value, traceback), last_message = \
+            self.errors[-1]
+        if last_exc_value != exc_value:
+            return False
 
-        if last_exc_value == exc_value:
-            self.errors[-1] = step, (exc_type, exc_value, traceback), last_message
-        else:
-            self.error(None, (None, None, None), message)
+        self.errors[-1] = step, (exc_type, exc_value, traceback), last_message
+        return True
 
 
 def error_on_exception(message):
@@ -57,9 +63,10 @@ def error_on_exception(message):
         def decorated(*args, **kwargs):
             try:
                 return func(*args, **kwargs)
-            except Exception as e:
+            except Exception as exc_value:
+                exc_type, _, traceback = sys.exc_info()
                 job = helpers.get_current_job()
-                job.job_status.message_for_exception(e, message)
+                job.job_status.error(exc_type, exc_value, traceback, message)
 
         return decorated
 

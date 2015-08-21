@@ -110,7 +110,10 @@ class Job(object):
 
     @property
     def current_step(self):
-        return self._steps[-1]
+        if self._steps:
+            return self._steps[-1]
+        else:
+            return self._first_step
 
     def new_step(self, **kwargs):
         step = Step(self, **kwargs)
