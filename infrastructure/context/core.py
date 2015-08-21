@@ -61,8 +61,9 @@ class Job(object):
     with context.new_job():
         do_import()
     """
-    def __init__(self, context, name=None, job_settings=None, test=False):
-        self.name = "<Unkown job>" if name is None else name
+    def __init__(self, context, name, uuid, job_settings=None, test=False):
+        self.name = name
+        self.uuid = uuid
         self.job_settings = job_settings
         self.test = test
         self.context = context

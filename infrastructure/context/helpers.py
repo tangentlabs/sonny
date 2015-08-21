@@ -29,9 +29,13 @@ def job(func, test=False):
     """
     @wraps(func)
     def decorated(*args, **kwargs):
-        name = get_importer_name(args)
-        job_settings = get_importer_job_settings(args)
-        with with_job(name=name, job_settings=job_settings, test=test) as job:
+        job_args = {
+            "name": get_importer_name(args),
+            "uuid": get_importer_uuid(args),
+            "job_settings": get_importer_job_settings(args),
+            "test": test,
+        }
+        with with_job(**job_args) as job:
             return func(*args, job=job, **kwargs)
 
     return decorated
@@ -80,24 +84,29 @@ def ignore_exceptions(returning):
     return decorator
 
 
-def get_importer_job_settings(args):
+def get_importer(args):
     from import_jobs.base import Importer
 
     if args and isinstance(args[0], Importer):
         importer = args[0]
-        return importer.JobSettings
+        return importer
 
     return None
+
+
+def get_importer_job_settings(args):
+    importer = get_importer(args)
+    return importer and importer.JobSettings
 
 
 def get_importer_name(args):
-    from import_jobs.base import Importer
+    importer = get_importer(args)
+    return importer and importer.name
 
-    if args and isinstance(args[0], Importer):
-        importer = args[0]
-        return importer.name
 
-    return None
+def get_importer_uuid(args):
+    importer = get_importer(args)
+    return importer and importer.uuid
 
 
 def find_facility_by_class_name(name):
