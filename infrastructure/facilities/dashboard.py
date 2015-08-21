@@ -8,21 +8,20 @@ from infrastructure.facilities.base import Facility
 
 class DashboardActionsMixin(object):
     def register_job_start(self):
+        self.job.run_id = None
+
         try:
             ok, response = self.post("jobs/api/job_start/", {
                 'name': self.job.name,
                 'uuid': self.job.uuid,
             })
-        except Exception, e:
-            self.job.logger.error("Could not connect to dashboard", exception=e)
-            self.job.run_id = None
-            return False
+        except Exception:
+            ok, response = False, None
 
         if not ok:
             self.job.logger.error(
                 "Could not register job start to dashboard: name=%s uuid=%s",
                 self.job.name, self.job.uuid)
-            self.job.run_id = None
             return False
 
         response = response
@@ -39,15 +38,34 @@ class DashboardActionsMixin(object):
                 'job_run': self.job.run_id,
                 'succeeded': succeeded,
             })
-        except Exception, e:
-            self.job.logger.error("Could not connect to dashboard", exception=e)
-            return False
+        except Exception:
+            ok, response = False, None
 
         if not ok:
             self.job.logger.error(
-                "Could not register job end to dashboard: name=%s uuid=%s",
-                self.job.name, self.job.uuid)
-            self.job.run_id = None
+                "Could not register job end to dashboard: name=%s uuid=%s "
+                "run=%s",
+                self.job.name, self.job.uuid, self.job_run_id)
+            return False
+
+        return True
+
+    def submit_job_profiling(self):
+        if not self.job.run_id:
+            return False
+
+        try:
+            ok, response = self.post("jobs/api/job_profiling/", {
+                'job_run': self.job.run_id,
+                'profiling_json': json.dumps(self.job.profiler.profiling_section.as_dict()),
+            })
+        except Exception:
+            ok, response = False, None
+
+        if not ok:
+            self.job.logger.error("Could not register job profiling to "
+                                  "dashboard: name=%s uuid=%s run=%s",
+                                  self.job.name, self.job.uuid, self.job.run_id)
             return False
 
         return True
@@ -60,6 +78,9 @@ class Dashboard(DashboardActionsMixin, Facility):
 
         self._dashboard_url = None
 
+    def exit_job(self, job, exc_type, exc_value, traceback):
+        self.submit_job_profiling()
+
     @property
     def dashboard_url(self):
         if not self._dashboard_url:
@@ -69,7 +90,11 @@ class Dashboard(DashboardActionsMixin, Facility):
 
     def post(self, relative_url, data):
         url = '%s/%s' % (self.dashboard_url, relative_url)
-        response = requests.post(url, data=data)
+        try:
+            response = requests.post(url, data=data)
+        except Exception, e:
+            self.job.logger.error("Could not connect to dashboard", exception=e)
+            raise
 
         if response.ok:
             try:
