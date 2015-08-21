@@ -4,6 +4,17 @@ Wolseley Importing
 All the importing that needs to be done for Wolseley
 
 
+Getting started
+====
+
+Create a virtual environment, and isntall dependencies via ``make``
+
+.. code-block:: shell
+
+  mkvirtualenv wolseley-importing
+  make
+
+
 Usage
 ====
 
