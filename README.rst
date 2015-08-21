@@ -4,6 +4,17 @@ Tangent Importing
 All the importing that needs to be done
 
 
+Getting started
+====
+
+Create a virtual environment, and isntall dependencies via ``make``
+
+.. code-block:: shell
+
+  mkvirtualenv tangent-importer
+  make
+
+
 Usage
 ====
 
