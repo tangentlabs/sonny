@@ -101,9 +101,6 @@ class Dashboard(DashboardActionsMixin, Facility):
 
         self._dashboard_url = None
 
-    def exit_job(self, job, exc_type, exc_value, traceback):
-        self.submit_job_profiling()
-
     @property
     def dashboard_url(self):
         if not self._dashboard_url:
