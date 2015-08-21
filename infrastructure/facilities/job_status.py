@@ -1,4 +1,3 @@
-import json
 from functools import wraps
 
 from infrastructure.context import helpers
@@ -12,6 +11,10 @@ class JobStatus(Facility):
         super(JobStatus, self).enter_job(job, facility_settings)
 
         self.errors = []
+
+    def exit_job(self, job, exc_type, exc_value, traceback):
+        if not self.job.test:
+            self.job.dashboard.submit_job_profiling()
 
     def first_step(self, job):
         if not self.job.test:
