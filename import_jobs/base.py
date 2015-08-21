@@ -26,9 +26,12 @@ class Importer(ImporterRunningMixin):
         """
         test_defaults = {}
 
+    @classmethod
+    def get_name(cls):
+        return '%s:%s' % (cls.__module__, cls.__name__)
+
     def __init__(self, files_to_fetch=None, _today=None):
-        self.name = '%s:%s' % \
-            (self.__class__.__module__, self.__class__.__name__)
+        self.name = self.get_name()
 
         if isinstance(files_to_fetch, (str, unicode)):
             files_to_fetch = [files_to_fetch]
