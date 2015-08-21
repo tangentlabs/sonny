@@ -7,11 +7,16 @@ from infrastructure.facilities.base import Facility
 
 
 class DashboardActionsMixin(object):
+    class URLS:
+        JOB_RUN_START = "jobs/runs/api/start/"
+        JOB_RUN_END = "jobs/runs/api/end/"
+        JOB_RUN_PROFILING = "jobs/runs/api/profiling/"
+
     def register_job_start(self):
         self.job.run_id = None
 
         try:
-            ok, response = self.post("jobs/api/job_start/", {
+            ok, response = self.post(self.URLS.JOB_RUN_START, {
                 'name': self.job.name,
                 'uuid': self.job.uuid,
             })
@@ -34,7 +39,7 @@ class DashboardActionsMixin(object):
             return False
 
         try:
-            ok, response = self.post("jobs/api/job_end/", {
+            ok, response = self.post(self.URLS.JOB_RUN_END, {
                 'job_run': self.job.run_id,
                 'succeeded': succeeded,
             })
@@ -55,7 +60,7 @@ class DashboardActionsMixin(object):
             return False
 
         try:
-            ok, response = self.post("jobs/api/job_profiling/", {
+            ok, response = self.post(self.URLS.JOB_RUN_PROFILING, {
                 'job_run': self.job.run_id,
                 'profiling_json': json.dumps(self.job.profiler.profiling_section.as_dict()),
             })
