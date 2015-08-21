@@ -64,6 +64,16 @@ class ProfilingSection(object):
             for profiling_section in self.profiling_sections
         )
 
+    def as_dict(self):
+        return {
+            "name": self.job_step.name if self.job_step else '<root>',
+            "duration": self.duration,
+            "sections": [
+                profiling_section.as_dict()
+                for profiling_section in self.profiling_sections
+            ],
+        }
+
 
 @helpers.register_facility("profiler")
 class SimpleProfiler(BaseProfiler):
