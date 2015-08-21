@@ -11,35 +11,58 @@ To see all jobs defined:
 
 ``./list.py``
 
-To run a job it's enough to do:
+Copy `conf/local.py-dist` to `conf/local.py`, and make sure the details for the
+local DB, and Dashboard instance, are correct
 
-``IMPORT_CONF=live ./run.py path.to.importer.package.ImporterClass``
+To run a job, with FTP/Email/DB access, it's enough to do:
 
-where ``IMPORT_CONF`` should be the appropriate environment. It defaults to ``local``.
-
-To pass named arguments:
-
-``./run.py path.to.importer.package.ImporterClass example=value demo=argument list_argument[]=first list_argument[]=second``
-
-To pass a boolean:
-
-``./run.py path.to.importer.package.ImporterClass flag1?=True flag2?=False``
-
-To pass facility settings overrides:
-
-``./run.py path.to.impoerter.package.ImporterClass importer_arg=value --FacilityName.setting_name=value``
+``./run.py path.to.importer.package.ImporterClass``
 
 To test a job, which mocks most functionality with side effects (eg FTP, DB, etc):
 
 ``./test.py path.to.importer.package.ImporterClass``
 
-To selectively not mock some facilities, eg don't mock saving to DB:
+In dev/production environment prepend with ``IMPORT_CONF=conf.<environment>``,
 
-``./test.py path.to.importer.package.ImporterClass --MockRegistry.no_mock_classes[]=DbSaver --MockRegistry.mock_classes[]=DbLoader``
+where ``IMPORT_CONF`` should be the appropriate environment. It defaults to
+``local``.
+
+
+Customising runs
+====
+
+To pass named arguments:
+
+``./run.py importer example=value demo=argument list_argument[]=first list_argument[]=second``
+
+To pass a boolean:
+
+``./run.py importer flag1?=True flag2?=False``
+
+To pass facility settings overrides:
+
+``./run.py importer importer_arg=value --FacilityName.setting_name=value``
+
+
+Useful CLI facility overrides
+====
+
+To limit the amount of logs:
+
+``./test.py importer --InMemoryLogger.log_level='INFO'``
+
+To selectively not mock some facilities, eg don't mock saving to/loading from DB:
+
+``./test.py importer --MockRegistry.no_mock_classes[]=DbSaver --MockRegistry.mock_classes[]=DbLoader``
 
 Or, to selectively mock only some facilities, eg mock only fetching:
 
-``./run.py path.to.importer.package.ImporterClass --MockRegistry.mock_classes[]=FtpFetcher --MockRegistry.mock_classes[]=LocalFileDeleter``
+``./run.py importer --MockRegistry.mock_classes[]=FtpFetcher --MockRegistry.mock_classes[]=LocalFileDeleter``
+
+When testing locally, you can use the importer's scripts to setup and tear down
+the DB:
+
+``./run.py importer --TemporaryDB.force_run?=True``
 
 
 Tests
