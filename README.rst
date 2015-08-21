@@ -71,3 +71,11 @@ Tests
 It's enough to do:
 
 ``nosetests``
+
+
+Dashboard
+====
+
+To use your local dashboard (http://github.com/tangentlabs/tangent-importer-dashboard) , you can register the jobs available:
+
+``./run.py import_jobs.register_jobs_to_dashboard.RegisterJobsToDashboard``

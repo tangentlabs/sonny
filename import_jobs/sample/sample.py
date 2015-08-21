@@ -15,14 +15,14 @@ class SampleImporter(common.FtpCsvDbImporter):
 
     uuid = '6e26c903-a4ca-4216-93b9-872765c6c888'
 
-    ftp_server = "main"
+    ftp_server = "live"
 
     insert_query = {
-        "database": "dashboard_live",
+        "database": "live",
         "file": location("sample.sql"),
     }
     post_job_query = {
-        "database": "dashboard_live",
+        "database": "live",
         "file": location("sample_post.sql"),
     }
 
