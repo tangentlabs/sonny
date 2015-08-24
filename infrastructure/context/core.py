@@ -85,6 +85,7 @@ class Job(object):
         except:
             exc_type, exc_value, traceback = sys.exc_info()
             self.__exit__(exc_type, exc_value, traceback)
+            raise
 
         return self
 
