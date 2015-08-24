@@ -1,4 +1,5 @@
 import sys
+import warnings
 
 from functools import wraps
 
@@ -9,14 +10,23 @@ from infrastructure.facilities.base import Facility
 
 @helpers.register_facility("job_status")
 class JobStatus(Facility):
+    class FacilitySettings(Facility.FacilitySettings):
+        filter_warnings = []
+        """
+        Entries to the warnings filter table
+        """
+
     def enter_job(self, job, facility_settings):
         super(JobStatus, self).enter_job(job, facility_settings)
 
         self.errors = []
+        self._setup_warnings()
 
     def exit_job(self, job, exc_type, exc_value, traceback):
         if not self.job.test:
             self.job.dashboard.submit_job_profiling()
+
+        self._reset_warnings()
 
     def first_step(self, job):
         if not self.job.test:
@@ -54,6 +64,19 @@ class JobStatus(Facility):
 
         self.errors[-1] = step, (exc_type, exc_value, traceback), last_message
         return True
+
+    def _setup_warnings(self):
+        self._catch_warnings = warnings.catch_warnings()
+        self._catch_warnings.__enter__()
+        try:
+            for warning in self.facility_settings.filter_warnings:
+                warnings.filterwarnings(**warning)
+        except Exception:
+            self._reset_warnings()
+            raise
+
+    def _reset_warnings(self):
+        self._catch_warnings.__exit__(None, None, None)
 
 
 def error_on_exception(message):
