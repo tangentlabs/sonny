@@ -1,5 +1,5 @@
 import time
-from functools import wraps
+import resource
 from abc import ABCMeta, abstractmethod
 
 from infrastructure.context import helpers
@@ -36,15 +36,24 @@ class ProfilingSection(object):
             self.parent.profiling_sections.append(self)
         self.name = name
         self.duration = duration
+        self.memory_created = None
 
         self.profiling_sections = []
 
+    def _get_memory_usage(self):
+        rusage = resource.getrusage(resource.RUSAGE_SELF)
+        page_size = resource.getpagesize()
+        return rusage.ru_maxrss * page_size
+
     def start(self):
         self.start_time = time.time()
+        self.start_memory = self._get_memory_usage()
 
     def finish(self):
         self.end_time = time.time()
         self.duration = self.end_time - self.start_time
+        self.end_memory = self._get_memory_usage()
+        self.memory_created = self.end_memory - self.start_memory
 
     def __enter__(self):
         self.profiler._push(self)
@@ -68,6 +77,7 @@ class ProfilingSection(object):
         return {
             "name": self.job_step.name if self.job_step else '<root>',
             "duration": self.duration,
+            "memory": self.memory_created,
             "sections": [
                 profiling_section.as_dict()
                 for profiling_section in self.profiling_sections
