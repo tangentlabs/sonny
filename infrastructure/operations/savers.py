@@ -34,7 +34,7 @@ class DbSaver(BaseSaver):
         self.connection = MySQLdb.connect(
             host=database['host'],
             port=database['port'],
-            user=database['user'],
+            user=database['username'],
             passwd=database['password'],
             db=database['database'],
         )
