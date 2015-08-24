@@ -66,7 +66,7 @@ def step(func):
     return decorated
 
 
-def ignore_exceptions(returning):
+def ignore_exceptions(classes=(Exception,), returning=None):
     """
     Ignore any exceptions raised from the function call
     """
@@ -76,7 +76,7 @@ def ignore_exceptions(returning):
         def decorated(*args, **kwargs):
             try:
                 return func(*args, **kwargs)
-            except Exception:
+            except classes:
                 return returning
 
         return decorated
