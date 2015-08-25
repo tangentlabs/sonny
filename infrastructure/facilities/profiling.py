@@ -2,6 +2,8 @@ import time
 from functools import wraps
 from abc import ABCMeta, abstractmethod
 
+from utils import pretty_bytes
+
 from infrastructure.context import helpers
 
 from infrastructure.facilities.base import Facility
@@ -57,15 +59,16 @@ class ProfilingSection(object):
 
     def __str__(self, indent=""):
         return ''.join(
-            "\n%s[%s] %s: %.3f%s" %
+            "\n%s[%s] %s: %.3fs, %s%s" %
             (indent, profiling_section.job_step.name,
              profiling_section.name, profiling_section.duration or -1,
+             pretty_bytes(profiling_section.memory_created),
              profiling_section.__str__(indent="  " + indent))
             for profiling_section in self.profiling_sections
         )
 
     def as_dict(self):
-        return {
+        _dict = {
             "name": self.job_step.name if self.job_step else '<root>',
             "duration": self.duration,
             "sections": [
@@ -73,6 +76,12 @@ class ProfilingSection(object):
                 for profiling_section in self.profiling_sections
             ],
         }
+
+        if not self.parent:
+            _dict['duration'] = sum((section.duration for section in self.profiling_sections), 0)
+            _dict['memory'] = sum((section.memory_created for section in self.profiling_sections), 0)
+
+        return _dict
 
 
 @helpers.register_facility("profiler")
