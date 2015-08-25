@@ -23,12 +23,10 @@ def to_date(*date_formats):
     return do_to_date
 
 
-def from_gbp():
-    def do_from_gbp(value):
-        if isinstance(value, (str, unicode)):
-            value = value.replace(u'£', '')
-            value = value.replace(',', '')
+def from_gbp(value):
+    if isinstance(value, (str, unicode)):
+        value = value.replace(u'£', '')
+        value = value.replace(',', '')
 
-        return float(value)
+    return float(value)
 
-    return do_from_gbp
