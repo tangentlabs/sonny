@@ -99,3 +99,32 @@ class TestFromGbp(unittest.TestCase):
         else:
             with self.assertRaises(ValueError):
                 result = caster(gbp)
+
+
+@ddt
+class TestFixAccountNumber(unittest.TestCase):
+    caster = staticmethod(casters.fix_account_number)
+
+    @data(
+        # Unscramblable account numbers
+        ('1234567', '1234567'),
+        ('1234A67', '1234A67'),
+        ('E234A67', 'E234A67'),
+        # Unscrabled account numbers
+        ('1234E67', '1234E67'),
+        # Scrambled account numbers
+        ('1.234e+67', '1234E64'),
+        ('1.234E+67', '1234E64'),
+        # Future scrambled account numbers
+        ('1.2345E+78', None),
+    )
+    @unpack
+    def test_transformer_output(self, gbp, expected):
+        caster = self.caster
+
+        if expected is not None:
+            result = caster(gbp)
+            self.assertEquals(result, expected)
+        else:
+            with self.assertRaises(AssertionError):
+                result = caster(gbp)
