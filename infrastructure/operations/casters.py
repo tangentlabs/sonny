@@ -27,6 +27,7 @@ def from_gbp():
     def do_from_gbp(value):
         if isinstance(value, (str, unicode)):
             value = value.replace(u'£', '')
+            value = value.replace(',', '')
 
         return float(value)
 
