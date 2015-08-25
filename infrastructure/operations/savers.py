@@ -16,6 +16,10 @@ class BaseSaver(BaseOperation):
     def save_no_data(self):
         pass
 
+    @abstractmethod
+    def save_no_data_multiple_queries(self):
+        pass
+
     def __repr__(self):
         return self.__class__.__name__
 
@@ -80,3 +84,7 @@ class PrintSaver(BaseSaver):
     @helpers.step
     def save_no_data(self):
         print 'Save with no data'
+
+    @helpers.step
+    def save_no_data_multiple_queries(self):
+        print 'save_no_data_multiple_queries'
