@@ -83,6 +83,7 @@ class Job(object):
             self._first_step = self.new_step(name='<root>', is_first=True)
             self._first_step.__enter__()
         except:
+            self._first_step = None
             exc_type, exc_value, traceback = sys.exc_info()
             self.__exit__(exc_type, exc_value, traceback)
             raise
