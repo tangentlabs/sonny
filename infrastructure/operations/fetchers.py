@@ -59,11 +59,9 @@ class FtpContextManager(object):
 
     def __enter__(self):
         job = helpers.get_current_job()
-        source = job.ftp_registry["servers"][self.source]
-        host = job.ftp_registry["hosts"][source["host"]]
-        user = host["users"][source["user"]]
-        self.ftp = FTP(host["server"])
-        self.ftp.login(user['username'], user['password'])
+        source = job.ftp_registry.get_ftp_server(self.source)
+        self.ftp = FTP(source["server"])
+        self.ftp.login(source['username'], source['password'])
 
         return self.ftp
 
@@ -193,12 +191,10 @@ class ImapContextManager(object):
 
     def __enter__(self):
         job = helpers.get_current_job()
-        server = job.email_registry["servers"][self.source]
-        host = job.email_registry["hosts"][server["host"]]
-        user = host["users"][server["user"]]
+        source = job.email_registry.get_email_server(self.source)
 
-        self.connection = imaplib.IMAP4_SSL(host["server"])
-        self.connection.login(user["username"], user["password"])
+        self.connection = imaplib.IMAP4_SSL(source["server"])
+        self.connection.login(source["username"], source["password"])
 
         self.connection.select(self.mailbox)
 

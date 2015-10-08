@@ -1,3 +1,6 @@
+import sys
+
+
 class Context(object):
     """
     Registry for facilities that want to operate on jobs and steps, and job
@@ -72,16 +75,34 @@ class Job(object):
 
     def __enter__(self):
         self.context._push_job(self)
+
         self._enter_facilities()
-        self._first_step = self.new_step(name='<root>', is_first=True)
-        self._first_step.__enter__()
+        # Make sure that we exit properly if the first step fails
+        self._first_step = None
+        try:
+            self._first_step = self.new_step(name='<root>', is_first=True)
+            self._first_step.__enter__()
+        except:
+            exc_type, exc_value, traceback = sys.exc_info()
+            self.__exit__(exc_type, exc_value, traceback)
+            raise
 
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
-        self._first_step.__exit__(exc_type, exc_value, traceback)
-        self._exit_facilities(exc_type, exc_value, traceback)
-        self.context._pop_job(self)
+        # Make sure that we exit properly if the last step fails
+        try:
+            if self._first_step:
+                self._first_step.__exit__(exc_type, exc_value, traceback)
+        except:
+            if (exc_type, exc_value, traceback) == (None, None, None):
+                exc_type, exc_value, traceback = sys.exc_info()
+            self._exit_facilities(exc_type, exc_value, traceback)
+            raise
+        else:
+            self._exit_facilities(exc_type, exc_value, traceback)
+        finally:
+            self.context._pop_job(self)
 
     def _create_facilities(self):
         self.facilities = {

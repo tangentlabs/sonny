@@ -25,8 +25,9 @@ class DashboardActionsMixin(object):
             ok, response = False, None
 
         if not ok:
-            self.job.logger.error(
-                "Could not register job start to dashboard: name=%s uuid=%s",
+            self.job.logger.warn(
+                "Could not register job start to monitoring dashboard: "
+                "name=%s uuid=%s",
                 self.job.name, self.job.uuid)
             return False
 
@@ -48,9 +49,9 @@ class DashboardActionsMixin(object):
             ok, response = False, None
 
         if not ok:
-            self.job.logger.error(
-                "Could not register job end to dashboard: name=%s uuid=%s "
-                "run=%s",
+            self.job.logger.warn(
+                "Could not register job end to monitoring dashboard: name=%s "
+                "uuid=%s run=%s",
                 self.job.name, self.job.uuid, self.job_run_id)
             return False
 
@@ -61,17 +62,19 @@ class DashboardActionsMixin(object):
             return False
 
         try:
+            profiling = self.job.profiler.profiling_section.as_dict()
             ok, response = self.post(self.URLS.JOB_RUN_PROFILING, {
                 'job_run': self.job.run_id,
-                'profiling_json': json.dumps(self.job.profiler.profiling_section.as_dict()),
+                'profiling_json': json.dumps(profiling),
             })
         except Exception:
             ok, response = False, None
 
         if not ok:
-            self.job.logger.error("Could not register job profiling to "
-                                  "dashboard: name=%s uuid=%s run=%s",
-                                  self.job.name, self.job.uuid, self.job.run_id)
+            self.job.logger.warn("Could not register job profiling to "
+                                 "monitoring dashboard: name=%s uuid=%s "
+                                 "run=%s",
+                                 self.job.name, self.job.uuid, self.job.run_id)
             return False
 
         return True
@@ -86,9 +89,9 @@ class DashboardActionsMixin(object):
             ok, response = False, None
 
         if not ok:
-            self.job.logger.error("Could not register jobs to dashboard: "
-                                  "name=%s uuid=%s run=%s",
-                                  self.job.name, self.job.uuid, self.job.run_id)
+            self.job.logger.warn("Could not register jobs to monitoring "
+                                 "dashboard: name=%s uuid=%s run=%s",
+                                 self.job.name, self.job.uuid, self.job.run_id)
             return False
 
         return True
@@ -113,7 +116,8 @@ class Dashboard(DashboardActionsMixin, Facility):
         try:
             response = requests.post(url, data=data)
         except Exception, e:
-            self.job.logger.error("Could not connect to dashboard", exception=e)
+            self.job.logger.warn("Could not connect to monitoring dashboard",
+                                 exception=e)
             raise
 
         if response.ok:

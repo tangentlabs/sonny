@@ -11,15 +11,4 @@ class DbRegistry(GenericConfigRegistry):
         """
         Get all the database info for a database alias
         """
-        database = self["databases"][alias]
-        host = self["hosts"][database["host"]]
-        user = host["users"][database["user"]]
-        db = host["databases"][database["database"]]
-        return {
-            "host": host['host'],
-            "port": int(host['port']),
-            "user": user['username'],
-            "password": user['password'],
-            "database": db['name'],
-            "is_disposable": db.get('is_disposable', False),
-        }
+        return self[alias]
