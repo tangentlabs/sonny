@@ -1,4 +1,0 @@
-ACCNO, STBR, CUSTOMER,     LIMIT, ADDRESS01,       ADDRESS02, ADDRESS03, ADDRESS04, ADDRESS05, TELEPHONE,   TERMS, OPENED
-10001, OXF,  "Adam Smith", 500,   "Road Street 1", "W1W 8ND", "London",  "UK",      "",        07466665555, "N/A", 1/1/2015
-10002, BAR,  "William De", 600,   "Main Street 1", "E77 8ND", "London",  "UK",      "",        07466665556, "N/A", 1/1/2014
-10003, LON,  "George Hew", 700,   "Back Alley 1",  "S99 8ND", "London",  "UK",      "",        07466665557, "N/A", 1/1/2013
