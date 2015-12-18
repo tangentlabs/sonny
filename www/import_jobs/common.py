@@ -121,7 +121,7 @@ class EmailLoadTransformInsertDeleteImporter(Importer):
 
     @abstractproperty # noqa
     def email_source(self): pass # noqa
-    file_pattern = '*.xls'
+    file_pattern = '*.xls*'
     @abstractproperty # noqa
     def insert_queries(self): pass # noqa
 
