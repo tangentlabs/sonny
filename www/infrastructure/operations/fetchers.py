@@ -11,6 +11,7 @@ from abc import abstractmethod
 from infrastructure.context import helpers
 
 from infrastructure.operations.base import BaseOperation
+import re
 
 
 class BaseFileFetcher(BaseOperation):
@@ -125,6 +126,17 @@ class FtpFetcher(BaseFileFetcher):
             return filenames
 
     @helpers.step
+    def search_regex_files(self, directory, regex):
+        with FtpContextManager(self.source) as ftp:
+            filenames = self._search_regex_files_with_ftp(ftp, directory, regex)
+            filenames = [
+                os.path.join(directory, filename)
+                for filename in filenames
+            ]
+
+            return filenames
+
+    @helpers.step
     def fetch_from_search(self, directory, pattern="*"):
         with FtpContextManager(self.source) as ftp:
             filenames = self._search_files_with_ftp(ftp, directory, pattern)
@@ -135,6 +147,13 @@ class FtpFetcher(BaseFileFetcher):
         ftp.cwd(directory)
         filenames = ftp.nlst()
         filtered = self._filter_files_by_filename(filenames, pattern)
+
+        return filtered
+
+    def _search_regex_files_with_ftp(self, ftp, directory, regex):
+        ftp.cwd(directory)
+        filenames = ftp.nlst()
+        filtered = self._filter_regex_files_by_filename(filenames, regex)
 
         return filtered
 
@@ -176,6 +195,13 @@ class FtpFetcher(BaseFileFetcher):
             filename
             for filename in filenames
             if fnmatch.fnmatch(filename, pattern)
+        ]
+
+    def _filter_regex_files_by_filename(self, filenames, regex):
+        return [
+            filename
+            for filename in filenames
+            if re.match(regex, filename)
         ]
 
 
