@@ -24,6 +24,16 @@ def to_date(*date_formats):
     return do_to_date
 
 
+def from_date(date_format):
+    def do_from_date(_date):
+        try:
+            return _date.strftime(date_format)
+        except AttributeError:
+            pass
+
+    return do_from_date
+
+
 def from_gbp(value):
     if isinstance(value, (str, unicode)):
         value = value.replace(u'£', '')
