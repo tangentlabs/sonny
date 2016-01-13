@@ -26,12 +26,18 @@ def to_date(*date_formats):
 
 def from_date(date_format):
     def do_from_date(_date):
-        try:
-            return _date.strftime(date_format)
-        except AttributeError:
-            pass
+        return _date.strftime(date_format)
 
     return do_from_date
+
+
+def cast_if_not_none(func):
+     def do_cast_if_not_none(arg):
+         if not arg:
+            return arg
+         return func(arg)
+
+     return do_cast_if_not_none
 
 
 def from_gbp(value):

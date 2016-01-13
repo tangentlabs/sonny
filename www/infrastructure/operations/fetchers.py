@@ -382,3 +382,23 @@ class NoOpFetcher(BaseFileFetcher):
     @helpers.step
     def search_files(self, *args, **kwargs):
         return kwargs.get('filenames') or []
+
+
+class LocalFileContextManager(object):
+    def __init__(self, filenames, fetch_files_method, dispose_files_method):
+        self.filenames = filenames
+        self.fetch_files_method = fetch_files_method
+        self.dispose_files_method = dispose_files_method
+        pass
+
+    def __enter__(self):
+        self.local_filenames = self.fetch_files_method(self.filenames)
+        return self.local_filenames
+
+    def __exit__(self, type, value, traceback):
+        filenames_to_clear = [
+            local_filename
+            for local_filename, exception in self.local_filenames
+            if local_filename
+        ]
+        self.dispose_files_method(filenames_to_clear)
