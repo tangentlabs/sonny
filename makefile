@@ -1,5 +1,5 @@
 install:
-	pip install -r deploy/requirements.txt
+	pip install -r www/deploy/requirements.txt
 
 .PHONY: install
 
