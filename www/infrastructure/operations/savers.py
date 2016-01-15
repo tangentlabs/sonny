@@ -56,7 +56,8 @@ class DbSaver(BaseSaver):
 
     @helpers.step
     def save(self, data):
-        self.cursor.executemany(self.query, data)
+        for row in data:
+            self.cursor.execute(self.query, row)
         self.connection.commit()
 
     @helpers.step
