@@ -385,14 +385,14 @@ class NoOpFetcher(BaseFileFetcher):
 
 
 class LocalFileContextManager(object):
-    def __init__(self, filenames, fetch_files_method, dispose_files_method):
+    def __init__(self, filenames, fetcher, disposer):
         self.filenames = filenames
-        self.fetch_files_method = fetch_files_method
-        self.dispose_files_method = dispose_files_method
+        self.fetcher = fetcher
+        self.disposer = disposer
         pass
 
     def __enter__(self):
-        self.local_filenames = self.fetch_files_method(self.filenames)
+        self.local_filenames = self.fetcher.fetch_files_that_exist(self.filenames)
         return self.local_filenames
 
     def __exit__(self, type, value, traceback):
@@ -401,4 +401,4 @@ class LocalFileContextManager(object):
             for local_filename, exception in self.local_filenames
             if local_filename
         ]
-        self.dispose_files_method(filenames_to_clear)
+        self.disposer.delete_files(filenames_to_clear)
