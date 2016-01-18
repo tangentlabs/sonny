@@ -44,18 +44,12 @@ class FtpDbImporter(Importer):
     def ftp_server(self):
         pass
 
-    def fetch_files(self, filenames):
-        return self.fetcher(self.ftp_server).fetch_files_that_exist(filenames)
-
-    def delete_files(self, filenames):
-        return self.deleter().delete_files(filenames)
-
     @helpers.step
     def do_run(self):
         with fetchers.LocalFileContextManager(
                 self.get_files_list(),
-                self.fetch_files,
-                self.delete_files) as local_filenames:
+                self.fetcher(self.ftp_server),
+                self.deleter()) as local_filenames:
             if not local_filenames:
                 return
 
@@ -86,7 +80,7 @@ class FtpDbImporter(Importer):
         return version_str
 
     def get_filenames(self):
-        fetcher = fetchers.FtpFetcher(self.ftp_server)
+        fetcher = self.fetcher(self.ftp_server)
         all_remote_filenames = fetcher.search_regex_files('', self.file_regex)
         filenames = sorted(all_remote_filenames, key=self.version_from_filename, reverse=True)
         return filenames
