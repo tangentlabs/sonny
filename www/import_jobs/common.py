@@ -76,8 +76,13 @@ class FtpDbImporter(Importer):
         return [self.get_latest_file()]
 
     def version_from_filename(self, filename):
-        version_str = re.match(self.file_regex, filename).groups()[0]
-        return version_str
+        version = re.match(self.file_regex, filename).groups()[0]
+        # try to return an integer incase we are sorting by int,
+        # otherwise return the version as string
+        try:
+            return int(version)
+        except ValueError:
+            return version
 
     def get_filenames(self):
         fetcher = self.fetcher(self.ftp_server)
