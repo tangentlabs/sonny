@@ -56,9 +56,15 @@ class DbSaver(BaseSaver):
 
     @helpers.step
     def save(self, data):
-        for row in data:
-            self.cursor.execute(self.query, row)
+        for batched_row in self._batch(data):
+            self.cursor.executemany(self.query, batched_row)
         self.connection.commit()
+
+    def _batch(self, iterable, n=15000):
+        l = list(iterable)
+        size = len(l)
+        for ndx in range(0, size, n):
+            yield l[ndx:min(ndx + n, size)]
 
     @helpers.step
     def save_no_data(self):
