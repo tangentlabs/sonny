@@ -42,6 +42,10 @@ class BaseFileFetcher(BaseOperation):
         pass
 
     @abstractmethod
+    def search_regex_files(self, directory, regex):
+        pass
+
+    @abstractmethod
     def fetch_from_search(self, *args, **kwargs):
         pass
 
@@ -263,6 +267,9 @@ class EmailFetcher(BaseFileFetcher):
     def search_files(self, *args, **kwargs):
         raise Exception("This fetcher doesn't support 'search_files'")
 
+    def search_regex_files(self, *args, **kwargs):
+        raise Exception("This fetcher doesn't support 'search_regex_files'")
+
     @helpers.step
     def fetch_from_search(self, maillbox, **search_params):
         with ImapContextManager(self.source, maillbox) as connection:
@@ -381,6 +388,10 @@ class NoOpFetcher(BaseFileFetcher):
 
     @helpers.step
     def search_files(self, *args, **kwargs):
+        return kwargs.get('filenames') or []
+
+    @helpers.step
+    def search_regex_files(self, *args, **kwargs):
         return kwargs.get('filenames') or []
 
 

@@ -28,9 +28,9 @@ class FtpDbImporter(Importer):
     saver = savers.DbSaver
     deleter = file_deleters.LocalFileDeleter
 
-    def __init__(self, ftp_files_to_fetch=None, **kwargs):
+    def __init__(self, files_to_fetch=None, **kwargs):
         super(FtpDbImporter, self).__init__(
-            files_to_fetch=ftp_files_to_fetch, **kwargs)
+            files_to_fetch=files_to_fetch, **kwargs)
 
     @abstractproperty
     def loader(self):
@@ -76,44 +76,26 @@ class FtpDbImporter(Importer):
         return [self.get_latest_file()]
 
     def version_from_filename(self, filename):
-        version = re.match(self.file_regex, filename).groups()[0]
-        # try to return an integer incase we are sorting by int,
-        # otherwise return the version as string
-        try:
-            return int(version)
-        except ValueError:
-            return version
+        version = re.match(self.file_regex, filename).groups()[1]
+        return float(version)
 
-    def get_filenames(self):
+    def get_files_to_fetch(self):
         fetcher = self.fetcher(self.ftp_server)
         all_remote_filenames = fetcher.search_regex_files('', self.file_regex)
         filenames = sorted(all_remote_filenames, key=self.version_from_filename, reverse=True)
         return filenames
 
     def get_latest_file(self):
-        filenames = self.get_filenames()
+        filenames = self.files_to_fetch
         return filenames[0]
-
-    def get_files_to_fetch(self):
-        return None
 
 
 class FtpCsvDbImporter(FtpDbImporter):
-    """
-    A ftp-db importer that uses CSV for loading data
-    """
-    @property
-    def loader(self):
-        return loaders.CsvLoader
+    loader = loaders.CsvLoader
 
 
 class FtpExcelDbImporter(FtpDbImporter):
-    """
-    A ftp-db importer that uses Excel for loading data
-    """
-    @property
-    def loader(self):
-        return loaders.ExcelLoader
+    loader = loaders.ExcelLoader
 
 
 class EmailLoadTransformInsertDeleteImporter(Importer):
