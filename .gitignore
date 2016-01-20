@@ -5,5 +5,5 @@
 *.~lock*
 
 # Local settings
-conf/local.py
+www/conf/local.py
 

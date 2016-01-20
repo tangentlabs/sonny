@@ -1,4 +1,4 @@
-from abc import abstractmethod, abstractproperty
+from abc import ABCMeta, abstractmethod, abstractproperty
 
 from infrastructure.context import helpers
 
@@ -12,102 +12,90 @@ from infrastructure.operations import transformers
 from infrastructure.operations import formatters
 from infrastructure.operations import savers
 from infrastructure.operations import file_deleters
+import re
 
 
-class FetchLoadInsertDeleteCleanupImporter(Importer):
+class FtpDbImporter(Importer):
     """
-    As the name describes:
-    * Fetch a file
-    * Load it
-    * Insert it into a data store
-    * Delete the fetched files
-    * Run a post-job script
+    An abstract ftp->db importer:
+    * Use FTP for importing
+    * Use a DB for inserting
+    * Use a local file deleter
     """
-    @abstractproperty # noqa
-    def file_server(self): pass # noqa
-    @abstractproperty # noqa
-    def insert_query(self): pass # noqa
-    def post_job_query(self): pass # noqa
+    __metaclass__ = ABCMeta
 
-    @abstractproperty # noqa
-    def fetcher(self): pass # noqa
-    @abstractproperty # noqa
-    def _loader(self): pass # noqa
-    @abstractproperty # noqa
-    def saver(self): pass # noqa
-    @abstractproperty # noqa
-    def deleter(self): pass # noqa
+    fetcher = fetchers.FtpFetcher
+    saver = savers.DbSaver
+    deleter = file_deleters.LocalFileDeleter
+
+    def __init__(self, files_to_fetch=None, **kwargs):
+        super(FtpDbImporter, self).__init__(
+            files_to_fetch=files_to_fetch, **kwargs)
+
+    @abstractproperty
+    def loader(self):
+        pass
+
+    @abstractproperty
+    def file_regex(self):
+        pass
+
+    @abstractproperty
+    def ftp_server(self):
+        pass
 
     @helpers.step
     def do_run(self):
-        filenames_or_search_kwargs, is_pattern = self.files_or_search_to_fetch
-        if is_pattern:
-            search_kwargs = filenames_or_search_kwargs
-            local_filenames = self.fetcher(self.file_server).fetch_files_from_search(**search_kwargs)
-        else:
-            filenames = filenames_or_search_kwargs
-            local_filenames = self.fetcher(self.file_server).fetch_files(filenames)
+        with fetchers.LocalFileContextManager(
+                self.get_files_list(),
+                self.fetcher(self.ftp_server),
+                self.deleter()) as local_filenames:
+            if not local_filenames:
+                return
 
-        try:
-            for local_filename in local_filenames:
-                data = self._loader().get_all_data_with_headers(local_filename)
+            self.pre_insert()
+            for local_filename, exception in local_filenames:
+                data = self.loader().get_all_data_with_headers(local_filename)
                 data = self.transform_data(data)
-                self.saver(self.insert_query).save(data)
-        finally:
-            self.deleter().delete_files(local_filenames)
-        self.saver(self.post_job_query).save_no_data()
+                self.saver(self.insert_queries).save(data)
+            self.post_insert()
+
+    @helpers.step
+    def pre_insert(self):
+        pass
+
+    @helpers.step
+    def post_insert(self):
+        pass
 
     @helpers.step
     def transform_data(self, data):
         return data
 
-    @property
-    def files_or_search_to_fetch(self):
-        if self.files_to_fetch:
-            is_pattern = False
-            filenames = self.files_to_fetch
-        else:
-            filenames, is_pattern = self.get_files_or_search_to_fetch()
+    def get_files_list(self):
+        return [self.get_latest_file()]
 
-        return filenames, is_pattern
+    def version_from_filename(self, filename):
+        version = re.match(self.file_regex, filename).groups()[1]
+        return float(version)
 
-    @helpers.step
-    @abstractmethod
-    def get_files_or_search_to_fetch(self):
-        """
-        The filenames, or search pattern, to fetch from the remote location
-        """
-        pass
+    def get_files_to_fetch(self):
+        fetcher = self.fetcher(self.ftp_server)
+        all_remote_filenames = fetcher.search_regex_files('', self.file_regex)
+        filenames = sorted(all_remote_filenames, key=self.version_from_filename, reverse=True)
+        return filenames
+
+    def get_latest_file(self):
+        filenames = self.files_to_fetch
+        return filenames[0]
 
 
-class FtpCsvDbImporter(FetchLoadInsertDeleteCleanupImporter):
-    """
-    A more specific importer:
-    * Use FTP for importing
-    * Use CSV for loading
-    * Use a DB for inserting
-    * Use a local file deleter
-    """
-    fetcher = fetchers.FtpFetcher
-    _loader = loaders.CsvLoader
-    saver = savers.DbSaver
-    deleter = file_deleters.LocalFileDeleter
+class FtpCsvDbImporter(FtpDbImporter):
+    loader = loaders.CsvLoader
 
-    def __init__(self, ftp_files_to_fetch=None, **kwargs):
-        super(FtpCsvDbImporter, self).__init__(
-            files_to_fetch=ftp_files_to_fetch, **kwargs)
 
-    @helpers.step
-    def get_files_or_search_to_fetch(self):
-        return self.get_ftp_files_or_search_to_fetch()
-
-    @abstractmethod
-    def get_ftp_files_or_search_to_fetch(self):
-        pass
-
-    @property
-    def file_server(self):
-        return self.ftp_server
+class FtpExcelDbImporter(FtpDbImporter):
+    loader = loaders.ExcelLoader
 
 
 class EmailLoadTransformInsertDeleteImporter(Importer):

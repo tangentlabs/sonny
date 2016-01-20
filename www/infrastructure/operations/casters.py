@@ -24,6 +24,28 @@ def to_date(*date_formats):
     return do_to_date
 
 
+def from_date(date_format):
+    def do_from_date(_date):
+        return _date.strftime(date_format)
+
+    return do_from_date
+
+
+def cast_if_not_none(func):
+     def do_cast_if_not_none(arg):
+         if not arg:
+            return arg
+         return func(arg)
+
+     return do_cast_if_not_none
+
+def none_if_not_isinstance(*types):
+    def do_none_if_not_isinstance(value):
+        if not isinstance(value, types):
+            return None
+        return value
+    return do_none_if_not_isinstance
+
 def from_gbp(value):
     if isinstance(value, (str, unicode)):
         value = value.replace(u'£', '')

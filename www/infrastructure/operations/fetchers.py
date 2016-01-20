@@ -11,6 +11,7 @@ from abc import abstractmethod
 from infrastructure.context import helpers
 
 from infrastructure.operations.base import BaseOperation
+import re
 
 
 class BaseFileFetcher(BaseOperation):
@@ -38,6 +39,10 @@ class BaseFileFetcher(BaseOperation):
 
     @abstractmethod
     def search_files(self, *args, **kwargs):
+        pass
+
+    @abstractmethod
+    def search_regex_files(self, directory, regex):
         pass
 
     @abstractmethod
@@ -125,6 +130,17 @@ class FtpFetcher(BaseFileFetcher):
             return filenames
 
     @helpers.step
+    def search_regex_files(self, directory, regex):
+        with FtpContextManager(self.source) as ftp:
+            filenames = self._search_regex_files_with_ftp(ftp, directory, regex)
+            filenames = [
+                os.path.join(directory, filename)
+                for filename in filenames
+            ]
+
+            return filenames
+
+    @helpers.step
     def fetch_from_search(self, directory, pattern="*"):
         with FtpContextManager(self.source) as ftp:
             filenames = self._search_files_with_ftp(ftp, directory, pattern)
@@ -135,6 +151,13 @@ class FtpFetcher(BaseFileFetcher):
         ftp.cwd(directory)
         filenames = ftp.nlst()
         filtered = self._filter_files_by_filename(filenames, pattern)
+
+        return filtered
+
+    def _search_regex_files_with_ftp(self, ftp, directory, regex):
+        ftp.cwd(directory)
+        filenames = ftp.nlst()
+        filtered = self._filter_regex_files_by_filename(filenames, regex)
 
         return filtered
 
@@ -176,6 +199,13 @@ class FtpFetcher(BaseFileFetcher):
             filename
             for filename in filenames
             if fnmatch.fnmatch(filename, pattern)
+        ]
+
+    def _filter_regex_files_by_filename(self, filenames, regex):
+        return [
+            filename
+            for filename in filenames
+            if re.match(regex, filename)
         ]
 
 
@@ -236,6 +266,9 @@ class EmailFetcher(BaseFileFetcher):
     @helpers.step
     def search_files(self, *args, **kwargs):
         raise Exception("This fetcher doesn't support 'search_files'")
+
+    def search_regex_files(self, *args, **kwargs):
+        raise Exception("This fetcher doesn't support 'search_regex_files'")
 
     @helpers.step
     def fetch_from_search(self, maillbox, **search_params):
@@ -356,3 +389,27 @@ class NoOpFetcher(BaseFileFetcher):
     @helpers.step
     def search_files(self, *args, **kwargs):
         return kwargs.get('filenames') or []
+
+    @helpers.step
+    def search_regex_files(self, *args, **kwargs):
+        return kwargs.get('filenames') or []
+
+
+class LocalFileContextManager(object):
+    def __init__(self, filenames, fetcher, disposer):
+        self.filenames = filenames
+        self.fetcher = fetcher
+        self.disposer = disposer
+        pass
+
+    def __enter__(self):
+        self.local_filenames = self.fetcher.fetch_files_that_exist(self.filenames)
+        return self.local_filenames
+
+    def __exit__(self, type, value, traceback):
+        filenames_to_clear = [
+            local_filename
+            for local_filename, exception in self.local_filenames
+            if local_filename
+        ]
+        self.disposer.delete_files(filenames_to_clear)
