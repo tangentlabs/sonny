@@ -27,6 +27,8 @@ class FtpDbImporter(Importer):
     fetcher = fetchers.FtpFetcher
     saver = savers.DbSaver
     deleter = file_deleters.LocalFileDeleter
+    pre_insert_queries = []
+    post_insert_queries = []
 
     def __init__(self, files_to_fetch=None, **kwargs):
         super(FtpDbImporter, self).__init__(
