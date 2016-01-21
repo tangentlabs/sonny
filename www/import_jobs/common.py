@@ -62,11 +62,13 @@ class FtpDbImporter(Importer):
 
     @helpers.step
     def pre_insert(self):
-        pass
+        for pre_insert_query in self.pre_insert_queries:
+            self.saver(pre_insert_query).save_no_data()
 
     @helpers.step
     def post_insert(self):
-        pass
+        for post_insert_query in self.post_insert_queries:
+            self.saver(post_insert_query).save_no_data()
 
     @helpers.step
     def transform_data(self, data):
