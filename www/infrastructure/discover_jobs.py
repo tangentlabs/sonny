@@ -43,7 +43,7 @@ def _get_subpackages_recursive_generator(package, is_package=True, failures=None
                 yield subpackage
 
 
-def get_importer_classes(packages):
+def get_importer_classes(packages, testable_only=False):
     potentional_importers = [
         getattr(package, name)
         for package in packages
@@ -53,6 +53,7 @@ def get_importer_classes(packages):
         potentional_importer
         for potentional_importer in potentional_importers
         if is_concrete_importer(potentional_importer)
+        and ((not testable_only) or potentional_importer.is_testable)
     )
 
 
@@ -84,17 +85,17 @@ def get_importer_details(classes):
     ]
 
 
-def get_importers_names():
+def get_importers_names(testable_only=False):
     sub_packages, failures = get_subpackages(import_jobs)
-    importers = get_importer_classes(sub_packages)
+    importers = get_importer_classes(sub_packages, testable_only=testable_only)
     names = get_classes_full_names(importers)
 
     return names, failures
 
 
-def get_importers_details():
+def get_importers_details(testable_only=False):
     sub_packages, failures = get_subpackages(import_jobs)
-    importers = get_importer_classes(sub_packages)
+    importers = get_importer_classes(sub_packages, testable_only=testable_only)
     details = get_importer_details(importers)
 
     return {
