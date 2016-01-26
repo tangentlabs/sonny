@@ -91,7 +91,7 @@ class TestFromGbp(unittest.TestCase):
     )
     @unpack
     def test_transformer_output(self, gbp, expected):
-        caster = self.caster()
+        caster = self.caster
 
         if expected is not None:
             result = caster(gbp)
