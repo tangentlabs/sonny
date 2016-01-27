@@ -13,6 +13,11 @@ class ImporterRunningMixin(object):
     Default test arguments
     """
 
+    is_testable = True
+    """
+    Whether this job should be ever tested
+    """
+
     @classmethod
     def run(cls, *args, **kwargs):
         """
