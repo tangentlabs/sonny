@@ -1,5 +1,6 @@
 Wolseley Importing
 ====
+[![Build Status](https://travis-ci.com/tangentlabs/wolseley-importer.svg?token=ufE8NVayL3qNDrGK8J3z&branch=master)](https://travis-ci.com/tangentlabs/wolseley-importer)
 
 All the importing that needs to be done for Wolseley
 
