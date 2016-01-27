@@ -1,5 +1,6 @@
 Tangent Importer
 ====
+[![Build Status](https://travis-ci.com/tangentlabs/tangent-importer.svg?token=ufE8NVayL3qNDrGK8J3z&branch=master)](https://travis-ci.com/tangentlabs/tangent-importer)
 
 All the importing that needs to be done
 
