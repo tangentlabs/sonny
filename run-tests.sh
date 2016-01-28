@@ -1,4 +1,4 @@
 #!/bin/sh
 
-cd www
+cd tangent_importer
 IMPORT_CONF=testing_conf nosetests

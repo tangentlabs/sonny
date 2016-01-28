@@ -159,4 +159,4 @@ from infrastructure.facility import (
 )
 ```
 
-[quick start guide]: https://github.com/tangentlabs/tangent-importer/blob/master/www/docs/quick-start-guide.md
+[quick start guide]: https://github.com/tangentlabs/tangent-importer/blob/master/tangent_importer/docs/quick-start-guide.md
