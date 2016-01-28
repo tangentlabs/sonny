@@ -102,8 +102,10 @@ Tests
 It's enough to do:
 
 ```shell
-nosetests
+./run-tests.sh
 ```
+
+which uses `nosetests`
 
 
 Dashboard
