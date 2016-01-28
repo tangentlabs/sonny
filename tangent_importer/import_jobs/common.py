@@ -1,3 +1,4 @@
+import re
 from abc import ABCMeta, abstractmethod, abstractproperty
 
 from tangent_importer.infrastructure.context import helpers
@@ -12,7 +13,6 @@ from tangent_importer.infrastructure.operations import transformers
 from tangent_importer.infrastructure.operations import formatters
 from tangent_importer.infrastructure.operations import savers
 from tangent_importer.infrastructure.operations import file_deleters
-import re
 
 
 class FtpDbImporter(Importer):
