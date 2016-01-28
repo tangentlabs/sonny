@@ -4,7 +4,7 @@ import sys
 from pydoc import locate
 
 
-def main():
+def run_from_command_line():
     sysargs = sys.argv[1:]
     if not sysargs:
         raise Exception("First argument must be the package & class name of "
@@ -18,5 +18,6 @@ def main():
                         "try again" % package_and_class_name)
     importer_class.run_from_command_line(args)
 
+
 if __name__ == '__main__':
-    main()
+    run_from_command_line()
