@@ -8,10 +8,13 @@ from tangent_importer import import_jobs
 from tangent_importer.import_jobs.base import Importer
 
 
-def get_subpackages(package):
+def get_subpackages(packages):
+    subpackages = []
     failures = set()
-    subpackages = list(_get_subpackages_recursive_generator(
-        package, failures=failures))
+
+    for package in packages:
+        subpackages += list(_get_subpackages_recursive_generator(
+            package, failures=failures))
 
     return subpackages, failures
 
@@ -85,16 +88,16 @@ def get_importer_details(classes):
     ]
 
 
-def get_importers_names(testable_only=False):
-    sub_packages, failures = get_subpackages(import_jobs)
+def get_importers_names(packages=[import_jobs], testable_only=False):
+    sub_packages, failures = get_subpackages(packages)
     importers = get_importer_classes(sub_packages, testable_only=testable_only)
     names = get_classes_full_names(importers)
 
     return names, failures
 
 
-def get_importers_details(testable_only=False):
-    sub_packages, failures = get_subpackages(import_jobs)
+def get_importers_details(packages=[import_jobs], testable_only=False):
+    sub_packages, failures = get_subpackages(packages)
     importers = get_importer_classes(sub_packages, testable_only=testable_only)
     details = get_importer_details(importers)
 
