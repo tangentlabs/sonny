@@ -3,8 +3,8 @@
 from infrastructure.discover_jobs import get_importers_names
 
 
-def list_importers():
-    names, failures = get_importers_names()
+def list_importers(*args, **kwargs):
+    names, failures = get_importers_names(*args, **kwargs)
 
     if failures:
         print '-' * 40
