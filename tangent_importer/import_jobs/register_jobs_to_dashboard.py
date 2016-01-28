@@ -1,6 +1,6 @@
-from infrastructure.context import helpers
+from tangent_importer.infrastructure.context import helpers
 
-from import_jobs.base import Importer
+from tangent_importer.import_jobs.base import Importer
 
 
 class RegisterJobsToDashboard(Importer):

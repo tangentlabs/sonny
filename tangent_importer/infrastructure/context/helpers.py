@@ -1,8 +1,8 @@
 from functools import wraps
 
-from utils import get_callable_name
+from tangent_importer.utils import get_callable_name
 
-from infrastructure.context.core import context, Job
+from tangent_importer.infrastructure.context.core import context, Job
 
 
 def get_current_job():
@@ -85,7 +85,7 @@ def ignore_exceptions(classes=(Exception,), returning=None):
 
 
 def get_importer(args):
-    from import_jobs.base import Importer
+    from tangent_importer.import_jobs.base import Importer
 
     if args and isinstance(args[0], Importer):
         importer = args[0]

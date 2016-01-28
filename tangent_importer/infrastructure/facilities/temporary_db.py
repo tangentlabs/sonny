@@ -1,8 +1,8 @@
-from infrastructure.context import helpers
+from tangent_importer.infrastructure.context import helpers
 
-from infrastructure.facilities.base import Facility
+from tangent_importer.infrastructure.facilities.base import Facility
 
-from infrastructure.operations.savers import DbSaver
+from tangent_importer.infrastructure.operations.savers import DbSaver
 
 
 @helpers.register_facility("temporary_db")

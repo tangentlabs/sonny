@@ -1,10 +1,10 @@
 import unittest
 from ddt import ddt, data, unpack
 
-from infrastructure.context import helpers
-from infrastructure.facilities import *  # noqa
+from tangent_importer.infrastructure.context import helpers
+from tangent_importer.infrastructure.facilities import *  # noqa
 
-from infrastructure.operations.loaders import CsvLoader
+from tangent_importer.infrastructure.operations.loaders import CsvLoader
 
 
 @ddt

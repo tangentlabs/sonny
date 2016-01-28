@@ -1,8 +1,8 @@
 from datetime import date
 
-import utils
+from tangent_importer import utils
 
-from import_jobs import common
+from tangent_importer.import_jobs import common
 
 location = utils.make_location(__file__)
 

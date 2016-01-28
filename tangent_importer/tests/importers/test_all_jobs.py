@@ -4,7 +4,8 @@ import unittest
 
 from pydoc import locate
 
-from infrastructure.discover_jobs import get_importers_names
+from tangent_importer.infrastructure.discover_jobs import get_importers_names
+
 
 class TestAllJobs(unittest.TestCase):
 

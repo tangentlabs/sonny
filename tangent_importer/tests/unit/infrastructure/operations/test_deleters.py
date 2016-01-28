@@ -5,10 +5,10 @@ import tempfile
 
 import unittest
 
-from infrastructure.context import helpers
-from infrastructure.facilities import *  # noqa
+from tangent_importer.infrastructure.context import helpers
+from tangent_importer.infrastructure.facilities import *  # noqa
 
-from infrastructure.operations.file_deleters import \
+from tangent_importer.infrastructure.operations.file_deleters import \
     LocalFileDeleter, NoOpFileDeleter
 
 

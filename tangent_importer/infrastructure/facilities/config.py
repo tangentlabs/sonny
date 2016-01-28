@@ -1,9 +1,9 @@
 import os
 from importlib import import_module
 
-from infrastructure.context import helpers
+from tangent_importer.infrastructure.context import helpers
 
-from infrastructure.facilities.base import Facility
+from tangent_importer.infrastructure.facilities.base import Facility
 
 
 @helpers.register_facility("config")

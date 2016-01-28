@@ -1,6 +1,6 @@
 import itertools
 
-from infrastructure.context import helpers
+from tangent_importer.infrastructure.context import helpers
 
 
 def keep_keys(keys):

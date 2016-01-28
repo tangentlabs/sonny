@@ -2,7 +2,7 @@
 Import any facilities you want to automatically import for every job
 """
 
-from infrastructure.facilities import (  # noqa
+from tangent_importer.infrastructure.facilities import (  # noqa
     mocking,
     logging,
     profiling,

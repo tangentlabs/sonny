@@ -4,9 +4,9 @@ from termcolor import colored
 import warnings
 from abc import ABCMeta, abstractmethod
 
-from infrastructure.context import helpers
+from tangent_importer.infrastructure.context import helpers
 
-from infrastructure.facilities.base import Facility
+from tangent_importer.infrastructure.facilities.base import Facility
 
 
 class BaseLogger(Facility):

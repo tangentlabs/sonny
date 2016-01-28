@@ -4,8 +4,8 @@ from pydoc import locate
 import pkgutil
 import inspect
 
-import import_jobs
-from import_jobs.base import Importer
+from tangent_importer import import_jobs
+from tangent_importer.import_jobs.base import Importer
 
 
 def get_subpackages(package):
