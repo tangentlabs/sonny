@@ -14,8 +14,9 @@ class Config(Facility):
     def enter_job(self, job, facility_settings):
         super(Config, self).enter_job(job, facility_settings)
 
-        self.config_environment = os.environ.get(self.CONF_ENV_VAR_NAME, "local")
-        config_module = 'conf.%s' % self.config_environment
+        self.config_environment = \
+            os.environ.get(self.CONF_ENV_VAR_NAME, "conf.local")
+        config_module = self.config_environment
         try:
             self.config = import_module(config_module)
         except ImportError, e:
