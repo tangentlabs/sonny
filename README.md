@@ -1,8 +1,13 @@
-Wolseley Importing
+Tangent Importer
 ====
-[![Build Status](https://travis-ci.com/tangentlabs/wolseley-importer.svg?token=ufE8NVayL3qNDrGK8J3z&branch=master)](https://travis-ci.com/tangentlabs/wolseley-importer)
+[![Build Status](https://travis-ci.com/tangentlabs/tangent-importer.svg?token=7g46pNEyQdgRptEWbzrk&branch=master)](https://travis-ci.com/tangentlabs/tangent-importer)
 
-All the importing that needs to be done for Wolseley
+An importing framework, that makes writing of importers easy, and allows to do
+a lot of snooping and metrics gathering behind the scenes.
+
+It's considered a work in progress, where it's final form is not yet
+necessarily there, and developers are encouraged to try and improve it's API,
+and way of doing things.
 
 
 Getting started
@@ -11,7 +16,7 @@ Getting started
 Create a virtual environment, and isntall dependencies via ``make``
 
 ```shell
-mkvirtualenv wolseley-importing
+mkvirtualenv tangent-importer
 make
 ```
 
@@ -42,7 +47,7 @@ To test a job, which mocks most functionality with side effects (eg FTP, DB, etc
 In dev/production environment prepend with `IMPORT_CONF=<environment>`,
 
 where `IMPORT_CONF` should be the appropriate environment. It defaults to
-`local`.
+`conf.local`.
 
 
 Customising runs
@@ -111,7 +116,7 @@ which uses `nosetests`
 Dashboard
 ====
 
-To use your local [dashboard](http://gitlab.tangentlabs.co.uk/tangentlabs/wolseley-importing-dashboard) , you can register the jobs available:
+To use your local [dashboard](http://gitlab.tangentlabs.co.uk/tangentlabs/tangent-importing-dashboard) , you can register the jobs available:
 
 ```shell
 ./run.py import_jobs.register_jobs_to_dashboard.RegisterJobsToDashboard

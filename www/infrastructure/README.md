@@ -82,8 +82,8 @@ All of these layers should communicate through the following interfaces:
 4. Can use `wrap_step` to manipulate the inputs and outputs of the step
 
 
-[quick start guide]: https://github.com/tangentlabs/wolseley-importing/blob/master/docs/quick-start-guide.md
-[annotated guide]: https://github.com/tangentlabs/wolseley-importing/blob/master/docs/annotated-guide.md
+[quick start guide]: https://github.com/tangentlabs/tangent-importer/blob/master/www/docs/quick-start-guide.md
+[annotated guide]: https://github.com/tangentlabs/tangent-importer/blob/master/www/docs/annotated-guide.md
 
-[Importer]: https://github.com/tangentlabs/wolseley-importing/blob/master/import_jobs/base.py
-[Facility]: https://github.com/tangentlabs/wolseley-importing/blob/master/infrastructure/facilities/base.py
+[Importer]: https://github.com/tangentlabs/tangent-importer/blob/master/www/import_jobs/base.py
+[Facility]: https://github.com/tangentlabs/tangent-importer/blob/master/www/infrastructure/facilities/base.py
