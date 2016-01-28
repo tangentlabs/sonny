@@ -1,6 +1,6 @@
-from infrastructure.facilities.generic_config_registry import GenericConfigRegistry
+from tangent_importer.infrastructure.facilities.generic_config_registry import GenericConfigRegistry
 
-from infrastructure.context import helpers
+from tangent_importer.infrastructure.context import helpers
 
 
 @helpers.register_facility("db_registry")

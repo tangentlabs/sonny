@@ -8,9 +8,9 @@ from email.parser import HeaderParser
 from email.header import decode_header
 from abc import abstractmethod
 
-from infrastructure.context import helpers
+from tangent_importer.infrastructure.context import helpers
 
-from infrastructure.operations.base import BaseOperation
+from tangent_importer.infrastructure.operations.base import BaseOperation
 import re
 
 

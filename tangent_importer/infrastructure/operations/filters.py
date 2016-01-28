@@ -1,4 +1,4 @@
-from infrastructure.context import helpers
+from tangent_importer.infrastructure.context import helpers
 
 
 def _input_matches_static_values(static_values, _input):

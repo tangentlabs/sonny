@@ -1,6 +1,6 @@
 from abc import ABCMeta
 
-from infrastructure.facilities.base import Facility
+from tangent_importer.infrastructure.facilities.base import Facility
 
 
 class GenericConfigRegistry(Facility):

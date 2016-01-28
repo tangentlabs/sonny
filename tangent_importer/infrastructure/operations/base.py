@@ -1,8 +1,8 @@
 from abc import ABCMeta
 
-from infrastructure.context import helpers
+from tangent_importer.infrastructure.context import helpers
 
-from infrastructure.facilities.mocking import Mockable
+from tangent_importer.infrastructure.facilities.mocking import Mockable
 
 
 class BaseOperation(Mockable):

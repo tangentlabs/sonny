@@ -1,6 +1,6 @@
 import sys
 
-from infrastructure.context import helpers
+from tangent_importer.infrastructure.context import helpers
 
 
 class ImporterRunningMixin(object):

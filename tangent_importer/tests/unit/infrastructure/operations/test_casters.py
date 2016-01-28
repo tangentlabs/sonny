@@ -4,9 +4,9 @@ from datetime import datetime
 import unittest
 from ddt import ddt, data, unpack
 
-from infrastructure.facilities import *  # noqa
+from tangent_importer.infrastructure.facilities import *  # noqa
 
-from infrastructure.operations import casters
+from tangent_importer.infrastructure.operations import casters
 
 
 @ddt

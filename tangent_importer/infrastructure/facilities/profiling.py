@@ -2,11 +2,11 @@ import time
 import resource
 from abc import ABCMeta, abstractmethod
 
-from utils import pretty_bytes
+from tangent_importer.utils import pretty_bytes
 
-from infrastructure.context import helpers
+from tangent_importer.infrastructure.context import helpers
 
-from infrastructure.facilities.base import Facility
+from tangent_importer.infrastructure.facilities.base import Facility
 
 
 class BaseProfiler(Facility):

@@ -1,17 +1,17 @@
 from abc import ABCMeta, abstractmethod, abstractproperty
 
-from infrastructure.context import helpers
+from tangent_importer.infrastructure.context import helpers
 
-from infrastructure.facilities import everything  # noqa
+from tangent_importer.infrastructure.facilities import everything  # noqa
 
-from import_jobs.base import Importer
+from tangent_importer.import_jobs.base import Importer
 
-from infrastructure.operations import fetchers
-from infrastructure.operations import loaders
-from infrastructure.operations import transformers
-from infrastructure.operations import formatters
-from infrastructure.operations import savers
-from infrastructure.operations import file_deleters
+from tangent_importer.infrastructure.operations import fetchers
+from tangent_importer.infrastructure.operations import loaders
+from tangent_importer.infrastructure.operations import transformers
+from tangent_importer.infrastructure.operations import formatters
+from tangent_importer.infrastructure.operations import savers
+from tangent_importer.infrastructure.operations import file_deleters
 import re
 
 

@@ -2,10 +2,10 @@
 
 import unittest
 
-from infrastructure.context import helpers
-from infrastructure.facilities import *  # noqa
+from tangent_importer.infrastructure.context import helpers
+from tangent_importer.infrastructure.facilities import *  # noqa
 
-from infrastructure.operations.savers import PrintSaver
+from tangent_importer.infrastructure.operations.savers import PrintSaver
 
 
 # TODO: Add test for DbSaver, creating a local DB for testing from config

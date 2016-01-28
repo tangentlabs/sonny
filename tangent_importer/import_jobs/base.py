@@ -1,11 +1,11 @@
 from abc import ABCMeta, abstractmethod, abstractproperty
 from datetime import date
 
-from infrastructure.context import helpers
+from tangent_importer.infrastructure.context import helpers
 
-from infrastructure.facilities import everything # noqa
+from tangent_importer.infrastructure.facilities import everything # noqa
 
-from import_jobs.runner import ImporterRunningMixin
+from tangent_importer.import_jobs.runner import ImporterRunningMixin
 
 
 class Importer(ImporterRunningMixin):
