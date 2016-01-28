@@ -1,8 +1,13 @@
 Tangent Importer
 ====
-[![Build Status](https://travis-ci.com/tangentlabs/tangent-importer.svg?token=ufE8NVayL3qNDrGK8J3z&branch=master)](https://travis-ci.com/tangentlabs/tangent-importer)
+[![Build Status](https://travis-ci.com/tangentlabs/tangent-importer.svg?token=7g46pNEyQdgRptEWbzrk&branch=develop)](https://travis-ci.com/tangentlabs/tangent-importer)
 
-All the importing that needs to be done
+An importing framework, that makes writing of importers easy, and allows to do
+a lot of snooping and metrics gathering behind the scenes.
+
+It's considered a work in progress, where it's final form is not yet
+necessarily there, and developers are encouraged to try and improve it's API,
+and way of doing things.
 
 
 Getting started
@@ -42,7 +47,7 @@ To test a job, which mocks most functionality with side effects (eg FTP, DB, etc
 In dev/production environment prepend with `IMPORT_CONF=<environment>`,
 
 where `IMPORT_CONF` should be the appropriate environment. It defaults to
-`local`.
+`conf.local`.
 
 
 Customising runs
@@ -102,8 +107,10 @@ Tests
 It's enough to do:
 
 ```shell
-nosetests
+./run-tests.sh
 ```
+
+which uses `nosetests`
 
 
 Dashboard
