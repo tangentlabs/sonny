@@ -1,3 +1,4 @@
+import re
 import os
 import fnmatch
 from ftplib import FTP, error_perm
@@ -11,7 +12,6 @@ from abc import abstractmethod
 from tangent_importer.infrastructure.context import helpers
 
 from tangent_importer.infrastructure.operations.base import BaseOperation
-import re
 
 
 class BaseFileFetcher(BaseOperation):
