@@ -80,7 +80,7 @@ class Hider(Facility):
         return wrapped
 ```
 
-Add it to [infrastructure/everything.py](https://github.com/tangentlabs/tangent-importer/blob/develop/infrastructure/everything.py)
+Add it to [infrastructure/everything.py](https://github.com/tangentlabs/tangent-importer/blob/master/tangent_importer/infrastructure/everything.py)
 
 ```python
 from infrastructure.facilityies import (
@@ -90,4 +90,4 @@ from infrastructure.facilityies import (
 )
 ```
 
-[annotated version]: https://github.com/tangentlabs/tangent-importer/blob/develop/docs/annotated.md
+[annotated version]: https://github.com/tangentlabs/tangent-importer/blob/master/tangent_importer/docs/annotated.md

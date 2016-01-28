@@ -5,5 +5,5 @@
 *.~lock*
 
 # Local settings
-www/conf/local.py
+tangent_importer/conf/local.py
 
