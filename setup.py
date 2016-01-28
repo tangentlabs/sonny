@@ -4,7 +4,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='tangent_importer',
-    version='0.1',
+    version='0.2',
     description='Importing framework',
     url='http://github.com/tangentlabs/tangent-importer',
     author='Costas Basdekis',
