@@ -30,7 +30,7 @@ class JobConfig(Facility):
 
     def _load_config(self):
         filename = self.facility_settings.filename
-        config_environment = self.job.config.config_environment
+        config_environment = self.job.config.environment
         config = self._get_job_environment_config(filename, config_environment)
 
         return config

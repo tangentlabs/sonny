@@ -14,17 +14,18 @@ class Config(Facility):
     def enter_job(self, job, facility_settings):
         super(Config, self).enter_job(job, facility_settings)
 
-        self.config_environment = \
+        self.config_module_name = \
             os.environ.get(self.CONF_ENV_VAR_NAME, "conf.local")
-        config_module = self.config_environment
         try:
-            self.config = import_module(config_module)
+            self.config = import_module(self.config_module_name)
         except ImportError, e:
             raise Exception("Could not load config module '%s'. Make sure "
                             "that you specified properly in env variable %s, "
                             "and that it can be loaded:\n %s"
-                            % (config_module, self.CONF_ENV_VAR_NAME, e))
-        self.config.config_environment = self.config_environment
+                            % (self.config_module_name,
+                               self.CONF_ENV_VAR_NAME, e))
+        self.config.environment = \
+            getattr(self.config, 'environment', self.config_module_name)
 
     def __getattr__(self, key):
         return getattr(self.__getattribute__("config"), key)
