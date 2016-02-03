@@ -83,7 +83,9 @@ class DashboardActionsMixin(object):
     def discover_and_register_jobs(self):
         ok, response = False, None
         try:
-            from infrastructure.discover_jobs import get_importers_details
+            from tangent_importer.infrastructure.discover_jobs import (
+                get_importers_details,
+            )
             ok, response = self.post(self.URLS.JOB_REGISTER, {
                 'jobs': json.dumps(get_importers_details()),
             })
