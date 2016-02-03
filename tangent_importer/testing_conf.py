@@ -1,3 +1,5 @@
+from tangent_importer.conf.default import * # noqa
+
 environment = 'testing'
 
 db_registry = {
