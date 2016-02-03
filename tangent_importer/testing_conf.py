@@ -1,3 +1,5 @@
+environment = 'testing'
+
 db_registry = {
 }
 

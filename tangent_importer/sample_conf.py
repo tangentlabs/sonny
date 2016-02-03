@@ -1,3 +1,5 @@
+environment = 'sample'
+
 db_registry = {
     "main": {
         "host": "127.0.0.1",
