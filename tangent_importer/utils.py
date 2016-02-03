@@ -1,5 +1,6 @@
 import os
 import math
+from importlib import import_module
 
 
 def make_location(_file_):
@@ -45,3 +46,23 @@ def pretty_bytes(_bytes):
     scaled_bytes = _bytes / (1024 ** scale)
 
     return "%s%sb" % (scaled_bytes, suffix)
+
+
+CONF_ENV_VAR_NAME = "IMPORT_CONF"
+
+
+def get_config_module(config_module_name=None):
+    if config_module_name is None:
+        config_module_name = os.environ.get(CONF_ENV_VAR_NAME, "conf.local")
+
+    try:
+        config = import_module(config_module_name)
+    except ImportError, e:
+        raise Exception("Could not load config module '%s'. Make sure "
+                        "that you specified properly in env variable %s, "
+                        "and that it can be loaded:\n %s"
+                        % (config_module_name,
+                           CONF_ENV_VAR_NAME, e))
+    config.environment = getattr(config, 'environment', config_module_name)
+
+    return config_module_name, config
