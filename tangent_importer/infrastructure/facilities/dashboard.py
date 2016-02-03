@@ -81,21 +81,19 @@ class DashboardActionsMixin(object):
         return True
 
     def discover_and_register_jobs(self):
+        ok, response = False, None
         try:
             from infrastructure.discover_jobs import get_importers_details
             ok, response = self.post(self.URLS.JOB_REGISTER, {
                 'jobs': json.dumps(get_importers_details()),
             })
-        except Exception:
-            ok, response = False, None
-
-        if not ok:
-            self.job.logger.warn("Could not register jobs to monitoring "
-                                 "dashboard: name=%s uuid=%s run=%s "
-                                 "response=%s",
-                                 self.job.name, self.job.uuid, self.job.run_id,
-                                 response)
-            return False
+        finally:
+            if not ok:
+                self.job.logger.warn("Could not register jobs to monitoring "
+                                     "dashboard: name=%s uuid=%s run=%s "
+                                     "response=%s",
+                                     self.job.name, self.job.uuid,
+                                     self.job.run_id, response)
 
         return True
 
