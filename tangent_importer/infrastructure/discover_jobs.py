@@ -4,8 +4,36 @@ from pydoc import locate
 import pkgutil
 import inspect
 
-from tangent_importer import import_jobs
+from tangent_importer import utils
+
 from tangent_importer.import_jobs.base import Importer
+
+
+def import_package(package_name):
+    base_package = __import__(package_name)
+    package_path_parts = package_name.split('.')
+
+    package = base_package
+    for part in package_path_parts[1:]:
+        package = getattr(package, part)
+
+    return package
+
+
+def get_importers_packages(importers_packages_names=None):
+    if importers_packages_names is None:
+        _, config = utils.get_config_module()
+        importers_packages_names = config.IMPORTERS_PACKAGES_NAMES
+
+    return map(import_package, importers_packages_names)
+
+
+def get_importers_subpackages(importers_packages_names=None):
+    importers_packages = get_importers_packages(
+        importers_packages_names=importers_packages_names)
+    sub_packages, failures = get_subpackages(importers_packages)
+
+    return sub_packages, failures
 
 
 def get_subpackages(packages):
@@ -46,18 +74,26 @@ def _get_subpackages_recursive_generator(package, is_package=True, failures=None
                 yield subpackage
 
 
-def get_importer_classes(packages, testable_only=False):
+def get_importer_classes(
+        packages=None, importers_packages_names=None, testable_only=False):
+    failures = []
+    if packages is None:
+        packages, failures = get_importers_subpackages(
+            importers_packages_names=importers_packages_names)
+
     potentional_importers = [
         getattr(package, name)
         for package in packages
         for name in dir(package)
     ]
-    return set(
+    importer_classes = set(
         potentional_importer
         for potentional_importer in potentional_importers
         if is_concrete_importer(potentional_importer)
         and ((not testable_only) or potentional_importer.is_testable)
     )
+
+    return importer_classes, failures
 
 
 def is_concrete_importer(potentional_importer):
@@ -88,17 +124,21 @@ def get_importer_details(classes):
     ]
 
 
-def get_importers_names(packages=[import_jobs], testable_only=False):
-    sub_packages, failures = get_subpackages(packages)
-    importers = get_importer_classes(sub_packages, testable_only=testable_only)
+def get_importers_names(importers_packages_names=None, testable_only=False):
+    importers, failures = get_importer_classes(
+        importers_packages_names=importers_packages_names,
+        testable_only=testable_only,
+    )
     names = get_classes_full_names(importers)
 
     return names, failures
 
 
-def get_importers_details(packages=[import_jobs], testable_only=False):
-    sub_packages, failures = get_subpackages(packages)
-    importers = get_importer_classes(sub_packages, testable_only=testable_only)
+def get_importers_details(importers_packages_names=None, testable_only=False):
+    importers, failures = get_importer_classes(
+        importers_packages_names=importers_packages_names,
+        testable_only=testable_only,
+    )
     details = get_importer_details(importers)
 
     return {
