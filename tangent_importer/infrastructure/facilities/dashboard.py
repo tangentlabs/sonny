@@ -27,8 +27,8 @@ class DashboardActionsMixin(object):
         if not ok:
             self.job.logger.warn(
                 "Could not register job start to monitoring dashboard: "
-                "name=%s uuid=%s",
-                self.job.name, self.job.uuid)
+                "name=%s uuid=%s response=%s",
+                self.job.name, self.job.uuid, response)
             return False
 
         response = response
@@ -51,8 +51,8 @@ class DashboardActionsMixin(object):
         if not ok:
             self.job.logger.warn(
                 "Could not register job end to monitoring dashboard: name=%s "
-                "uuid=%s run=%s",
-                self.job.name, self.job.uuid, self.job_run_id)
+                "uuid=%s run=%s response=%s",
+                self.job.name, self.job.uuid, self.job_run_id, response)
             return False
 
         return True
@@ -73,8 +73,9 @@ class DashboardActionsMixin(object):
         if not ok:
             self.job.logger.warn("Could not register job profiling to "
                                  "monitoring dashboard: name=%s uuid=%s "
-                                 "run=%s",
-                                 self.job.name, self.job.uuid, self.job.run_id)
+                                 "run=%s response=%s",
+                                 self.job.name, self.job.uuid, self.job.run_id,
+                                 response)
             return False
 
         return True
@@ -90,8 +91,10 @@ class DashboardActionsMixin(object):
 
         if not ok:
             self.job.logger.warn("Could not register jobs to monitoring "
-                                 "dashboard: name=%s uuid=%s run=%s",
-                                 self.job.name, self.job.uuid, self.job.run_id)
+                                 "dashboard: name=%s uuid=%s run=%s "
+                                 "response=%s",
+                                 self.job.name, self.job.uuid, self.job.run_id,
+                                 response)
             return False
 
         return True
