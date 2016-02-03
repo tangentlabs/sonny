@@ -4,16 +4,12 @@ import unittest
 
 from pydoc import locate
 
-from tangent_importer import import_jobs
 from tangent_importer.infrastructure.discover_jobs import get_importers_names
 
 
 class TestAllJobs(unittest.TestCase):
-    importer_packages = [import_jobs]
-
     def test_importers_run_without_errors(self):
-        names, failures = get_importers_names(packages=self.importer_packages,
-                                              testable_only=True)
+        names, failures = get_importers_names(testable_only=True)
 
         failed_names = []
         for name in names:
