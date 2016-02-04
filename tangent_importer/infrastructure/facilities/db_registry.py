@@ -2,6 +2,8 @@ import MySQLdb
 
 from tangent_importer.infrastructure.facilities.generic_config_registry import GenericConfigRegistry
 
+from tangent_importer.infrastructure.operations.database import DatabaseAccess
+
 from tangent_importer.infrastructure.context import helpers
 
 
@@ -20,17 +22,4 @@ class DbRegistry(GenericConfigRegistry):
         Helper function to create a connection to a database by alias
         """
         database = self.get_database(alias)
-        return self.create_connection_to_database_from_info(database)
-
-    @classmethod
-    def create_connection_to_database_from_info(cls, database):
-        connection = MySQLdb.connect(
-            host=database['host'],
-            port=database['port'],
-            user=database['username'],
-            passwd=database['password'],
-            db=database['database'],
-        )
-        connection.set_character_set('utf8')
-
-        return connection
+        return DatabaseAccess().create_connection_from_info(database)

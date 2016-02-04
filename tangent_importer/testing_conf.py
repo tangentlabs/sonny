@@ -10,6 +10,7 @@ db_registry = {
         "password": "password",
         "is_disposable": True,
         "database": "test",
+        "connector_name": "MySql",
     },
 }
 
