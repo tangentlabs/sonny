@@ -9,3 +9,9 @@ install:
 script:
   - "./run-tests.sh"
 
+services:
+  - mysql
+
+ before_install:
+  - mysql -e "create database IF NOT EXISTS test;" -uroot
+
