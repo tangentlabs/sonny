@@ -1,7 +1,5 @@
 from abc import abstractmethod
 
-import MySQLdb
-
 from tangent_importer.infrastructure.context import helpers
 from tangent_importer.infrastructure.operations.base import BaseOperation
 from tangent_importer.infrastructure.operations.utils import batch
@@ -34,14 +32,8 @@ class DbSaver(BaseSaver):
             self.query = _file.read()
         self.multiple_queries = self._split_multiple_queries()
 
-        database = self.db_registry.get_database(self.destination["database"])
-        self.connection = MySQLdb.connect(
-            host=database['host'],
-            port=database['port'],
-            user=database['username'],
-            passwd=database['password'],
-            db=database['database'],
-        )
+        alias = self.destination["database"]
+        self.connection = self.db_registry.create_connection_to_database(alias)
         self.cursor = self.connection.cursor()
 
     def _split_multiple_queries(self):

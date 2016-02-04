@@ -1,7 +1,5 @@
 from abc import abstractmethod
 
-import MySQLdb
-
 from tangent_importer.infrastructure.context import helpers
 
 from tangent_importer.infrastructure.operations.base import BaseOperation
@@ -36,14 +34,8 @@ class DbLoader(BaseDbLoader):
         with open(source['file'], 'rb') as _file:
             self.query = _file.read()
 
-        database = self.db_registry.get_database(self.source["database"])
-        self.connection = MySQLdb.connect(
-            host=database['host'],
-            port=database['port'],
-            user=database['username'],
-            passwd=database['password'],
-            db=database['database'],
-        )
+        alias = self.destination["database"]
+        self.connection = self.db_registry.create_connection_to_database(alias)
         self.cursor = self.connection.cursor()
 
     def _get_column_names(self):
