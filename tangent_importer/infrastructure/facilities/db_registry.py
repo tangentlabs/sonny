@@ -31,5 +31,6 @@ class DbRegistry(GenericConfigRegistry):
             passwd=database['password'],
             db=database['database'],
         )
+        connection.set_character_set('utf8')
 
         return connection
