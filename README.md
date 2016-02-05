@@ -1,6 +1,6 @@
 Sonny: Importer framework
 ====
-[![Build Status](https://travis-ci.com/tangentlabs/sonny.svg?token=7g46pNEyQdgRptEWbzrk&branch=develop)](https://travis-ci.com/tangentlabs/sonny)
+[![Build Status](https://travis-ci.com/tangentlabs/sonny.svg?token=ufE8NVayL3qNDrGK8J3z&branch=develop)](https://travis-ci.com/tangentlabs/sonny)
 
 An importing framework, that makes writing of importers easy, and allows to do
 a lot of snooping and metrics gathering behind the scenes.
