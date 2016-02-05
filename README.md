@@ -1,6 +1,6 @@
-Tangent Importer
+Sonny: Importer framework
 ====
-[![Build Status](https://travis-ci.com/tangentlabs/tangent-importer.svg?token=7g46pNEyQdgRptEWbzrk&branch=develop)](https://travis-ci.com/tangentlabs/tangent-importer)
+[![Build Status](https://travis-ci.com/tangentlabs/sonny.svg?token=7g46pNEyQdgRptEWbzrk&branch=develop)](https://travis-ci.com/tangentlabs/sonny)
 
 An importing framework, that makes writing of importers easy, and allows to do
 a lot of snooping and metrics gathering behind the scenes.
@@ -16,7 +16,7 @@ Getting started
 Create a virtual environment, and isntall dependencies via ``make``
 
 ```shell
-mkvirtualenv tangent-importer
+mkvirtualenv sonny
 make
 ```
 
@@ -116,8 +116,14 @@ which uses `nosetests`
 Dashboard
 ====
 
-To use your local [dashboard](http://github.com/tangentlabs/tangent-importer-dashboard) , you can register the jobs available:
+To use your local [dashboard](http://github.com/tangentlabs/sonny-dashboard) , you can register the jobs available:
 
 ```shell
 ./run.py import_jobs.register_jobs_to_dashboard.RegisterJobsToDashboard
 ```
+
+
+Name
+====
+
+From the Django web framework background, this project is named after Sonny Rollins

@@ -1,5 +1,5 @@
 install:
-	pip install -r tangent_importer/deploy/requirements.txt
+	pip install -r sonny/deploy/requirements.txt
 
 .PHONY: install
 

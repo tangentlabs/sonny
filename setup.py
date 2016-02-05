@@ -3,10 +3,10 @@ from setuptools import setup, find_packages
 
 
 setup(
-    name='tangent_importer',
+    name='sonny',
     version='0.2',
     description='Importing framework',
-    url='http://github.com/tangentlabs/tangent-importer',
+    url='http://github.com/tangentlabs/sonny',
     author='Costas Basdekis',
     author_email='costas@basdekis.io',
     license='MIT',

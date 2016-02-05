@@ -4,9 +4,6 @@
 # LibreOffice
 *.~lock*
 
-# Local settings
-tangent_importer/conf/local.py
-
 # Python Package
 build/
 dist/

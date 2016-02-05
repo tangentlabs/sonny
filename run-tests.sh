@@ -1,6 +1,6 @@
 #!/bin/sh
 
-cd tangent_importer
+cd sonny
 
-IMPORT_CONF=tangent_importer.testing_conf nosetests "$@"
+IMPORT_CONF=sonny.testing_conf nosetests "$@"
 
