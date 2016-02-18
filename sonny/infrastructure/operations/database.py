@@ -1,7 +1,7 @@
 from abc import ABCMeta, abstractmethod, abstractproperty
 
 import MySQLdb
-
+import psycopg2
 
 class DatabaseAccess(object):
     """
@@ -93,4 +93,24 @@ class MySqlDatabaseConnector(DatabaseAccess):
             user=database['username'],
             passwd=database['password'],
             db=database['database'],
+        )
+
+@DatabaseAccess.register_connector
+class PostgresDatabaseConnector(DatabaseAccess):
+    """
+    Postgres connector class
+    """
+    connector_name = 'Postgres'
+
+    def create_connection(self, *args, **kwargs):
+        connection = psycopg2.connect(*args, **kwargs)
+        return connection
+
+    def create_connection_from_info(self, database):
+        return self.create_connection(
+            host=database['host'],
+            port=database['port'],
+            user=database['username'],
+            password=database['password'],
+            database=database['database'],
         )

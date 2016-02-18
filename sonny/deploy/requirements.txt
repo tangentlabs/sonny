@@ -1,6 +1,7 @@
 # utilities
 ipdb
 ipython
+psycopg2
 
 # Testing
 nose

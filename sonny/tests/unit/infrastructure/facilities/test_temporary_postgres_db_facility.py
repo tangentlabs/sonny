@@ -12,16 +12,16 @@ from sonny.infrastructure.context import helpers
 
 location = utils.make_location(__file__)
 
-database = 'test'
+database = 'test_postgres'
 
 
-class ImporterToTestSetupScriptImporter(Importer):
-    uuid = '1000000000'
+class ImporterToTestSetupScriptImporterWithMysql(Importer):
+    uuid = '0b97d314-d653-11e5-ab30-625662870761'
 
     class JobSettings(Importer.JobSettings):
         class TemporaryDBFacilitySettings(TemporaryDB.FacilitySettings):
             db_setup_scripts = {
-                database: location("test_setup.sql"),
+                database: location("test_setup_postgres.sql"),
             }
             should_run = True
 
@@ -35,7 +35,7 @@ class ImporterToTestSetupScriptImporter(Importer):
         pass
 
 
-class TestTemporaryDBFacility(unittest.TestCase):
+class TestTemporaryMysqlDBFacility(unittest.TestCase):
     def setUp(self):
         _, config = utils.get_config_module()
         database_info = config.db_registry[database]
@@ -43,7 +43,7 @@ class TestTemporaryDBFacility(unittest.TestCase):
         self.cursor = self.connection.cursor()
 
     def test_setup_script(self):
-        importer = ImporterToTestSetupScriptImporter()
+        importer = ImporterToTestSetupScriptImporterWithMysql()
         importer.test()
 
         self.cursor.execute("SELECT COUNT(*) FROM test_table")
