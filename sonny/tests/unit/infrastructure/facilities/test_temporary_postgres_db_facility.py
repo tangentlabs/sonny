@@ -15,7 +15,7 @@ location = utils.make_location(__file__)
 database = 'test_postgres'
 
 
-class ImporterToTestSetupScriptImporterWithMysql(Importer):
+class ImporterToTestSetupScriptImporterWithPostgres(Importer):
     uuid = '0b97d314-d653-11e5-ab30-625662870761'
 
     class JobSettings(Importer.JobSettings):
@@ -43,7 +43,7 @@ class TestTemporaryMysqlDBFacility(unittest.TestCase):
         self.cursor = self.connection.cursor()
 
     def test_setup_script(self):
-        importer = ImporterToTestSetupScriptImporterWithMysql()
+        importer = ImporterToTestSetupScriptImporterWithPostgres()
         importer.test()
 
         self.cursor.execute("SELECT COUNT(*) FROM test_table")
