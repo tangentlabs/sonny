@@ -31,10 +31,12 @@ class SampleImporter(common.FtpCsvDbImporter):
 
     pre_insert_queries = []
 
-    insert_queries = {
+    insert_queries = [
+        {
         "database": "dashboard",
         "file": location("sample.sql"),
     }
+    ]
 
     post_insert_queries = [
         {
