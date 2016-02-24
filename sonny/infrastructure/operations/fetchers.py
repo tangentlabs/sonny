@@ -404,12 +404,12 @@ class LocalFileContextManager(object):
 
     def __enter__(self):
         self.local_filenames = self.fetcher.fetch_files_that_exist(self.filenames)
-        return self.local_filenames
-
-    def __exit__(self, type, value, traceback):
-        filenames_to_clear = [
+        self.local_filenames = [
             local_filename
             for local_filename, exception in self.local_filenames
             if local_filename
         ]
-        self.disposer.delete_files(filenames_to_clear)
+        return self.local_filenames
+
+    def __exit__(self, type, value, traceback):
+        self.disposer.delete_files(self.local_filenames)
