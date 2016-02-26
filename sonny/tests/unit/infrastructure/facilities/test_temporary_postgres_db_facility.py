@@ -35,7 +35,7 @@ class ImporterToTestSetupScriptImporterWithPostgres(Importer):
         pass
 
 
-class TestTemporaryMysqlDBFacility(unittest.TestCase):
+class TestTemporaryPostgresDBFacility(unittest.TestCase):
     def setUp(self):
         _, config = utils.get_config_module()
         database_info = config.db_registry[database]
