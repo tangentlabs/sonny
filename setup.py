@@ -14,7 +14,6 @@ setup(
     include_package_data=True,
     install_requires=[
         "PyYAML==3.11",
-        "MySQL-python==1.2.5",
         "xlrd==0.9.4",
         "Jinja2==2.8",
         "termcolor==1.1.0",

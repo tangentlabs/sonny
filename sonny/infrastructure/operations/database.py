@@ -1,8 +1,5 @@
 from abc import ABCMeta, abstractmethod, abstractproperty
 
-import MySQLdb
-import psycopg2
-
 class DatabaseAccess(object):
     """
     Helper to access the database, usually from the database information from
@@ -81,6 +78,7 @@ class MySqlDatabaseConnector(DatabaseAccess):
     connector_name = 'MySql'
 
     def create_connection(self, *args, **kwargs):
+        MySQLdb = __import__('MySQLdb')
         connection = MySQLdb.connect(*args, **kwargs)
         connection.set_character_set('utf8')
 
@@ -103,6 +101,7 @@ class PostgresDatabaseConnector(DatabaseAccess):
     connector_name = 'Postgres'
 
     def create_connection(self, *args, **kwargs):
+        psycopg2 = __import__('psycopg2')
         connection = psycopg2.connect(*args, **kwargs)
         return connection
 
