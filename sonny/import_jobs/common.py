@@ -150,7 +150,8 @@ class EmailLoadTransformInsertDeleteImporter(BaseImporter):
         search_kwargs = self.get_search_kwargs()
         local_filenames = self.fetcher(self.email_source, self.file_pattern)\
             .fetch_from_search('INBOX', **search_kwargs)
-
+        if not local_filenames:
+            return
         try:
             self.process_data(local_filenames)
         finally:
