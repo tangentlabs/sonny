@@ -315,7 +315,12 @@ class EmailFetcher(BaseFileFetcher):
 
     def _filter_attachments_by_filename(self, attachments):
         for attachment in attachments:
-            filename = attachment.get_filename().lower()
+            filename = attachment.get_filename()
+            charset = decode_header(filename)[0][1]
+            if charset:
+                string_to_decode = decode_header(filename)[0][0]
+                filename = str(string_to_decode).decode(charset)
+            filename = filename.lower()
             if fnmatch.fnmatch(filename, self.pattern):
                 yield attachment
 
