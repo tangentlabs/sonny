@@ -34,7 +34,7 @@ class DbLoader(BaseDbLoader):
         with open(source['file'], 'rb') as _file:
             self.query = _file.read()
 
-        alias = self.destination["database"]
+        alias = self.source["database"]
         self.connection = self.db_registry.create_connection_to_database(alias)
         self.cursor = self.connection.cursor()
 
