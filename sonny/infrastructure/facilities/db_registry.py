@@ -1,5 +1,3 @@
-import MySQLdb
-
 from sonny.infrastructure.facilities.generic_config_registry import GenericConfigRegistry
 
 from sonny.infrastructure.operations.database import DatabaseAccess
