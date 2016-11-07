@@ -25,6 +25,7 @@ class InMemoryNotifier(BaseNotifier):
 
         self.notifications = {}
 
+    @helpers.step
     def notify(self, recipients, message):
         for recipient in recipients:
             self.notifications.setdefault(recipient, [])\
