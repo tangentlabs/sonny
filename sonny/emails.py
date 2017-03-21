@@ -24,7 +24,7 @@ class EmailSender(object):
 
         # fire emails
         for recipient in to:
-            return requests.post(
+            response = requests.post(
                 "{base_url}/messages".format(base_url=self.mailgun_settings.get('base_url')),
                 auth=("api", self.mailgun_settings.get('api_key')),
                 data={"from": self.mailgun_settings.get('from'),
@@ -34,3 +34,5 @@ class EmailSender(object):
                           name=recipient['name'])},
                 files=attachments
             )
+            if response.status_code >= 400:
+                print 'Error with sending e-mail: [{}]'.format(response.status_code), response.text
