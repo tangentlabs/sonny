@@ -19,11 +19,11 @@ class EmailSender(object):
         assert isinstance(attachments, list) or isinstance(attachments, tuple)
         subject = str(subject)
 
-        # configure attachments
-        attachments = [("attachment", open(a)) for a in attachments]
-
-        # fire emails
         for recipient in to:
+            # configure attachments
+            open_attachments = [open(a, 'rb') for a in attachments]
+
+            # fire emails
             response = requests.post(
                 "{base_url}/messages".format(base_url=self.mailgun_settings.get('base_url')),
                 auth=("api", self.mailgun_settings.get('api_key')),
@@ -32,7 +32,12 @@ class EmailSender(object):
                       "subject": subject,
                       "text": "Dear {name},\n\nPlease find attached a Be Trade Happy report.\n\n".format(
                           name=recipient['name'])},
-                files=attachments
+                files=[("attachment", a) for a in open_attachments]
             )
+
             if response.status_code >= 400:
                 print 'Error with sending e-mail: [{}]'.format(response.status_code), response.text
+
+            # close files
+            for a in open_attachments:
+                a.close()
