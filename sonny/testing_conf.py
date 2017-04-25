@@ -29,4 +29,19 @@ ftp_registry = {
 email_registry = {
 }
 
+push_notification_registry = {
+    "default": {
+        "url": "https://notify.tangentlabs.co.uk",
+        "system": "wlshub",
+        "subSystem": 1,
+        "title": "Importer job completed",
+        "body": "Job '%s' completed with %s errors!",
+        "icon": "https://www.tangent.co.uk/static/favicon-2.jpg",
+        "link": "https://www.tangent.co.uk",
+        "highPriority": False,
+        "ttl": 5,
+    }
+}
+
+
 DASHBOARD_URL = None
