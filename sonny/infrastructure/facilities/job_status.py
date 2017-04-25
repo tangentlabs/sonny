@@ -44,6 +44,8 @@ class JobStatus(Facility):
                                  "Job '%s' completed with %s errors!" %
                                  (self.job.name, len(self.errors)))
 
+        self.job.push_notifier.notify(self.job.push_notification_registry, self.job, self.errors)
+
     def error(self, exc_type, exc_value, traceback, message=None):
         if self._update_last_exception_message(exc_value, message):
             return

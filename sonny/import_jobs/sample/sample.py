@@ -22,7 +22,7 @@ class SampleImporter(common.FtpCsvDbImporter):
         }
 
     uuid = '6e26c903-a4ca-4216-93b9-872765c6c888'
-
+    name = 'Sample Job'
     ftp_server = "main"
 
     @property

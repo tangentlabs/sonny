@@ -7,6 +7,8 @@ from sonny.infrastructure.facilities import (  # noqa
     logging,
     profiling,
     notifying,
+    push_notification_registry,
+    push_notifying,
     job_status,
     config,
     job_config,
