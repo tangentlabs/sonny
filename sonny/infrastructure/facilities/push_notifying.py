@@ -55,7 +55,7 @@ class PushNotifier(BasePushNotifier):
                     }
                     self.notifications.append(json.dumps(data))
 
-                    requests.post(url, data=json.dumps(data))
+                    requests.post(url, json=data)
             except AttributeError:
                 pass
 
