@@ -44,7 +44,9 @@ class PushNotifier(BasePushNotifier):
                     ttl = push_registry["ttl"]
 
                     data = {
-                        "system": system,
+                        "system": {
+                            "name": system,
+                        },
                         "subSystem": subSystem,
                         "title": title,
                         "body": body % (job.name, len(errors)),
