@@ -49,7 +49,7 @@ class PushNotifier(BasePushNotifier):
                         },
                         "subSystem": subSystem,
                         "title": title,
-                        "body": body % (job.name, len(errors)),
+                        "body": body % (job.name.split(':')[1], len(errors)),
                         "icon": icon,
                         "link": link,
                         "highPriority": highPriority,
