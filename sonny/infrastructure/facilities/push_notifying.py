@@ -30,7 +30,7 @@ class PushNotifier(BasePushNotifier):
 
     @helpers.step
     def notify(self, registry, job, errors):
-        if registry and not job.test:
+        if registry:
             try:
                 for name, push_registry in registry.registry.iteritems():
                     url = push_registry["url"] + "/rest/pushNotification"
@@ -57,7 +57,8 @@ class PushNotifier(BasePushNotifier):
                     }
                     self.notifications.append(json.dumps(data))
 
-                    requests.post(url, json=data)
+                    if not job.test:
+                        requests.post(url, json=data)
             except AttributeError:
                 pass
 
