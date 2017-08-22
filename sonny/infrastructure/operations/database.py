@@ -1,5 +1,6 @@
 from abc import ABCMeta, abstractmethod, abstractproperty
 
+
 class DatabaseAccess(object):
     """
     Helper to access the database, usually from the database information from
@@ -93,6 +94,7 @@ class MySqlDatabaseConnector(DatabaseAccess):
             db=database['database'],
         )
 
+
 @DatabaseAccess.register_connector
 class PostgresDatabaseConnector(DatabaseAccess):
     """
@@ -108,6 +110,28 @@ class PostgresDatabaseConnector(DatabaseAccess):
     def create_connection_from_info(self, database):
         return self.create_connection(
             host=database['host'],
+            port=database['port'],
+            user=database['username'],
+            password=database['password'],
+            database=database['database'],
+        )
+
+
+@DatabaseAccess.register_connector
+class MsSqlDatabaseConnector(DatabaseAccess):
+    """
+    MsSql connector class
+    """
+    connector_name = 'Mssql'
+
+    def create_connection(self, *args, **kwargs):
+        import pymssql
+        connection = pymssql.connect(*arg, **kwargs)
+        return connection
+
+    def create_connection_from_info(self, database):
+        return self.create_connection(
+            server=database['host'],
             port=database['port'],
             user=database['username'],
             password=database['password'],
