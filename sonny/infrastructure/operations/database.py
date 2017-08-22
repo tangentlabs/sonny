@@ -122,11 +122,11 @@ class MsSqlDatabaseConnector(DatabaseAccess):
     """
     MsSql connector class
     """
-    connector_name = 'Mssql'
+    connector_name = 'MsSql'
 
     def create_connection(self, *args, **kwargs):
         import pymssql
-        connection = pymssql.connect(*arg, **kwargs)
+        connection = pymssql.connect(*args, **kwargs)
         return connection
 
     def create_connection_from_info(self, database):
