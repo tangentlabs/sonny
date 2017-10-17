@@ -97,9 +97,10 @@ class FtpDbImporter(BaseImporter):
                 self.fetcher(self.ftp_server),
                 self.deleter()) as local_filenames:
             if not local_filenames:
-                return
+                return False
 
             self.process_data(local_filenames)
+            return True
 
     def get_files_list(self):
         return [self.get_latest_file()]
@@ -151,11 +152,12 @@ class EmailLoadTransformInsertDeleteImporter(BaseImporter):
         local_filenames = self.fetcher(self.email_source, self.file_pattern)\
             .fetch_from_search('INBOX', **search_kwargs)
         if not local_filenames:
-            return
+            return False
         try:
             self.process_data(local_filenames)
         finally:
             self.deleter().delete_files(local_filenames)
+            return True
 
     @helpers.step
     def get_search_kwargs(self):
