@@ -8,7 +8,7 @@ class EmailSender(object):
         self.mailgun_settings = config.MAILGUN_SETTINGS
         self.sonny_config = config
 
-    def send_emails(self, to=None, subject=None, attachments=None):
+    def send_emails(self, to=None, subject=None, get_text=None, attachments=None):
         to = to or []
         attachments = attachments or []
 
@@ -16,6 +16,7 @@ class EmailSender(object):
         assert isinstance(to, list)
         assert len(to) >= 1
         assert subject is not None
+        assert callable(get_text)
         assert isinstance(attachments, list) or isinstance(attachments, tuple)
         subject = str(subject)
 
@@ -30,8 +31,7 @@ class EmailSender(object):
                 data={"from": self.mailgun_settings.get('from'),
                       "to": [recipient['email']],
                       "subject": subject,
-                      "text": "Dear {name},\n\nPlease find attached a Be Trade Happy report.\n\n".format(
-                          name=recipient['name'])},
+                      "text": get_text(recipient=recipient)},
                 files=[("attachment", a) for a in open_attachments]
             )
 
