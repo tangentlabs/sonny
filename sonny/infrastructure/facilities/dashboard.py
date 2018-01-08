@@ -24,15 +24,17 @@ class DashboardActionsMixin(object):
         except Exception:
             ok, response = False, None
 
+        if response:
+            self.job.run_id = response.get('job_run_id', None)
+        else:
+            self.job_run_id = None
+
         if not ok:
             self.job.logger.warn(
                 "Could not register job start to monitoring dashboard: "
                 "name=%s uuid=%s response=%s",
                 self.job.name, self.job.uuid, response)
             return False
-
-        response = response
-        self.job.run_id = response['job_run_id']
 
         return True
 
@@ -52,7 +54,7 @@ class DashboardActionsMixin(object):
             self.job.logger.warn(
                 "Could not register job end to monitoring dashboard: name=%s "
                 "uuid=%s run=%s response=%s",
-                self.job.name, self.job.uuid, self.job_run_id, response)
+                self.job.name, self.job.uuid, self.job_run_id or '[None]', response)
             return False
 
         return True
