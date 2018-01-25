@@ -29,7 +29,7 @@ class EmailSender(object):
                 "{base_url}/messages".format(base_url=self.mailgun_settings.get('base_url')),
                 auth=("api", self.mailgun_settings.get('api_key')),
                 data={"from": self.mailgun_settings.get('from'),
-                      "to": [recipient['email']],
+                      "to": recipient['email'],
                       "subject": subject,
                       "text": get_text(recipient=recipient)},
                 files=[("attachment", a) for a in open_attachments]
