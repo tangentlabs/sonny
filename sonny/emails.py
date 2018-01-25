@@ -32,7 +32,8 @@ class EmailSender(object):
                       "to": recipient['email'],
                       "subject": subject,
                       "text": get_text(recipient=recipient)},
-                files=[("attachment", a) for a in open_attachments]
+                files=[("attachment", a) for a in open_attachments],
+                verify=False
             )
 
             if response.status_code >= 400:
