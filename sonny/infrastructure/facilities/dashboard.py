@@ -24,9 +24,12 @@ class DashboardActionsMixin(object):
         except Exception:
             ok, response = False, None
 
-        if response:
-            self.job.run_id = response.get('job_run_id', None)
-        else:
+        try:
+            if response:
+                self.job.run_id = response.get('job_run_id', None)
+            else:
+                self.job.run_id = None
+        except:
             self.job.run_id = None
 
         if not ok:
