@@ -282,8 +282,7 @@ class EmailFetcher(BaseFileFetcher):
             filtered_attachments = self._filter_attachments_by_filename(
                 attachments)
             local_filenames = self._save_attachments(filtered_attachments)
-
-            return list(local_filenames)
+            return [f for f in local_filenames if f is not None]
 
     def _search_for_emails_in_server(self, connection, search_params):
         search_query = self._get_search_query(search_params)
