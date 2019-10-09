@@ -21,7 +21,7 @@ class BasePushNotifier(Facility):
         pass
 
 
-@helpers.register_facility("push_notifier")
+# @helpers.register_facility("push_notifier")
 class PushNotifier(BasePushNotifier):
     def enter_job(self, job, facility_settings):
         super(PushNotifier, self).enter_job(job, facility_settings)
