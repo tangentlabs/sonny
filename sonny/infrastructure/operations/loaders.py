@@ -23,14 +23,15 @@ class CsvLoader(BaseLoader):
         pass
 
     @helpers.step
-    def get_all_data_with_headers(self, filename):
+    def get_all_data_with_headers(self, filename, delimiter=None):
         with open(filename, 'rb') as _file:
-            data = self.get_all_data_with_headers_from_file(_file)
+            data = self.get_all_data_with_headers_from_file(_file, delimiter=delimiter)
             for datum in data:
                 yield datum
 
-    def get_all_data_with_headers_from_file(self, _file):
-        reader = csv.reader(_file, delimiter=',', skipinitialspace=True)
+    def get_all_data_with_headers_from_file(self, _file, delimiter=None):
+        delimiter = delimiter or ','
+        reader = csv.reader(_file, delimiter=delimiter, skipinitialspace=True)
 
         headers = reader.next()
 
@@ -56,13 +57,9 @@ class ExcelLoader(BaseLoader):
     def get_all_data_with_headers(self, filename):
         workbook = self._load_workbook(filename)
         sheet = workbook.sheet_by_index(self.sheet_index)
-        first_row_index, first_column_index = \
-            self._get_first_row_and_first_column_indexes(sheet)
-        headers = \
-            self._get_sheet_headers(sheet, first_row_index, first_column_index)
-        data = self._get_sheet_data(sheet, headers, first_row_index,
-                                    first_column_index)
-
+        first_row_index, first_column_index = self._get_first_row_and_first_column_indexes(sheet)
+        headers = self._get_sheet_headers(sheet, first_row_index, first_column_index)
+        data = self._get_sheet_data(sheet, headers, first_row_index, first_column_index)
         return data
 
     def _load_workbook(self, filename):
